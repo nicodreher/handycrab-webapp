@@ -1,0 +1,11 @@
+#demo-div{
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    padding: 5px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #ffc90e;
+    color: #fff;
+}

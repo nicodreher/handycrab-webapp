@@ -1,0 +1,20 @@
+build:
+  stage: build
+  image: maven:latest
+  script:
+    - mvn clean install -Dmaven.test.skip=true
+    - "docker build -t handycrab:1.0-SNAPSHOT"
+  artifacts:
+    paths:
+      - handycrab-ear/target/handycrab-ear-1.0-SNAPSHOT.jar
+  only:
+    - master
+
+deploy:
+  stage: deploy
+  image: maven:latest
+  script:
+    - mvn deploy -Dmaven.test.skip=true
+    #- "docker push handycrab:1.0-SNAPSHOT"
+  only:
+    - master
