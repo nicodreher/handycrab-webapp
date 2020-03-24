@@ -9,7 +9,7 @@ javadoc/
 ## IntelliJ  ##
 ###############
 
-../handycrap/.idea/
+.idea/
 /*.iml
 *.iml
 *.iws
