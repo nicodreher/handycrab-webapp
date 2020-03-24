@@ -5,10 +5,10 @@ variables:
 cache:
   paths:
     - .m2/repository/
-    - handycab-api/target/
-    - handycab-ear/target/
-    - handycab-server/target/
-    - handycab-webapp/target/
+    - handycrab-api/target/
+    - handycrab-ear/target/
+    - handycrab-server/target/
+    - handycrab-webapp/target/
 
 build:
   stage: build
@@ -39,8 +39,8 @@ docker_deploy:
   services:
     - docker:19.03.1-dind
   before_script:
-    #- docker login -u $NEXUS_USER -p $NEXUS_PASS $nexus.nico-dreher.de:8082
-    - docker login -u $NEXUS_USER -p $NEXUS_PASS $nexus.nico-dreher.de:8083
+    #- docker login -u $NEXUS_USER -p $NEXUS_PASS nexus.nico-dreher.de:8082
+    - docker login -u $NEXUS_USER -p $NEXUS_PASS nexus.nico-dreher.de:8083
   script:
     - docker pull nexus.nico-dreher.de:8083/handycrab:latest || true
     - docker build --cache-from nexus.nico-dreher.de:8082/handycrab:latest --tag nexus.nico-dreher.de:8083/handycrab:1.0-SNAPSHOT --tag nexus.nico-dreher.de:8083/handycrab:latest .
