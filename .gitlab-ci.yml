@@ -5,13 +5,19 @@ variables:
 cache:
   paths:
     - .m2/repository/
-    - target/
+    - handycab-api/target/
+    - handycab-ear/target/
+    - handycab-server/target/
+    - handycab-webapp/target/
 
 build:
   stage: build
   image: maven:latest
   script:
-    - mvn $MAVEN_CLI_OPTS compile package -Dmaven.test.skip=true
+    - mvn $MAVEN_CLI_OPTS clean compile package -Dmaven.test.skip=true
+  artifacts:
+    paths:
+      - handycrab-ear/target/handycrab-ear-1.0-SNAPSHOT.ear
 
 test:
   stage: test
@@ -27,9 +33,9 @@ deploy:
   only:
     - master
 
-docker_build:
+docker_deploy:
   image: docker:19.03.1
-  stage: build
+  stage: deploy
   services:
     - docker:19.03.1-dind
   before_script:
