@@ -1,20 +1,44 @@
+variables:
+  MAVEN_CLI_OPTS: "-s .m2/settings.xml --batch-mode"
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+
+cache:
+  paths:
+    - .m2/repository/
+    - target/
+
 build:
   stage: build
   image: maven:latest
   script:
-    - mvn clean install -Dmaven.test.skip=true
-    - "docker build -t handycrab:1.0-SNAPSHOT"
-  artifacts:
-    paths:
-      - handycrab-ear/target/handycrab-ear-1.0-SNAPSHOT.jar
-  only:
-    - master
+    - mvn $MAVEN_CLI_OPTS compile package -Dmaven.test.skip=true
+
+test:
+  stage: test
+  image: maven:latest
+  script:
+    - mvn $MAVEN_CLI_OPTS test
 
 deploy:
   stage: deploy
   image: maven:latest
   script:
-    - mvn deploy -Dmaven.test.skip=true
-    #- "docker push handycrab:1.0-SNAPSHOT"
+    - mvn $MAVEN_CLI_OPTS deploy
+  only:
+    - master
+
+docker_build:
+  image: docker:19.03.1
+  stage: build
+  services:
+    - docker:19.03.1-dind
+  before_script:
+    #- docker login -u $NEXUS_USER -p $NEXUS_PASS $nexus.nico-dreher.de:8082
+    - docker login -u $NEXUS_USER -p $NEXUS_PASS $nexus.nico-dreher.de:8083
+  script:
+    - docker pull nexus.nico-dreher.de:8083/handycrab:latest || true
+    - docker build --cache-from nexus.nico-dreher.de:8082/handycrab:latest --tag nexus.nico-dreher.de:8083/handycrab:1.0-SNAPSHOT --tag nexus.nico-dreher.de:8083/handycrab:latest .
+    - docker push nexus.nico-dreher.de:8083/handycrab:1.0-SNAPSHOT
+    - docker push nexus.nico-dreher.de:8083/handycrab:latest
   only:
     - master

@@ -37,7 +37,7 @@
     <repositories>
         <repository>
             <id>maven-public</id>
-            <url>http://nexus.nico-dreher.de:8081/repository/maven-public/</url>
+            <url>https://nexus.nico-dreher.de:8081/repository/maven-public/</url>
         </repository>
     </repositories>
 
@@ -45,12 +45,12 @@
         <repository>
             <id>maven-releases</id>
             <name>Releases</name>
-            <url>http://nexus.nico-dreher.de:8081/repository/maven-releases/</url>
+            <url>https://nexus.nico-dreher.de:8081/repository/maven-releases/</url>
         </repository>
         <snapshotRepository>
             <id>maven-snapshots</id>
             <name>Snapshots</name>
-            <url>http://nexus.nico-dreher.de:8081/repository/maven-snapshots/</url>
+            <url>https://nexus.nico-dreher.de:8081/repository/maven-snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 
