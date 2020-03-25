@@ -27,7 +27,7 @@ test:
   artifacts:
     reports:
       junit:
-        - habdycrab-server/target/surefire-reports/TEST-*.xml
+        - handycrab-server/target/surefire-reports/TEST-*.xml
         - handycrab-server/target/failsafe-reports/TEST-*.xml
 
 deploy:
