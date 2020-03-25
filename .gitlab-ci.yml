@@ -24,6 +24,11 @@ test:
   image: maven:latest
   script:
     - mvn $MAVEN_CLI_OPTS test
+  artifacts:
+    reports:
+      junit:
+        - habdycrab-server/target/surefire-reports/TEST-*.xml
+        - handycrab-server/target/failsafe-reports/TEST-*.xml
 
 deploy:
   stage: deploy
