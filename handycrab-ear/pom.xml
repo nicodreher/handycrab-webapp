@@ -54,7 +54,7 @@
                             <groupId>${project.groupId}</groupId>
                             <artifactId>${project.parent.artifactId}-server</artifactId>
                             <bundleFileName>server.war</bundleFileName>
-                            <context-root>/server</context-root>
+                            <context-root>/rest</context-root>
                         </webModule>
                         <webModule>
                             <groupId>${project.groupId}</groupId>
