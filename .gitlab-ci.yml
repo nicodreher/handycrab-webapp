@@ -51,5 +51,9 @@ docker_deploy:
     - docker build --cache-from nexus.nico-dreher.de:8082/handycrab:latest --tag nexus.nico-dreher.de:8083/handycrab:1.0-SNAPSHOT --tag nexus.nico-dreher.de:8083/handycrab:latest .
     - docker push nexus.nico-dreher.de:8083/handycrab:1.0-SNAPSHOT
     - docker push nexus.nico-dreher.de:8083/handycrab:latest
+  environment:
+    name: production
+    url: http://handycrab.nico-dreher.de
+
   only:
     - master
