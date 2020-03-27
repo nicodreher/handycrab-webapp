@@ -55,7 +55,7 @@ docker_deploy:
     - docker login -u $NEXUS_USER -p $NEXUS_PASS nexus.nico-dreher.de:8083
   script:
     - docker pull nexus.nico-dreher.de:8083/handycrab:latest || true
-    - docker build --cache-from nexus.nico-dreher.de:8082/handycrab:latest --tag nexus.nico-dreher.de:8083/handycrab:1.0-SNAPSHOT --tag nexus.nico-dreher.de:8083/handycrab:latest .
+    - docker build --cache-from nexus.nico-dreher.de:8084/handycrab:latest --tag nexus.nico-dreher.de:8083/handycrab:1.0-SNAPSHOT --tag nexus.nico-dreher.de:8083/handycrab:latest .
     - docker push nexus.nico-dreher.de:8083/handycrab:1.0-SNAPSHOT
     - docker push nexus.nico-dreher.de:8083/handycrab:latest
   only:
@@ -71,5 +71,6 @@ kubernetes_deploy:
     - echo $kube_config | base64 -d > ~/.kube/config
     - kubectl version
     - kubectl apply -f handycrab-deployment.yaml
+    - kubectl set image -n handycrab deployments/handycrab handycrab=nexus.nico-dreher.de:8084/handycrab:latest
   only:
     - master
