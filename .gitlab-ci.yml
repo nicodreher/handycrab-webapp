@@ -6,6 +6,7 @@ kubernetes_deploy:
   script:
     - mkdir ~/.kube/
     - echo $kube_config | base64 -d > ~/.kube/config
+    - ls -lh ~/.kube/
     - kubectl version
     - kubectl apply -f handycrab-deployment.yaml
   only:
