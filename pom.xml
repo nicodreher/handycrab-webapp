@@ -18,7 +18,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <junit.jupiter.version>5.5.2</junit.jupiter.version>
+        <junit.jupiter.version>5.6.1</junit.jupiter.version>
         <junit.platform.version>1.5.2</junit.platform.version>
         <eclipse.jetty.version>9.4.11.v20180605</eclipse.jetty.version>
         <glassfish.jersey.version>2.27</glassfish.jersey.version>
@@ -64,6 +64,14 @@
                     <source>${java.source.version}</source>
                     <target>${java.target.version}</target>
                 </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.2</version>
+            </plugin>
+            <plugin>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>2.22.2</version>
             </plugin>
         </plugins>
     </build>
