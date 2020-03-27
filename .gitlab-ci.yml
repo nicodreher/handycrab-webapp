@@ -1,6 +1,14 @@
+stages:
+  - build
+  - test
+  - push
+  - deploy
+
+
 variables:
   MAVEN_CLI_OPTS: "-s .m2/settings.xml --batch-mode"
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+  KUBECONFIG: ~/.kube/config
 
 cache:
   paths:
@@ -31,7 +39,7 @@ test:
         - handycrab-server/target/failsafe-reports/TEST-*.xml
 
 deploy:
-  stage: deploy
+  stage: push
   image: maven:latest
   script:
     - mvn $MAVEN_CLI_OPTS deploy
@@ -40,7 +48,7 @@ deploy:
 
 docker_deploy:
   image: docker:19.03.1
-  stage: deploy
+  stage: push
   services:
     - docker:19.03.1-dind
   before_script:
@@ -51,9 +59,17 @@ docker_deploy:
     - docker build --cache-from nexus.nico-dreher.de:8082/handycrab:latest --tag nexus.nico-dreher.de:8083/handycrab:1.0-SNAPSHOT --tag nexus.nico-dreher.de:8083/handycrab:latest .
     - docker push nexus.nico-dreher.de:8083/handycrab:1.0-SNAPSHOT
     - docker push nexus.nico-dreher.de:8083/handycrab:latest
+  only:
+    - master
+
+kubernetes_deploy:
+  image: nexus.nico-dreher.de:8084/kubectl:latest
+  stage: deploy
+  script:
+    - echo ${kube_config} | base64 -d > ${KUBECONFIG}
+    - kubectl apply -f handycrab-deployment.yaml
+  only:
+    - master
   environment:
     name: production
     url: http://handycrab.nico-dreher.de
-
-  only:
-    - master

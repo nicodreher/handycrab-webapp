@@ -1,0 +1,66 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: handycrab
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: handycrab
+  namespace: handycrab
+  labels:
+    app: handycrab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: handycrab
+  template:
+    metadata:
+      labels:
+        app: handycrab
+    spec:
+      containers:
+        - name: handycrab
+          image: nexus.nico-dreher.de:8084/handycrab:latest
+          ports:
+            - containerPort: 8080
+      imagePullSecrets:
+        - name: registrypullsecret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: handycrab
+  namespace: handycrab
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+  selector:
+    app: handycrab
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: app
+  namespace: handycrab
+  annotations:
+    ingress.kubernetes.io/rewrite-target: "/"
+spec:
+  rules:
+    - host: handycrab.nico-dreher.de
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: handycrab
+              servicePort: 8080
+    - host: nico-dreher.de
+      http:
+        paths:
+          - path: /handycrab
+            backend:
+              serviceName: handycrab
+              servicePort: 8080
