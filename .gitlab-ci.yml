@@ -12,6 +12,3 @@ kubernetes_deploy:
     - kubectl apply -f handycrab-deployment.yaml
   only:
     - master
-  environment:
-    name: production
-    url: http://handycrab.nico-dreher.de
