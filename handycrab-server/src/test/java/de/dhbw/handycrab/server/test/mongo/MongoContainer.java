@@ -13,7 +13,7 @@ public class MongoContainer extends GenericContainer<MongoContainer> {
      * {@link #setPortBindings(java.util.List)}.
      */
     public static final int MONGODB_PORT = 27017;
-    public static final String DEFAULT_IMAGE_AND_TAG = "mongo:4.0";
+    public static final String DEFAULT_IMAGE_AND_TAG = "mongo:latest";
 
     /**
      * Creates a new {@link MongoContainer} with the {@value DEFAULT_IMAGE_AND_TAG} image.

@@ -40,35 +40,46 @@ vote: Vote\
 500 - Interner Server Error (Immer möglich)\          
 Alles Ander Explizit definiert sein\
 ### Error:
-{errorCode} 1-N\
-Definiert für jede Anfrage
+{errorCode}
+### Fehlertypen
+
+| errorCode | Return Code | Text |
+--- | --- | ---
+1 | 400 | Unvollständige Anfrage
+2 | 401 | Unauthorizized
+3 | 400 | E-Mail schon verwendet
+4 | 400 | Username schon verwendet
+5 | 400 | Ungültige E-Mail
+6 | 400 | Ungültiger Login
+7 | 404 | User not Found
+8 | 400 | Invalid longitude/latitude
+9 | 404 | Barrier not Found
+10 | 400 | Invalid UserId
+11| 404 | Solution not Found
+
 ## REST-Schnittstellen
 ### Registrierung:
     .../users/register POST
     Login: false
     {email, username, password} -> {result: User}
-    400 - errorCode 1: Unvollständige Anfrage
-    400 - errorCode 2: E-Mail schon verwendet
-    400 - errorCode 3: Username schon verwendet
-    400 - errorCode 4: Ungültige E-Mail
     SESSION-COOKIE
+    ErrorCodes: 1, 3, 4, 5
 ### Login:
     .../users/login POST
     Login: false
     {email|username, password} -> {result: User}
-    400 - errorCode 1: Unvollständige Anfrage
-    400 - errorCode 2: Ungültiges Login
     SESSION-COOKIE
+    ErrorCodes: 1, 6
 ### Logout:
     .../users/logout POST
     Login: true
     {} -> {}
+    ErrorCodes: -
 ### Get-username
     .../users/name GET
     Login: false
     {id} -> {result: string}
-    400 - errorCode 1: Unvollständige Anfrage
-    404 - errorCode 2: User not Found
+    ErrorCodes: 7
 
 ### Barriers-Get:
     .../barriers/get GET
@@ -76,35 +87,29 @@ Definiert für jede Anfrage
     {longitude, latitude, radius (m)} -> {result: [Barrier]}
     {id} -> {result: Barrier}
     {postcode} - {result: [Barrier]}
-    400 - errorCode 1: Unvollständige Anfrage
+    ErrorCodes: 1
 
 ### Barrier-Add:
     .../barriers/add POST
     Login: true
     {title, longitude, latitude, picture? (Base64), description?, postcode, solution?} -> {result: barrier}
-    400 - errorCode 1: Unvollständige Anfrage
-    400 - errorCode 2: Invalid longitude/latitude
+    ErrorCodes: 8
 
 ### Barrier-Modify:
     .../barriers/modify PUT
     {id (BarrierId), title?, picture? (Base64)?, description?} -> {result: Barrier}
-    400 - errorCode 1: Unvollständige Anfrage
-
+    ErrorCodes: 1
 ### Barrier-Vote: 
     .../barriers/vote PUT
     {id (BarrierId), vote: Vote}
-    400 - errorCode 1: Unvollständige Anfrage
-    404 - errorCode 2: Barrier not Found
+    ErrorCodes: 9
 
 ### Barrier-Solution:
     .../barriers/solution POST
     {id (BarrierId), solution: Solution} -> {result: Barrier}
-    400 - errorCode 1: Unvollständige Anfrage
-    400 - errorCode 2: Invalid UserId
-    404 - errorCode 3: Barrier not Found
+    ErrorCodes: 1, 9, 10
 
 ### Barrier-Solution-Vote: 
     .../barriers/solutions/vote PUT
     {id (SolutionId), vote: Vote}
-    400 - errorCode 1: Unvollständige Anfrage
-    404 - errorCode 2: Solution not Found
+    ErrorCodes: 1, 11

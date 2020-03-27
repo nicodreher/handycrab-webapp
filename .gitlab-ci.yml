@@ -28,8 +28,9 @@ build:
 
 test:
   stage: test
-  image: maven:latest
+  image: nexus.nico-dreher.de:8084/maven-docker:latest
   script:
+    - cd handycrab-server/
     - mvn $MAVEN_CLI_OPTS test
   artifacts:
     reports:
