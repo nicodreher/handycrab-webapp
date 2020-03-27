@@ -24,6 +24,7 @@ spec:
       containers:
         - name: handycrab
           image: nexus.nico-dreher.de:8084/handycrab:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
       imagePullSecrets:

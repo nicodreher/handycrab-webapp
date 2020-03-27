@@ -70,6 +70,6 @@ kubernetes_deploy:
     - mkdir ~/.kube/
     - echo $kube_config | base64 -d > ~/.kube/config
     - kubectl version
-    - kubectl apply -f handycrab-deployment.yaml
+    - kubectl rollout restart -n handycrab deployment/handycrab
   only:
     - master

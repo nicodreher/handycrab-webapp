@@ -18,6 +18,6 @@ public class RestService {
     @Path("/test")
     @Produces(MediaType.TEXT_PLAIN)
     public String test() {
-        return "Auch true";
+        return "Auch true2";
     }
 }
