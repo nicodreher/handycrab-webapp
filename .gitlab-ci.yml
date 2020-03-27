@@ -63,8 +63,9 @@ docker_deploy:
     - master
 
 kubernetes_deploy:
-  image: nexus.nico-dreher.de:8084/kubectl:latest
-  entrypoint: [""]
+  image: 
+    name: nexus.nico-dreher.de:8084/kubectl:latest
+    entrypoint: [""]
   stage: deploy
   script:
     - echo ${kube_config} | base64 -d > ${KUBECONFIG}
