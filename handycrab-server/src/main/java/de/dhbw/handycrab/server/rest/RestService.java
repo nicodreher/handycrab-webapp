@@ -13,4 +13,11 @@ public class RestService {
     public String check() {
         return "true";
     }
+
+    @GET
+    @Path("/test")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String test() {
+        return "Auch true";
+    }
 }

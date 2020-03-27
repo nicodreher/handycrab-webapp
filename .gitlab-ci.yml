@@ -1,3 +1,66 @@
+stages:
+  - build
+  - test
+  - push
+  - deploy
+
+
+variables:
+  MAVEN_CLI_OPTS: "-s .m2/settings.xml --batch-mode"
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+
+cache:
+  paths:
+    - .m2/repository/
+    - handycrab-api/target/
+    - handycrab-ear/target/
+    - handycrab-server/target/
+    - handycrab-webapp/target/
+
+build:
+  stage: build
+  image: maven:latest
+  script:
+    - mvn $MAVEN_CLI_OPTS clean compile package -Dmaven.test.skip=true
+  artifacts:
+    paths:
+      - handycrab-ear/target/handycrab-ear-1.0-SNAPSHOT.ear
+
+test:
+  stage: test
+  image: maven:latest
+  script:
+    - mvn $MAVEN_CLI_OPTS test
+  artifacts:
+    reports:
+      junit:
+        - handycrab-server/target/surefire-reports/TEST-*.xml
+        - handycrab-server/target/failsafe-reports/TEST-*.xml
+
+deploy:
+  stage: push
+  image: maven:latest
+  script:
+    - mvn $MAVEN_CLI_OPTS deploy
+  only:
+    - master
+
+docker_deploy:
+  image: docker:19.03.1
+  stage: push
+  services:
+    - docker:19.03.1-dind
+  before_script:
+    #- docker login -u $NEXUS_USER -p $NEXUS_PASS nexus.nico-dreher.de:8082
+    - docker login -u $NEXUS_USER -p $NEXUS_PASS nexus.nico-dreher.de:8083
+  script:
+    - docker pull nexus.nico-dreher.de:8083/handycrab:latest || true
+    - docker build --cache-from nexus.nico-dreher.de:8082/handycrab:latest --tag nexus.nico-dreher.de:8083/handycrab:1.0-SNAPSHOT --tag nexus.nico-dreher.de:8083/handycrab:latest .
+    - docker push nexus.nico-dreher.de:8083/handycrab:1.0-SNAPSHOT
+    - docker push nexus.nico-dreher.de:8083/handycrab:latest
+  only:
+    - master
+
 kubernetes_deploy:
   image: 
     name: nexus.nico-dreher.de:8084/kubectl:latest
@@ -6,8 +69,6 @@ kubernetes_deploy:
   script:
     - mkdir ~/.kube/
     - echo $kube_config | base64 -d > ~/.kube/config
-    - ls -lh ~/.kube/
-    - head -3 ~/.kube/config 
     - kubectl version
     - kubectl apply -f handycrab-deployment.yaml
   only:
