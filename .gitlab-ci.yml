@@ -30,6 +30,7 @@ test:
   stage: test
   image: nexus.nico-dreher.de:8084/maven-docker:latest
   script:
+    - docker ps
     - mvn $MAVEN_CLI_OPTS test
   artifacts:
     reports:
