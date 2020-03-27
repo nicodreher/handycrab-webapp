@@ -1,5 +1,7 @@
 kubernetes_deploy:
-  image: nexus.nico-dreher.de:8084/kubectl:latest
+  image: 
+    name: nexus.nico-dreher.de:8084/kubectl:latest
+    entrypoint: [""]
   stage: deploy
   script:
     - mkdir ~/.kube/
