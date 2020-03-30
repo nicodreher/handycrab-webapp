@@ -95,13 +95,6 @@
       </role-mapping>
     </access-control>
   </management>
-  <system-properties>
-    <property name="mongo-host" value="handycrab-mongo"/>
-    <property name="mongo-user" value="handycrab"/>
-    <property name="mongo-port" value="27017"/>
-    <property name="mongo-password" value="${env.mongo_handycrab}"/>
-    <property name="mongo-database" value="handycrab"/>
-  </system-properties>
   <profile>
     <subsystem xmlns="urn:jboss:domain:logging:8.0">
       <console-handler name="CONSOLE">
@@ -428,7 +421,15 @@
         <subsystem xmlns="urn:wildfly:microprofile-metrics-smallrye:2.0" security-enabled="false" exposed-subsystems="*" prefix="${wildfly.metrics.prefix:wildfly}"/>
         <subsystem xmlns="urn:wildfly:microprofile-opentracing-smallrye:1.0"/>
         <subsystem xmlns="urn:jboss:domain:naming:2.0">
-            <remote-naming/>
+          <bindings>
+            <object-factory class="com.mongodb.client.jndi.MongoClientFactory" module="org.mongodb"
+              name="java:global/MyMongoClient">
+              <environment>
+                <property name="connectionString" value="${env.mongo_connection}"/>
+              </environment>
+            </object-factory>
+          </bindings>
+          <remote-naming/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:pojo:1.0"/>
         <subsystem xmlns="urn:jboss:domain:remoting:4.0">
