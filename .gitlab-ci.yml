@@ -69,6 +69,9 @@ kubernetes_deploy:
   script:
     - mkdir ~/.kube/
     - echo $kube_config | base64 -d > ~/.kube/config
+    - kubectl apply -f handycrab-namespace.yaml
+    - kubectl delete secret -n handycrab mongo-connection
+    - kubectl create secret generic -n handycrab mongo-connection --from-literal=connection="$mongo_connection"
     - kubectl apply -f handycrab-deployment.yaml
     - kubectl rollout restart -n handycrab deployment/handycrab
   only:

@@ -1,5 +1,7 @@
 package de.dhbw.handycrab.server.rest;
 
+import de.dhbw.handycrab.server.exceptions.IncompleteRequestException;
+
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -19,5 +21,19 @@ public class RestService {
     @Produces(MediaType.TEXT_PLAIN)
     public String test() {
         return "Auch true2";
+    }
+
+    @GET
+    @Path("/serverexception")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String serverException() {
+        throw new NullPointerException();
+    }
+
+    @GET
+    @Path("/incompleteexception")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String incompleteException() {
+        throw new IncompleteRequestException();
     }
 }
