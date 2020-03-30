@@ -1,9 +1,4 @@
 ---
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: handycrab
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -27,6 +22,14 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
+          env:
+            - name: mongo_connection
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-connection
+                  key: connection
+            - name: mongo_database
+              value: "handycrab"
       imagePullSecrets:
         - name: registrypullsecret
 ---
