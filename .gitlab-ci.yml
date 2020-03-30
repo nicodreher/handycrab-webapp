@@ -54,6 +54,7 @@ docker_deploy:
     #- docker login -u $NEXUS_USER -p $NEXUS_PASS nexus.nico-dreher.de:8082
     - docker login -u $NEXUS_USER -p $NEXUS_PASS nexus.nico-dreher.de:8083
   script:
+    - wget https://repo1.maven.org/maven2/org/mongodb/mongo-java-driver/3.12.2/mongo-java-driver-3.12.2.jar -P wildfly/modules/system/layers/base/org/mongodb/main/
     - docker pull nexus.nico-dreher.de:8083/handycrab:latest || true
     - docker build --cache-from nexus.nico-dreher.de:8084/handycrab:latest --tag nexus.nico-dreher.de:8083/handycrab:1.0-SNAPSHOT --tag nexus.nico-dreher.de:8083/handycrab:latest .
     - docker push nexus.nico-dreher.de:8083/handycrab:1.0-SNAPSHOT

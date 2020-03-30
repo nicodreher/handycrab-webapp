@@ -18,46 +18,48 @@
         <extension module="org.jboss.as.pojo"/>
         <extension module="org.jboss.as.remoting"/>
         <extension module="org.jboss.as.sar"/>
-        <extension module="org.jboss.as.security"/>
-        <extension module="org.jboss.as.transactions"/>
-        <extension module="org.jboss.as.webservices"/>
-        <extension module="org.jboss.as.weld"/>
-        <extension module="org.wildfly.extension.batch.jberet"/>
-        <extension module="org.wildfly.extension.bean-validation"/>
-        <extension module="org.wildfly.extension.clustering.web"/>
-        <extension module="org.wildfly.extension.core-management"/>
-        <extension module="org.wildfly.extension.discovery"/>
-        <extension module="org.wildfly.extension.ee-security"/>
-        <extension module="org.wildfly.extension.elytron"/>
-        <extension module="org.wildfly.extension.io"/>
-        <extension module="org.wildfly.extension.microprofile.config-smallrye"/>
-        <extension module="org.wildfly.extension.microprofile.health-smallrye"/>
-        <extension module="org.wildfly.extension.microprofile.metrics-smallrye"/>
-        <extension module="org.wildfly.extension.microprofile.opentracing-smallrye"/>
-        <extension module="org.wildfly.extension.request-controller"/>
-        <extension module="org.wildfly.extension.security.manager"/>
-        <extension module="org.wildfly.extension.undertow"/>
+      <extension module="org.jboss.as.security"/>
+      <extension module="org.jboss.as.transactions"/>
+      <extension module="org.jboss.as.webservices"/>
+      <extension module="org.jboss.as.weld"/>
+      <extension module="org.wildfly.extension.batch.jberet"/>
+      <extension module="org.wildfly.extension.bean-validation"/>
+      <extension module="org.wildfly.extension.clustering.web"/>
+      <extension module="org.wildfly.extension.core-management"/>
+      <extension module="org.wildfly.extension.discovery"/>
+      <extension module="org.wildfly.extension.ee-security"/>
+      <extension module="org.wildfly.extension.elytron"/>
+      <extension module="org.wildfly.extension.io"/>
+      <extension module="org.wildfly.extension.microprofile.config-smallrye"/>
+      <extension module="org.wildfly.extension.microprofile.health-smallrye"/>
+      <extension module="org.wildfly.extension.microprofile.metrics-smallrye"/>
+      <extension module="org.wildfly.extension.microprofile.opentracing-smallrye"/>
+      <extension module="org.wildfly.extension.request-controller"/>
+      <extension module="org.wildfly.extension.security.manager"/>
+      <extension module="org.wildfly.extension.undertow"/>
     </extensions>
-    <management>
-        <security-realms>
-            <security-realm name="ManagementRealm">
-                <authentication>
-                    <local default-user="$local" skip-group-loading="true"/>
-                    <properties path="mgmt-users.properties" relative-to="jboss.server.config.dir"/>
-                </authentication>
-                <authorization map-groups-to-roles="false">
-                    <properties path="mgmt-groups.properties" relative-to="jboss.server.config.dir"/>
-                </authorization>
-            </security-realm>
-            <security-realm name="ApplicationRealm">
-                <server-identities>
-                    <ssl>
-                        <keystore path="application.keystore" relative-to="jboss.server.config.dir" keystore-password="password" alias="server" key-password="password" generate-self-signed-certificate-host="localhost"/>
-                    </ssl>
-                </server-identities>
-                <authentication>
-                    <local default-user="$local" allowed-users="*" skip-group-loading="true"/>
-                    <properties path="application-users.properties" relative-to="jboss.server.config.dir"/>
+  <management>
+    <security-realms>
+      <security-realm name="ManagementRealm">
+        <authentication>
+          <local default-user="$local" skip-group-loading="true"/>
+          <properties path="mgmt-users.properties" relative-to="jboss.server.config.dir"/>
+        </authentication>
+        <authorization map-groups-to-roles="false">
+          <properties path="mgmt-groups.properties" relative-to="jboss.server.config.dir"/>
+        </authorization>
+      </security-realm>
+      <security-realm name="ApplicationRealm">
+        <server-identities>
+          <ssl>
+            <keystore path="application.keystore" relative-to="jboss.server.config.dir"
+              keystore-password="password" alias="server" key-password="password"
+              generate-self-signed-certificate-host="localhost"/>
+          </ssl>
+        </server-identities>
+        <authentication>
+          <local default-user="$local" allowed-users="*" skip-group-loading="true"/>
+          <properties path="application-users.properties" relative-to="jboss.server.config.dir"/>
                 </authentication>
                 <authorization>
                     <properties path="application-roles.properties" relative-to="jboss.server.config.dir"/>
@@ -83,26 +85,26 @@
                 <socket-binding http="management-http"/>
             </http-interface>
         </management-interfaces>
-        <access-control provider="simple">
-            <role-mapping>
-                <role name="SuperUser">
-                    <include>
-                        <user name="$local"/>
-                    </include>
-                </role>
-            </role-mapping>
-        </access-control>
-    </management>
-    <profile>
-        <subsystem xmlns="urn:jboss:domain:logging:8.0">
-            <console-handler name="CONSOLE">
-                <level name="INFO"/>
-                <formatter>
-                    <named-formatter name="COLOR-PATTERN"/>
-                </formatter>
-            </console-handler>
-            <periodic-rotating-file-handler name="FILE" autoflush="true">
-                <formatter>
+    <access-control provider="simple">
+      <role-mapping>
+        <role name="SuperUser">
+          <include>
+            <user name="$local"/>
+          </include>
+        </role>
+      </role-mapping>
+    </access-control>
+  </management>
+  <profile>
+    <subsystem xmlns="urn:jboss:domain:logging:8.0">
+      <console-handler name="CONSOLE">
+        <level name="INFO"/>
+        <formatter>
+          <named-formatter name="COLOR-PATTERN"/>
+        </formatter>
+      </console-handler>
+      <periodic-rotating-file-handler name="FILE" autoflush="true">
+        <formatter>
                     <named-formatter name="PATTERN"/>
                 </formatter>
                 <file relative-to="jboss.server.log.dir" path="server.log"/>
@@ -177,6 +179,9 @@
             <infinispan-routing cache-container="web" cache="routing"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:ee:4.0">
+            <global-modules>
+                <module name="org.mongodb" slot="main"/>
+            </global-modules>
             <spec-descriptor-property-replacement>false</spec-descriptor-property-replacement>
             <concurrent>
                 <context-services>
@@ -419,7 +424,15 @@
         <subsystem xmlns="urn:wildfly:microprofile-metrics-smallrye:2.0" security-enabled="false" exposed-subsystems="*" prefix="${wildfly.metrics.prefix:wildfly}"/>
         <subsystem xmlns="urn:wildfly:microprofile-opentracing-smallrye:1.0"/>
         <subsystem xmlns="urn:jboss:domain:naming:2.0">
-            <remote-naming/>
+          <bindings>
+            <object-factory class="com.mongodb.client.jndi.MongoClientFactory" module="org.mongodb"
+              name="java:global/MongoClient">
+              <environment>
+                <property name="connectionString" value="${env.mongo_connection}"/>
+              </environment>
+            </object-factory>
+          </bindings>
+          <remote-naming/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:pojo:1.0"/>
         <subsystem xmlns="urn:jboss:domain:remoting:4.0">
