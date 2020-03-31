@@ -30,7 +30,7 @@ test:
   stage: test
   image: maven:latest
   script:
-    - mvn $MAVEN_CLI_OPTS -pl handycrab-server test
+    - mvn $MAVEN_CLI_OPTS -pl handycrab-server,handycrab-api test
   artifacts:
     reports:
       junit:
