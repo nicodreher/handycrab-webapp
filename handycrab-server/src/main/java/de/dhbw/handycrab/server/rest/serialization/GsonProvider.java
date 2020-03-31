@@ -1,7 +1,14 @@
 package de.dhbw.handycrab.server.rest.serialization;
 
 import com.google.gson.Gson;
-
+import de.dhbw.handycrab.server.utils.GsonUtils;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import javax.enterprise.context.Dependent;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
@@ -11,9 +18,6 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
-import java.io.*;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
 
 /**
  * The GsonProvieder provides a MessageBodyWriter and a MessageBodyReader to serialize and deserialize all incoming json
@@ -30,10 +34,11 @@ import java.lang.reflect.Type;
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class GsonProvider<T> implements MessageBodyReader<T>, MessageBodyWriter<T> {
-    /**
-     * A instance of the Gson serializer
-     */
-    private static final Gson GSON = de.dhbw.handycrab.api.utils.GsonUtils.getGson();
+
+  /**
+   * A instance of the Gson serializer
+   */
+  private static final Gson GSON = GsonUtils.getGson();
 
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {

@@ -1,22 +1,22 @@
 package de.dhbw.handycrab.server.rest;
 
-import com.google.gson.Gson;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import de.dhbw.handycrab.api.Test;
 import de.dhbw.handycrab.api.users.User;
+import de.dhbw.handycrab.server.beans.persistence.CollectionProviderBean;
+import de.dhbw.handycrab.server.beans.persistence.DataSource;
 import de.dhbw.handycrab.server.exceptions.IncompleteRequestException;
-import org.bson.Document;
-
+import de.dhbw.handycrab.server.utils.GsonUtils;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import org.bson.Document;
 
 @Path("")
 public class RestService {
@@ -30,7 +30,7 @@ public class RestService {
     @Produces(MediaType.TEXT_PLAIN)
     public String check() {
         User user = new User("King", "King@Kong.com", "test");
-        return "true" + test.getValue(de.dhbw.handycrab.api.utils.GsonUtils.getGson().toJson(user), User.class);
+      return "true" + test.getValue(GsonUtils.getGson().toJson(user), User.class);
     }
 
     @GET

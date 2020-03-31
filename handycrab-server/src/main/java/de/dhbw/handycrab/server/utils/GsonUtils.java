@@ -1,4 +1,4 @@
-package de.dhbw.handycrab.api.utils;
+package de.dhbw.handycrab.server.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
