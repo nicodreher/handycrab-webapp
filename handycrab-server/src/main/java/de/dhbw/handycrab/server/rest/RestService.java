@@ -1,7 +1,10 @@
 package de.dhbw.handycrab.server.rest;
 
+import com.google.gson.Gson;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
+import de.dhbw.handycrab.api.Test;
+import de.dhbw.handycrab.api.users.User;
 import de.dhbw.handycrab.server.exceptions.IncompleteRequestException;
 import org.bson.Document;
 
@@ -11,20 +14,26 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Path("")
 public class RestService {
     @Resource(lookup = "java:global/MongoClient")
     private MongoClient client;
+    @Resource(lookup = Test.LOOKUP)
+    private Test<User> test;
 
     @GET
     @Path("/check")
     @Produces(MediaType.TEXT_PLAIN)
     public String check() {
-        return "true";
+        User user = new User();
+        user._id = UUID.randomUUID();
+        user.username = "King";
+        user.email = "King@Kong.com";
+        return "true" + test.getValue(de.dhbw.handycrab.api.utils.GsonUtils.getGson().toJson(user), User.class);
     }
 
     @GET
@@ -66,5 +75,16 @@ public class RestService {
             String[] msgs = msg.split(":");
             return  "<b>" + msgs[0] + ":</b> " + msgs[1];
         }).collect(Collectors.joining("<br />")) + "</body></html>";
+    }
+
+    @GET
+    @Path("/user")
+    @Produces(MediaType.APPLICATION_JSON)
+    public User getUser() {
+        User user = new User();
+        user._id = UUID.randomUUID();
+        user.username = "King";
+        user.email = "King@Kong.com";
+        return user;
     }
 }

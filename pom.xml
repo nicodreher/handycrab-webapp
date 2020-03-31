@@ -36,8 +36,8 @@
 
     <repositories>
         <repository>
-            <id>maven-public</id>
-            <url>https://nexus.nico-dreher.de:8443/repository/maven-public/</url>
+            <id>maven-central</id>
+            <url>https://repo.maven.apache.org/maven2/</url>
         </repository>
     </repositories>
 

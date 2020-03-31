@@ -6,12 +6,12 @@
 2: DOWN
 
 ### User:
-id: uuid\
+_id: uuid\
 username: string\
 email: string
 
 ### Solution:
-id: uuid\
+_id: uuid\
 text: string\
 userId: uuid\
 upvotes: int\
@@ -19,7 +19,7 @@ downvotes: int\
 vote: Vote
 
 ### Barrier:
-id: uuid\
+_id: uuid\
 userId: uuid\
 title: string\
 longitude: double\
@@ -78,14 +78,14 @@ Alles Ander Explizit definiert sein\
 ### Get-username
     .../users/name GET
     Login: false
-    {id} -> {result: string}
+    {_id} -> {result: string}
     ErrorCodes: 7
 
 ### Barriers-Get:
     .../barriers/get GET
     Login: true
     {longitude, latitude, radius (m)} -> {result: [Barrier]}
-    {id} -> {result: Barrier}
+    {_id} -> {result: Barrier}
     {postcode} - {result: [Barrier]}
     ErrorCodes: 1
 
@@ -97,19 +97,19 @@ Alles Ander Explizit definiert sein\
 
 ### Barrier-Modify:
     .../barriers/modify PUT
-    {id (BarrierId), title?, picture? (Base64)?, description?} -> {result: Barrier}
+    {_id (BarrierId), title?, picture? (Base64)?, description?} -> {result: Barrier}
     ErrorCodes: 1
 ### Barrier-Vote: 
     .../barriers/vote PUT
-    {id (BarrierId), vote: Vote}
+    {_id (BarrierId), vote: Vote}
     ErrorCodes: 9
 
 ### Barrier-Solution:
     .../barriers/solution POST
-    {id (BarrierId), solution: Solution} -> {result: Barrier}
+    {_id (BarrierId), solution: Solution} -> {result: Barrier}
     ErrorCodes: 1, 9, 10
 
 ### Barrier-Solution-Vote: 
     .../barriers/solutions/vote PUT
-    {id (SolutionId), vote: Vote}
+    {_id (SolutionId), vote: Vote}
     ErrorCodes: 1, 11
