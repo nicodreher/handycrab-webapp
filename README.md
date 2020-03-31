@@ -6,21 +6,21 @@
 2: DOWN
 
 ### User:
-_id: uuid\
+_id: ObjectId\
 username: string\
 email: string
 
 ### Solution:
-_id: uuid\
+_id: ObjectId\
 text: string\
-userId: uuid\
+userId: ObjectId\
 upvotes: int\
 downvotes: int\
 vote: Vote
 
 ### Barrier:
-_id: uuid\
-userId: uuid\
+_id: ObjectId\
+userId: ObjectId\
 title: string\
 longitude: double\
 latitude: double\
@@ -61,19 +61,19 @@ Alles Ander Explizit definiert sein\
 ### Registrierung:
     .../users/register POST
     Login: false
-    {email, username, password} -> {result: User}
+    {email, username, password} -> {User}
     SESSION-COOKIE
     ErrorCodes: 1, 3, 4, 5
 ### Login:
     .../users/login POST
     Login: false
-    {email|username, password} -> {result: User}
+    {email|username, password} -> {User}
     SESSION-COOKIE
     ErrorCodes: 1, 6
 ### Logout:
     .../users/logout POST
-    Login: true
-    {} -> {}
+    Login: true (Unchecked)
+    {} -> EmptyBody
     ErrorCodes: -
 ### Get-username
     .../users/name GET
@@ -84,20 +84,20 @@ Alles Ander Explizit definiert sein\
 ### Barriers-Get:
     .../barriers/get GET
     Login: true
-    {longitude, latitude, radius (m)} -> {result: [Barrier]}
-    {_id} -> {result: Barrier}
-    {postcode} - {result: [Barrier]}
+    {longitude, latitude, radius (m)} -> [Barrier]
+    {_id} -> {Barrier}
+    {postcode} - [Barrier]
     ErrorCodes: 1
 
 ### Barrier-Add:
     .../barriers/add POST
     Login: true
-    {title, longitude, latitude, picture? (Base64), description?, postcode, solution?} -> {result: barrier}
+    {title, longitude, latitude, picture? (Base64), description?, postcode, solution?} -> {Barrier}
     ErrorCodes: 8
 
 ### Barrier-Modify:
     .../barriers/modify PUT
-    {_id (BarrierId), title?, picture? (Base64)?, description?} -> {result: Barrier}
+    {_id (BarrierId), title?, picture? (Base64)?, description?} -> {Barrier}
     ErrorCodes: 1
 ### Barrier-Vote: 
     .../barriers/vote PUT
@@ -106,7 +106,7 @@ Alles Ander Explizit definiert sein\
 
 ### Barrier-Solution:
     .../barriers/solution POST
-    {_id (BarrierId), solution: Solution} -> {result: Barrier}
+    {_id (BarrierId), solution: Solution} -> {Barrier}
     ErrorCodes: 1, 9, 10
 
 ### Barrier-Solution-Vote: 

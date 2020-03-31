@@ -29,10 +29,7 @@ public class RestService {
     @Path("/check")
     @Produces(MediaType.TEXT_PLAIN)
     public String check() {
-        User user = new User();
-        user._id = UUID.randomUUID();
-        user.username = "King";
-        user.email = "King@Kong.com";
+        User user = new User("King", "King@Kong.com", "test");
         return "true" + test.getValue(de.dhbw.handycrab.api.utils.GsonUtils.getGson().toJson(user), User.class);
     }
 
@@ -81,10 +78,7 @@ public class RestService {
     @Path("/user")
     @Produces(MediaType.APPLICATION_JSON)
     public User getUser() {
-        User user = new User();
-        user._id = UUID.randomUUID();
-        user.username = "King";
-        user.email = "King@Kong.com";
+        User user = new User("King", "King@Kong.com", "test");
         return user;
     }
 }

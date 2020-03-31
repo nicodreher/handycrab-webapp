@@ -1,22 +1,24 @@
 package de.dhbw.handycrab.api.users;
 
-import java.io.Serializable;
 import java.util.UUID;
 
-public class User implements Serializable {
+public class FrontendUser {
     private UUID _id;
     private String username;
     private String email;
-    private String password;
 
-    public User(String username, String email, String password) {
+    public FrontendUser(String username, String email) {
         this.username = username;
         this.email = email;
-        this.password = password;
     }
 
-    public User() {
+    public FrontendUser() {
+    }
 
+    public FrontendUser(User user) {
+        this._id = user.getID();
+        this.username = user.getUsername();
+        this.email = user.getEmail();
     }
 
     public void setUsername(String username) {
@@ -33,14 +35,6 @@ public class User implements Serializable {
 
     public String getEmail() {
         return email;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     public UUID getID() {
