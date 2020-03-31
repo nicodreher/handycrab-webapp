@@ -1,11 +1,23 @@
 #demo-div{
     position: absolute;
-    width: 100%;
     text-align: center;
     padding: 5px;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: #ffc90e;
-    color: #fff;
+}
+
+body{
+    margin: 0;
+    font-family: sans-serif;
+    font-size: 1em;
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE10+/Edge */
+    user-select: none; /* Standard */
+}
+
+h1{
+    font-size: 1em;
 }

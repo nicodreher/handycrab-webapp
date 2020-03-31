@@ -1,0 +1,14 @@
+#titlebar{
+    display: flex;
+    background-color: #ffc90e;
+    padding: 10px;
+    height: 25px;
+}
+
+#title{
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-left: 10px;
+    margin-right: 0;
+    padding: 0;
+}

@@ -1,0 +1,16 @@
+.about-div{
+    border-radius: 1px solid #ffc90e;
+    margin: 5px;
+    padding: 5px;
+    border-radius: 5px;
+    border: 1px solid #ffc90e;
+}
+
+.about-iframe{
+    width: 100%;
+    height: auto;
+    border: 0;
+    overflow: scroll;
+    padding: 0px;
+    margin: 0px;
+}

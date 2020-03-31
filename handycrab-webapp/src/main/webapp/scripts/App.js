@@ -1,32 +1,31 @@
 import React from "react"
 import ReactDOM from "react-dom"
 
+import {HomePage} from "./pages/HomePage.js"
+import {AboutPage} from "./pages/AboutPage.js"
+import {ErrorPage} from "./pages/ErrorPage.js"
+
+import {TitleBar} from "./components/TitleBar.js"
+import {Footer} from "./components/Footer.js"
+import {
+    BrowserRouter as Router,
+    Route,
+    Switch
+} from "react-router-dom"
+
 class App extends React.Component{
-
-    constructor(props) {
-        super(props);
-        this.state = {time: new Date().toLocaleTimeString()};
-    }
-
-    componentDidMount() {
-        this.intervalID = setInterval(
-            () => this.setTime(),
-            1000
-        );
-    }
-
-    componentWillUnmount() {
-        clearInterval(this.intervalID);
-    }
-
-    setTime(){
-        this.setState({time: new Date().toLocaleTimeString()});
-    }
-
     render(){
         return(
             <div>
-                <p id="demo-div">Hello World um {this.state.time}</p>
+                <TitleBar />
+                <Router>
+                    <Switch>
+                        <Route exact path="/" component={HomePage} />
+                        <Route exact path="/about" component={AboutPage} />
+                        <Route component={ErrorPage} />
+                    </Switch>
+                </Router>
+                <Footer />
             </div>
         )
     }
