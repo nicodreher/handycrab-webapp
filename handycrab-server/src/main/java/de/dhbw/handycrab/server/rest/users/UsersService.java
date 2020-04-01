@@ -43,7 +43,7 @@ public class UsersService {
         JSONObject entity = new JSONObject(json);
         if(entity.has("login") && entity.has("password")) {
             User user = users.login(entity.getString("login"), entity.getString("password"));
-            request.setAttribute("userId", user.getID());
+            request.getSession().setAttribute("userId", user.getID());
             return new FrontendUser(user);
         }
         else {
