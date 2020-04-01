@@ -1,14 +1,12 @@
 package de.dhbw.handycrab.server.rest.serialization;
 
 import com.google.gson.Gson;
-import de.dhbw.handycrab.server.utils.GsonUtils;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintWriter;
+import de.dhbw.handycrab.api.utils.Serializer;
+
+import java.io.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import javax.annotation.Resource;
 import javax.enterprise.context.Dependent;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
@@ -35,10 +33,8 @@ import javax.ws.rs.ext.Provider;
 @Produces(MediaType.APPLICATION_JSON)
 public class GsonProvider<T> implements MessageBodyReader<T>, MessageBodyWriter<T> {
 
-  /**
-   * A instance of the Gson serializer
-   */
-  private static final Gson GSON = GsonUtils.getGson();
+    @Resource(lookup = Serializer.LOOKUP)
+    private Serializer serializer;
 
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
@@ -50,7 +46,14 @@ public class GsonProvider<T> implements MessageBodyReader<T>, MessageBodyWriter<
                       MultivaluedMap<String, String> httpHeaders, InputStream entityStream)
             throws IOException, WebApplicationException {
         try(InputStreamReader reader = new InputStreamReader(entityStream)) {
-            return GSON.fromJson(reader, genericType);
+            try(BufferedReader br = new BufferedReader(reader)) {
+                StringBuilder text = new StringBuilder();
+                String line = "";
+                while((line = br.readLine()) != null) {
+                    text.append(line);
+                }
+                return serializer.restDeserialize(text.toString(), type);
+            }
         }
     }
 
@@ -69,7 +72,7 @@ public class GsonProvider<T> implements MessageBodyReader<T>, MessageBodyWriter<
                         MultivaluedMap<String, Object> httpHeaders, OutputStream entityStream) throws
             WebApplicationException {
         try(PrintWriter writer = new PrintWriter(entityStream)) {
-            String json = GSON.toJson(t);
+            String json = serializer.restSerialize(t);
             writer.write(json);
             writer.flush();
         }

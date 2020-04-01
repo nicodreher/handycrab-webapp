@@ -4,10 +4,8 @@ import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import de.dhbw.handycrab.api.Test;
 import de.dhbw.handycrab.api.users.User;
-import de.dhbw.handycrab.server.beans.persistence.CollectionProviderBean;
-import de.dhbw.handycrab.server.beans.persistence.DataSource;
+import de.dhbw.handycrab.api.utils.Serializer;
 import de.dhbw.handycrab.server.exceptions.IncompleteRequestException;
-import de.dhbw.handycrab.server.utils.GsonUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,13 +22,14 @@ public class RestService {
     private MongoClient client;
     @Resource(lookup = Test.LOOKUP)
     private Test<User> test;
-
+    @Resource(lookup = Serializer.LOOKUP)
+    private Serializer serializer;
     @GET
     @Path("/check")
     @Produces(MediaType.TEXT_PLAIN)
     public String check() {
         User user = new User("King", "King@Kong.com", "test");
-      return "true" + test.getValue(GsonUtils.getGson().toJson(user), User.class);
+        return "true" + test.getValue(serializer.serialize(user), User.class);
     }
 
     @GET

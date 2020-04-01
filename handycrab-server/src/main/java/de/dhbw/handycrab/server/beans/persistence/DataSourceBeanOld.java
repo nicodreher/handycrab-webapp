@@ -7,15 +7,19 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.UpdateOptions;
-import de.dhbw.handycrab.api.utils.Serializer;
-import org.bson.Document;
-import org.bson.conversions.Bson;
-
 import java.lang.reflect.Field;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import javax.annotation.Resource;
+import javax.ejb.EJB;
+import javax.ejb.Remote;
+import javax.ejb.Stateless;
+
+import de.dhbw.handycrab.server.beans.utils.SerializerBean;
+import org.bson.Document;
+import org.bson.conversions.Bson;
 
 /**
  * The DataSources are used to store and find serialized Java objects in a MongoDB Collection
@@ -23,27 +27,24 @@ import java.util.stream.StreamSupport;
  * @param <T> the type of the objects
  * @author Nico Dreher
  */
-public class DataSource<T> {
-    private Class<T> type;
-    private String collection;
-    private Serializer serializer;
-    private MongoClient client;
-
-    public DataSource(Class<T> type, String collection, Serializer serializer, MongoClient client) {
-        this.type = type;
-        this.collection = collection;
-        this.serializer = serializer;
-        this.client = client;
-    }
+@Stateless
+public class DataSourceBeanOld<T> {
+/*
+    @EJB
+    CollectionProviderBean collectionProviderBean;
+    @Resource(lookup = "java:global/MongoClient")
+    private MongoClient mongoClient;
+    @EJB
+    private SerializerBean serializerBean;
 
     /**
      * Check if the Collection contains a document with the ID
      *
      * @param _id the id of the document
      * @return whether the Collection contains the document
-     */
-    public boolean contains(Object _id) {
-        return contains(new Document("_id", _id));
+     *//*
+    public boolean contains(Object _id, String collectionName) {
+        return contains(new Document("_id", _id), collectionName);
     }
 
     /**
@@ -51,21 +52,21 @@ public class DataSource<T> {
      *
      * @param filter the filter to match
      * @return wheater the Collection contains a document which matches the filter
-     */
-    public boolean contains(Bson filter) {
-        return getCollection().countDocuments(filter) > 0;
+     *//*
+    public boolean contains(Bson filter, String collectionName) {
+        return getCollection(collectionName).countDocuments(filter) > 0;
     }
 
     /**
      * Get all documents of the Collection as a Stream of Java objects
      *
      * @return the Stream of Java objects
-     */
-    public Stream<T> find() {
-        MongoCursor<Document> iterator = getCollection()
+     *//*
+    public Stream<T> find(Class<T> type) {
+        MongoCursor<Document> iterator = getCollection(collectionProviderBean.getCollectionName(type))
                 .find().iterator();
         return StreamSupport.stream(Spliterators
-                        .spliteratorUnknownSize(new DocumentIterator<>(type, iterator, serializer), Spliterator.DISTINCT),
+                        .spliteratorUnknownSize(new DocumentIterator<>(type, iterator), Spliterator.DISTINCT),
                 false);
     }
 
@@ -74,14 +75,14 @@ public class DataSource<T> {
      *
      * @param builder the Database RequestBuilder
      * @return the Iterable
-     */
-    private FindIterable<Document> getIterable(RequestBuilder builder) {
+     *//*
+    private FindIterable<Document> getIterable(RequestBuilder<T> builder) {
         FindIterable<Document> iterable;
         if (builder.getFilter() != null) {
-            iterable = getCollection()
+            iterable = getCollection(collectionProviderBean.getCollectionName(builder.getType()))
                     .find(builder.getFilter());
         } else {
-            iterable = getCollection().find();
+            iterable = getCollection(collectionProviderBean.getCollectionName(builder.getType())).find();
         }
 
         if (builder.getSort() != null) {
@@ -103,12 +104,12 @@ public class DataSource<T> {
      *
      * @param builder the Database RequestBuilder
      * @return the Stream of Java objects
-     */
-    public Stream<T> find(RequestBuilder builder) {
+     *//*
+    public Stream<T> find(RequestBuilder<T> builder) {
         FindIterable<Document> iterable = getIterable(builder);
 
         return StreamSupport.stream(Spliterators
-                        .spliteratorUnknownSize(new DocumentIterator<T>(type, iterable.iterator(), serializer),
+                        .spliteratorUnknownSize(new DocumentIterator<T>(builder.getType(), iterable.iterator()),
                                 Spliterator.DISTINCT),
                 false);
     }
@@ -118,10 +119,10 @@ public class DataSource<T> {
      *
      * @param builder the Database RequestBuilder
      * @return the first document as a Java object
-     */
-    public T findFirst(RequestBuilder builder) {
+     *//*
+    public T findFirst(RequestBuilder<T> builder) {
         FindIterable<Document> iterable = getIterable(builder);
-        return fromBson(iterable.first());
+        return fromBson(iterable.first(), builder.getType());
     }
 
     /**
@@ -129,28 +130,28 @@ public class DataSource<T> {
      *
      * @param _id the ID of the document
      * @return the document as a Java object
-     */
-    public T get(Object _id) {
+     *//*
+    public T get(Object _id, Class<T> type) {
         return fromBson(
-                getCollection().find(new Document("_id", _id))
-                        .first());
+                getCollection(collectionProviderBean.getCollectionName(type)).find(new Document("_id", _id))
+                        .first(), type);
     }
 
     /**
      * Insert a object into the Collection
      *
      * @param t the object to insert
-     */
+     *//*
     public void insert(T t) {
         Document doc = toBson(t);
-        getCollection().insertOne(doc);
+        getCollection(collectionProviderBean.getCollectionName(t.getClass())).insertOne(doc);
 
         if (doc.containsKey("_id")) {
             try {
                 Field field = t.getClass().getDeclaredField("_id");
                 field.setAccessible(true);
                 try {
-                    field.set(t, doc.getObjectId("_id"));
+                    field.set(t, serializerBean.deserialize(doc.get("_id").toString(), field.getType()));
                 } catch (JsonSyntaxException e) {
                     field.set(t, doc.get("_id"));
                 }
@@ -163,13 +164,13 @@ public class DataSource<T> {
      * Replace a object in the Collection
      *
      * @param t the object to update
-     */
+     *//*
     public void update(T t) {
         Document document = toBson(t);
         if (document.containsKey("_id")) {
             Object _id = document.get("_id");
             document.remove("_id");
-            getCollection()
+            getCollection(collectionProviderBean.getCollectionName(t.getClass()))
                     .updateOne(new Document("_id", _id), new Document("$set", document));
         }
     }
@@ -178,11 +179,11 @@ public class DataSource<T> {
      * Update or insert a object in the collection
      *
      * @param t the object to upsert
-     */
+     *//*
     public void upsert(T t) {
         Document document = toBson(t);
         if (document.containsKey("_id")) {
-            getCollection()
+            getCollection(collectionProviderBean.getCollectionName(t.getClass()))
                     .updateOne(new Document("_id", document.get("_id")), new Document("$set", document),
                             new UpdateOptions().upsert(true));
         } else {
@@ -190,16 +191,16 @@ public class DataSource<T> {
         }
     }
 
-    public void deleteOne(Object _id) {
-        deleteOne(Filters.eq("_id", _id));
+    public void deleteOne(Object _id, Class<T> type) {
+        deleteOne(Filters.eq("_id", _id), type);
     }
 
-    public void deleteOne(Bson filter) {
-        getCollection().findOneAndDelete(filter);
+    public void deleteOne(Bson filter, Class<T> type) {
+        getCollection(collectionProviderBean.getCollectionName(type)).findOneAndDelete(filter);
     }
 
-    public MongoCollection<Document> getCollection() {
-        return client.getDatabase(System.getenv("mongo_database")).getCollection(collection);
+    public MongoCollection<Document> getCollection(String collectionName) {
+        return mongoClient.getDatabase(System.getenv("mongo_database")).getCollection(collectionName);
     }
 
     /**
@@ -207,9 +208,9 @@ public class DataSource<T> {
      *
      * @param document the document to deserialize
      * @return the object
-     */
-    T fromBson(Document document) {
-        return document != null ? serializer.deserialize(document.toJson(), type) : null;
+     *//*
+    protected T fromBson(Document document, Class<T> type) {
+        return document != null ? serializerBean.deserialize(document.toJson(), type) : null;
     }
 
     /**
@@ -217,8 +218,8 @@ public class DataSource<T> {
      *
      * @param object the object to serialize
      * @return the Bson Document
-     */
-    Document toBson(T object) {
-        return Document.parse(serializer.serialize(object));
-    }
+     *//*
+    protected Document toBson(T object) {
+        return Document.parse(serializerBean.serialize(object));
+    }*/
 }

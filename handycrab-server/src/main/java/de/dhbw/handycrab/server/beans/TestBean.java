@@ -2,9 +2,11 @@ package de.dhbw.handycrab.server.beans;
 
 import com.google.gson.Gson;
 import de.dhbw.handycrab.api.Test;
-import de.dhbw.handycrab.server.utils.GsonUtils;
+import de.dhbw.handycrab.api.utils.Serializer;
+
 import java.util.Random;
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import javax.ejb.Remote;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
@@ -15,8 +17,11 @@ import javax.ejb.Startup;
 public class TestBean<T> implements Test<T> {
 
     Random rdm = new Random();
-  int value;
-  Gson gson = GsonUtils.getGson();
+    int value;
+
+    @Resource(lookup = Serializer.LOOKUP)
+    private Serializer serializer;
+
 
     @PostConstruct
     private void postConstruct() {
@@ -26,6 +31,6 @@ public class TestBean<T> implements Test<T> {
 
     @Override
     public T getValue(String value, Class<T> clazz) {
-        return gson.fromJson(value, clazz);
+        return serializer.deserialize(value, clazz);
     }
 }

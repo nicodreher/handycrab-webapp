@@ -1,5 +1,6 @@
 # HandyCrap
 ## Datentypen:
+
 ### enum Vote:
 0: NONE\
 1: UP\
@@ -56,6 +57,8 @@ Alles Ander Explizit definiert sein\
 9 | 404 | Barrier not Found
 10 | 400 | Invalid UserId
 11| 404 | Solution not Found
+12 | 400 | Invalid Username
+13 | 400 | Invalid Password
 
 ## REST-Schnittstellen
 ### Registrierung:
@@ -63,7 +66,7 @@ Alles Ander Explizit definiert sein\
     Login: false
     {email, username, password} -> {User}
     SESSION-COOKIE
-    ErrorCodes: 1, 3, 4, 5
+    ErrorCodes: 1, 3, 4, 5, 12, 13
 ### Login:
     .../users/login POST
     Login: false

@@ -1,9 +1,12 @@
 package de.dhbw.handycrab.api.users;
 
+import org.bson.types.ObjectId;
+
+import java.io.Serializable;
 import java.util.UUID;
 
-public class FrontendUser {
-    private UUID _id;
+public class FrontendUser implements Serializable {
+    private ObjectId _id;
     private String username;
     private String email;
 
@@ -37,7 +40,7 @@ public class FrontendUser {
         return email;
     }
 
-    public UUID getID() {
+    public ObjectId getID() {
         return _id;
     }
 }

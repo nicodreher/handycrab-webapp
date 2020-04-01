@@ -1,17 +1,19 @@
 package de.dhbw.handycrab.api.users;
 
+import org.bson.types.ObjectId;
+
 import java.io.Serializable;
 import java.util.UUID;
 
 public class User implements Serializable {
-    private UUID _id;
+    private ObjectId _id;
     private String username;
     private String email;
     private String password;
 
-    public User(String username, String email, String password) {
-        this.username = username;
+    public User(String email, String username, String password) {
         this.email = email;
+        this.username = username;
         this.password = password;
     }
 
@@ -43,7 +45,7 @@ public class User implements Serializable {
         return password;
     }
 
-    public UUID getID() {
+    public ObjectId getID() {
         return _id;
     }
 }

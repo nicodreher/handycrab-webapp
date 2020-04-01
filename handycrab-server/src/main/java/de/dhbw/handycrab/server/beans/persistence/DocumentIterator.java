@@ -3,6 +3,9 @@ package de.dhbw.handycrab.server.beans.persistence;
 import com.mongodb.client.MongoCursor;
 import java.util.Iterator;
 import javax.inject.Inject;
+
+import de.dhbw.handycrab.api.utils.Serializer;
+import de.dhbw.handycrab.server.beans.utils.SerializerBean;
 import org.bson.Document;
 
 /**
@@ -18,8 +21,7 @@ public class DocumentIterator<T> implements Iterator<T> {
   /**
    * The Gson serializer object
    */
-  @Inject
-  private SerializerBean serializer;
+  private Serializer serializer;
   /**
    * The MongoCursor to iterate over
    */
@@ -29,18 +31,16 @@ public class DocumentIterator<T> implements Iterator<T> {
    */
   private Class<T> type;
 
-  public DocumentIterator() {
-  }
-
   /**
    * Creates an new DocumentIterator
    *
    * @param type   the type of the java object output
    * @param cursor the MongoCursor to iterate over
    */
-  public DocumentIterator(Class<T> type, MongoCursor<Document> cursor) {
+  public DocumentIterator(Class<T> type, MongoCursor<Document> cursor, Serializer serializer) {
     this.type = type;
     this.cursor = cursor;
+    this.serializer = serializer;
   }
 
   /**
