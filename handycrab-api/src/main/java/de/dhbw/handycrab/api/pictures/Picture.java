@@ -1,10 +1,12 @@
 package de.dhbw.handycrab.api.pictures;
 
+import org.bson.types.ObjectId;
+
 import java.io.Serializable;
 import java.util.UUID;
 
 public class Picture implements Serializable {
-    private UUID _id;
+    private ObjectId _id;
     private String base64;
     private String contentType;
 

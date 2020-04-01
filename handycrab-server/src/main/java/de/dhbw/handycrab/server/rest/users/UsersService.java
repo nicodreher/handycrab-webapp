@@ -1,7 +1,9 @@
 package de.dhbw.handycrab.server.rest.users;
 import de.dhbw.handycrab.api.RequestResult;
+import de.dhbw.handycrab.api.users.FrontendUser;
 import de.dhbw.handycrab.api.users.User;
 import de.dhbw.handycrab.api.users.Users;
+import de.dhbw.handycrab.server.exceptions.IncompleteRequestException;
 import de.dhbw.handycrab.server.exceptions.UnauthorizedException;
 import org.bson.types.ObjectId;
 import org.json.JSONObject;
@@ -23,18 +25,30 @@ public class UsersService {
     @Path("/register")
     @Consumes(MEDIA_TYPE)
     @Produces(MEDIA_TYPE)
-    public User register(@Context HttpServletRequest request, JSONObject entity) {
-        return users.register(entity.getString("email"), entity.getString("username"), entity.getString("password"));
+    public FrontendUser register(@Context HttpServletRequest request, String json) {
+        JSONObject entity = new JSONObject(json);
+        if(entity.has("email") && entity.has("username") && entity.has("password")) {
+            return new FrontendUser(users.register(entity.getString("email"), entity.getString("username"), entity.getString("password")));
+        }
+        else {
+            throw new IncompleteRequestException();
+        }
     }
 
     @POST
     @Path("/login")
     @Consumes(MEDIA_TYPE)
     @Produces(MEDIA_TYPE)
-    public User login(@Context HttpServletRequest request, JSONObject entity) {
-        User user = users.login(entity.getString("login"), entity.getString("password"));
-        request.setAttribute("userId", user.getID());
-        return user;
+    public FrontendUser login(@Context HttpServletRequest request, String json) {
+        JSONObject entity = new JSONObject(json);
+        if(entity.has("login") && entity.has("password")) {
+            User user = users.login(entity.getString("login"), entity.getString("password"));
+            request.setAttribute("userId", user.getID());
+            return new FrontendUser(user);
+        }
+        else {
+            throw new IncompleteRequestException();
+        }
     }
 
     @POST
@@ -49,7 +63,13 @@ public class UsersService {
     @Path("/name")
     @Consumes(MEDIA_TYPE)
     @Produces(MEDIA_TYPE)
-    public RequestResult getName(JSONObject entity) {
-        return new RequestResult(users.getUsername(new ObjectId(entity.getString("_id"))));
+    public RequestResult getName(String json) {
+        JSONObject entity = new JSONObject(json);
+        if(entity.has("_id")) {
+            return new RequestResult(users.getUsername(new ObjectId(entity.getString("_id"))));
+        }
+        else {
+            throw new IncompleteRequestException();
+        }
     }
 }

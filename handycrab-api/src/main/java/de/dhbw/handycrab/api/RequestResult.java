@@ -1,6 +1,8 @@
 package de.dhbw.handycrab.api;
 
-public class RequestResult {
+import java.io.Serializable;
+
+public class RequestResult implements Serializable {
     private Object result;
     public RequestResult(Object result) {
         this.result = result;
