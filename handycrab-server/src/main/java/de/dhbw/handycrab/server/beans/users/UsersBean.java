@@ -25,7 +25,8 @@ public class UsersBean implements Users {
 
     private static final String EMAIL_REGEX = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
     private static final String USERNAME_REGEX = "[a-zA-Z0-9_]{4,16}";
-    private static final String PASSWORD_REGEX = "[a-zA-Z0-9]{6,100}";
+
+    private static final String PASSWORD_REGEX = "[a-zA-Z0-9\"!#$%&'()*+,\\-./:;<=>?@\\[\\]]{6,100}";
 
     @Resource(lookup = "java:global/MongoClient")
     private MongoClient client;
@@ -45,15 +46,20 @@ public class UsersBean implements Users {
         construct();
     }
 
-
-
     @PostConstruct
     private void construct() {
         dataSource = new DataSource<>(User.class, "users", serializer, client);
     }
 
     @Override
+    public User getUser(ObjectId id) {
+        return dataSource.get(id);
+    }
+
+    @Override
     public User register(String email, String username, String password) {
+        email = email.toLowerCase();
+        username = username.toLowerCase();
         if(email.matches(EMAIL_REGEX)) {
             if(username.matches(USERNAME_REGEX)) {
                 if(password.matches(PASSWORD_REGEX)) {
@@ -86,7 +92,7 @@ public class UsersBean implements Users {
 
     @Override
     public User login(String login, String password) {
-        User user = dataSource.findFirst(new RequestBuilder().filter(Filters.and(Filters.or(Filters.eq("email", login), Filters.eq("username", login)), Filters.eq("password", sha512(password)))));
+        User user = dataSource.findFirst(new RequestBuilder().filter(Filters.and(Filters.or(Filters.eq("email", login.toLowerCase()), Filters.eq("username", login.toLowerCase())), Filters.eq("password", sha512(password)))));
         if(user != null) {
             return user;
         }
@@ -97,11 +103,16 @@ public class UsersBean implements Users {
 
     @Override
     public String getUsername(ObjectId id) {
-        if(dataSource.contains(id)) {
-            return dataSource.get(id).getUsername();
+        if(id != null) {
+            if(dataSource.contains(id)) {
+                return dataSource.get(id).getUsername();
+            }
+            else {
+                throw new UserNotFoundException();
+            }
         }
         else {
-            throw new UserNotFoundException();
+            throw new IncompleteRequestException();
         }
     }
 
@@ -117,7 +128,7 @@ public class UsersBean implements Users {
         }
     }
 
-    private static String sha512(String value) {
+    public static String sha512(String value) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-512");
             byte[] bytes = md.digest(value.getBytes());

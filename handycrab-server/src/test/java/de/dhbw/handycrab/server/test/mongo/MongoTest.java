@@ -3,6 +3,7 @@ package de.dhbw.handycrab.server.test.mongo;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.testcontainers.junit.jupiter.Container;
@@ -27,7 +28,7 @@ public class MongoTest {
         return getMongoClient().getDatabase(System.getenv("mongo_database"));
     }
 
-    protected MongoCollection getCollection(String collection) {
+    protected MongoCollection<Document> getCollection(String collection) {
         return getMongoDatabase().getCollection(collection);
     }
 }

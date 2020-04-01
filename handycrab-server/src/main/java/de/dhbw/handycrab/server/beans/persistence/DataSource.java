@@ -43,7 +43,12 @@ public class DataSource<T> {
      * @return whether the Collection contains the document
      */
     public boolean contains(Object _id) {
-        return contains(new Document("_id", _id));
+        if(_id != null) {
+            return contains(new Document("_id", _id));
+        }
+        else {
+            throw new NullPointerException();
+        }
     }
 
     /**
@@ -131,9 +136,12 @@ public class DataSource<T> {
      * @return the document as a Java object
      */
     public T get(Object _id) {
-        return fromBson(
-                getCollection().find(new Document("_id", _id))
-                        .first());
+        if(_id != null) {
+            return fromBson(getCollection().find(new Document("_id", _id)).first());
+        }
+        else {
+            throw new NullPointerException();
+        }
     }
 
     /**
@@ -181,17 +189,23 @@ public class DataSource<T> {
      */
     public void upsert(T t) {
         Document document = toBson(t);
-        if (document.containsKey("_id")) {
+        if(document.containsKey("_id")) {
             getCollection()
                     .updateOne(new Document("_id", document.get("_id")), new Document("$set", document),
                             new UpdateOptions().upsert(true));
-        } else {
+        }
+        else {
             insert(t);
         }
     }
 
     public void deleteOne(Object _id) {
-        deleteOne(Filters.eq("_id", _id));
+        if(_id != null) {
+            deleteOne(Filters.eq("_id", _id));
+        }
+        else {
+            throw new NullPointerException();
+        }
     }
 
     public void deleteOne(Bson filter) {

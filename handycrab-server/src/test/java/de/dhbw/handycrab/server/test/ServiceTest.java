@@ -13,7 +13,7 @@ import java.net.Socket;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TestServiceTest extends MongoTest {
+public class ServiceTest extends MongoTest {
 
 
     @BeforeEach
