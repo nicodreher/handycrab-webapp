@@ -21,7 +21,7 @@ build:
   stage: build
   image: maven:latest
   script:
-    - mvn $MAVEN_CLI_OPTS clean compile package -Dmaven.test.skip=true
+    - mvn $MAVEN_CLI_OPTS -Dmaven.test.skip=true clean compile package
   artifacts:
     paths:
       - handycrab-ear/target/handycrab-ear-1.0-SNAPSHOT.ear
@@ -43,7 +43,7 @@ deploy:
   stage: push
   image: maven:latest
   script:
-    - mvn $MAVEN_CLI_OPTS deploy
+    - mvn $MAVEN_CLI_OPTS -Dmaven.test.skip=true deploy
   only:
     - master
 
