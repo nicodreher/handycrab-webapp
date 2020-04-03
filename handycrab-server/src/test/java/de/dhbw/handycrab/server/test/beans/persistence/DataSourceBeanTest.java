@@ -1,4 +1,4 @@
-package de.dhbw.handycrab.server.beans.persistence;
+package de.dhbw.handycrab.server.test.beans.persistence;
 
 import de.dhbw.handycrab.api.users.User;
 import org.junit.jupiter.api.Test;

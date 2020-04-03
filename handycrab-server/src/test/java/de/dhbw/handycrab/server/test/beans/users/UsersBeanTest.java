@@ -1,29 +1,35 @@
-package de.dhbw.handycrab.server.beans.users;
+package de.dhbw.handycrab.server.test.beans.users;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static com.mongodb.client.model.Filters.*;
 
 import com.mongodb.client.FindIterable;
 import de.dhbw.handycrab.api.users.User;
+import de.dhbw.handycrab.server.beans.users.UsersBean;
 import de.dhbw.handycrab.server.beans.utils.SerializerBean;
 import de.dhbw.handycrab.server.exceptions.IncompleteRequestException;
 import de.dhbw.handycrab.server.exceptions.InvalidLoginException;
 import de.dhbw.handycrab.server.exceptions.UnauthorizedException;
 import de.dhbw.handycrab.server.exceptions.UserNotFoundException;
-import de.dhbw.handycrab.server.test.mongo.MongoTest;
+import de.dhbw.handycrab.server.test.mongo.MongoContainer;
 import org.bson.Document;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
-public class UsersBeanTest extends MongoTest {
+@Testcontainers
+public class UsersBeanTest {
+
+    @Container
+    private MongoContainer container = new MongoContainer();
 
     private Document generateUser(ObjectId id, String email, String username, String password) {
         Document doc = new Document();
@@ -45,7 +51,7 @@ public class UsersBeanTest extends MongoTest {
         Document[] docs = generateUsers();
         Map<String, ObjectId> users = new HashMap<>();
         for(Document doc : docs) {
-            getCollection("users").insertOne(doc);
+            container.getCollection("users").insertOne(doc);
             users.put(doc.getString("username"), doc.getObjectId("_id"));
         }
         return users;
@@ -55,12 +61,12 @@ public class UsersBeanTest extends MongoTest {
     @CsvFileSource(resources = "/users/register.csv")
     public void registerTest(String email, String username, String password) {
         insertUsers();
-        UsersBean bean = new UsersBean(getMongoClient(), new SerializerBean());
+        UsersBean bean = new UsersBean(container.getMongoClient(), new SerializerBean());
         User user = bean.register(email, username, password);
         assertNotNull(user.getID());
         Bson filter = and(eq("email", user.getEmail().toLowerCase()), eq("username", user.getUsername().toLowerCase()));
-        assertEquals(1, getCollection("users").countDocuments(filter));
-        FindIterable<Document> result = getCollection("users").find(filter);
+        assertEquals(1, container.getCollection("users").countDocuments(filter));
+        FindIterable<Document> result = container.getCollection("users").find(filter);
         Document first = result.first();
         assertNotNull(first);
         assertEquals(user.getID(), first.getObjectId("_id"));
@@ -70,7 +76,7 @@ public class UsersBeanTest extends MongoTest {
     @CsvFileSource(resources = "/users/failregister.csv")
     public void failRegisterTest(String comment, String email, String username, String password, String expectedException) {
         Map<String, ObjectId> users = insertUsers();
-        UsersBean bean = new UsersBean(getMongoClient(), new SerializerBean());
+        UsersBean bean = new UsersBean(container.getMongoClient(), new SerializerBean());
         final User[] user = new User[1];
         try {
             assertThrows((Class<? extends Throwable>) Class.forName(expectedException) , () -> user[0] = bean.register(email, username, password));
@@ -89,8 +95,8 @@ public class UsersBeanTest extends MongoTest {
         else if(username != null) {
             filter = eq("username", username.toLowerCase());
         }
-        if(filter != null && getCollection("users").countDocuments(filter) != 0) {
-            getCollection("users").find(filter).forEach((Consumer<Document>) doc -> {
+        if(filter != null && container.getCollection("users").countDocuments(filter) != 0) {
+            container.getCollection("users").find(filter).forEach((Consumer<Document>) doc -> {
                 assertTrue(users.containsKey(doc.getString("username")));
                 assertEquals(users.get(doc.getString("username")), doc.getObjectId("_id"));
             });
@@ -100,8 +106,8 @@ public class UsersBeanTest extends MongoTest {
     @CsvFileSource(resources = "/users/login.csv")
     public void loginTest(String comment, String email, String username, String password, String login, String loginPassword, boolean correct, boolean complete) {
         Document doc = generateUser(new ObjectId(), email, username, password);
-        getCollection("users").insertOne(doc);
-        UsersBean bean = new UsersBean(getMongoClient(), new SerializerBean());
+        container.getCollection("users").insertOne(doc);
+        UsersBean bean = new UsersBean(container.getMongoClient(), new SerializerBean());
         if(correct) {
             User user = bean.login(login, loginPassword);
             assertNotNull(user);
@@ -117,7 +123,7 @@ public class UsersBeanTest extends MongoTest {
 
     @Test
     public void getUserNullTest() {
-        UsersBean bean = new UsersBean(getMongoClient(), new SerializerBean());
+        UsersBean bean = new UsersBean(container.getMongoClient(), new SerializerBean());
         final User[] user = new User[1];
         assertThrows(NullPointerException.class, () -> user[0] = bean.getUser(null));
         assertNull(user[0]);
@@ -125,7 +131,7 @@ public class UsersBeanTest extends MongoTest {
 
     @Test
     public void getUserNotExistingTest() {
-        UsersBean bean = new UsersBean(getMongoClient(), new SerializerBean());
+        UsersBean bean = new UsersBean(container.getMongoClient(), new SerializerBean());
         User user = bean.getUser(new ObjectId());
         assertNull(user);
     }
@@ -133,7 +139,7 @@ public class UsersBeanTest extends MongoTest {
     @Test
     public void getUserExistingTest() {
         insertUsers();
-        UsersBean bean = new UsersBean(getMongoClient(), new SerializerBean());
+        UsersBean bean = new UsersBean(container.getMongoClient(), new SerializerBean());
         var user1 = bean.getUser(new ObjectId("000000000000000000000000"));
         assertNotNull(user1);
         assertEquals("000000000000000000000000", user1.getID().toHexString());
@@ -165,7 +171,7 @@ public class UsersBeanTest extends MongoTest {
 
     @Test
     public void getUserNameTest() {
-        UsersBean bean = new UsersBean(getMongoClient(), new SerializerBean());
+        UsersBean bean = new UsersBean(container.getMongoClient(), new SerializerBean());
         Map<String, ObjectId> users = insertUsers();
         for(String username : users.keySet()) {
             assertEquals(username, bean.getUsername(users.get(username)));
@@ -177,7 +183,7 @@ public class UsersBeanTest extends MongoTest {
 
     @Test
     public void checkAuthorizedTest() {
-        UsersBean bean = new UsersBean(getMongoClient(), new SerializerBean());
+        UsersBean bean = new UsersBean(container.getMongoClient(), new SerializerBean());
         Map<String, ObjectId> users = insertUsers();
         for(ObjectId user : users.values()) {
             bean.checkAuthorized(user);

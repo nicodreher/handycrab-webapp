@@ -1,5 +1,9 @@
 package de.dhbw.handycrab.server.test.mongo;
 
+import com.mongodb.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
 import org.jetbrains.annotations.NotNull;
 import org.testcontainers.containers.GenericContainer;
 
@@ -14,6 +18,7 @@ public class MongoContainer extends GenericContainer<MongoContainer> {
      */
     public static final int MONGODB_PORT = 27017;
     public static final String DEFAULT_IMAGE_AND_TAG = "mongo:latest";
+    private MongoClient client;
 
     /**
      * Creates a new {@link MongoContainer} with the {@value DEFAULT_IMAGE_AND_TAG} image.
@@ -41,6 +46,21 @@ public class MongoContainer extends GenericContainer<MongoContainer> {
     @NotNull
     public Integer getPort() {
         return getMappedPort(MONGODB_PORT);
+    }
+
+    public MongoClient getMongoClient() {
+        if(client == null) {
+            client = new MongoClient(getContainerIpAddress(), getPort());
+        }
+        return client;
+    }
+
+    public MongoDatabase getMongoDatabase() {
+        return getMongoClient().getDatabase(System.getenv("mongo_database"));
+    }
+
+    public MongoCollection<Document> getCollection(String collection) {
+        return getMongoDatabase().getCollection(collection);
     }
 
 }

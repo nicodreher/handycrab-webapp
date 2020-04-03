@@ -1,7 +1,6 @@
 package de.dhbw.handycrab.server.test;
 
 import de.dhbw.handycrab.server.test.mongo.MongoContainer;
-import de.dhbw.handycrab.server.test.mongo.MongoTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,8 +12,11 @@ import java.net.Socket;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ServiceTest extends MongoTest {
+@Testcontainers
+public class ServiceTest {
 
+    @Container
+    private MongoContainer container = new MongoContainer();
 
     @BeforeEach
     public void setupTest() {
