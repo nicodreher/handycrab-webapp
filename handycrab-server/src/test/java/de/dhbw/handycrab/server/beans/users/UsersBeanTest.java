@@ -68,7 +68,7 @@ public class UsersBeanTest extends MongoTest {
 
     @ParameterizedTest(name = "[{index}] {0}")
     @CsvFileSource(resources = "/users/failregister.csv")
-    public void registerWrongEmailTest(String comment, String email, String username, String password, String expectedException) {
+    public void failRegisterTest(String comment, String email, String username, String password, String expectedException) {
         Map<String, ObjectId> users = insertUsers();
         UsersBean bean = new UsersBean(getMongoClient(), new SerializerBean());
         final User[] user = new User[1];
@@ -79,8 +79,17 @@ public class UsersBeanTest extends MongoTest {
             fail(e);
         }
         assertNull(user[0]);
-        Bson filter = or(eq("email", email.toLowerCase()), eq("username", username.toLowerCase()));
-        if(getCollection("users").countDocuments(filter) != 0) {
+        Bson filter = null;
+        if(email != null && username != null) {
+            filter = or(eq("email", email.toLowerCase()), eq("username", username.toLowerCase()));
+        }
+        else if(email != null) {
+            filter = eq("email", email.toLowerCase());
+        }
+        else if(username != null) {
+            filter = eq("username", username.toLowerCase());
+        }
+        if(filter != null && getCollection("users").countDocuments(filter) != 0) {
             getCollection("users").find(filter).forEach((Consumer<Document>) doc -> {
                 assertTrue(users.containsKey(doc.getString("username")));
                 assertEquals(users.get(doc.getString("username")), doc.getObjectId("_id"));
@@ -89,7 +98,7 @@ public class UsersBeanTest extends MongoTest {
     }
     @ParameterizedTest(name = "[{index}] {0}")
     @CsvFileSource(resources = "/users/login.csv")
-    public void loginTest(String comment, String email, String username, String password, String login, String loginPassword, boolean correct) {
+    public void loginTest(String comment, String email, String username, String password, String login, String loginPassword, boolean correct, boolean complete) {
         Document doc = generateUser(new ObjectId(), email, username, password);
         getCollection("users").insertOne(doc);
         UsersBean bean = new UsersBean(getMongoClient(), new SerializerBean());
@@ -99,8 +108,9 @@ public class UsersBeanTest extends MongoTest {
             assertEquals(doc.getObjectId("_id"), user.getID());
         }
         else {
+            Class<? extends  Throwable> exception = complete ? InvalidLoginException.class : IncompleteRequestException.class;
             final User[] user = new User[1];
-            assertThrows(InvalidLoginException.class, () -> user[0] = bean.login(login, loginPassword));
+            assertThrows(exception, () -> user[0] = bean.login(login, loginPassword));
             assertNull(user[0]);
         }
     }

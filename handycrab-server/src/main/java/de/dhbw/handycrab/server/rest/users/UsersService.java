@@ -27,12 +27,7 @@ public class UsersService {
     @Produces(MEDIA_TYPE)
     public FrontendUser register(@Context HttpServletRequest request, String json) {
         JSONObject entity = new JSONObject(json);
-        if(entity.has("email") && entity.has("username") && entity.has("password")) {
-            return new FrontendUser(users.register(entity.getString("email"), entity.getString("username"), entity.getString("password")));
-        }
-        else {
-            throw new IncompleteRequestException();
-        }
+        return new FrontendUser(users.register(entity.getString("email"), entity.getString("username"), entity.getString("password")));
     }
 
     @POST
@@ -41,14 +36,9 @@ public class UsersService {
     @Produces(MEDIA_TYPE)
     public FrontendUser login(@Context HttpServletRequest request, String json) {
         JSONObject entity = new JSONObject(json);
-        if(entity.has("login") && entity.has("password")) {
-            User user = users.login(entity.getString("login"), entity.getString("password"));
-            request.getSession().setAttribute("userId", user.getID());
-            return new FrontendUser(user);
-        }
-        else {
-            throw new IncompleteRequestException();
-        }
+        User user = users.login(entity.getString("login"), entity.getString("password"));
+        request.getSession().setAttribute("userId", user.getID());
+        return new FrontendUser(user);
     }
 
     @POST
@@ -65,11 +55,6 @@ public class UsersService {
     @Produces(MEDIA_TYPE)
     public RequestResult getName(String json) {
         JSONObject entity = new JSONObject(json);
-        if(entity.has("_id")) {
-            return new RequestResult(users.getUsername(new ObjectId(entity.getString("_id"))));
-        }
-        else {
-            throw new IncompleteRequestException();
-        }
+        return new RequestResult(users.getUsername(new ObjectId(entity.getString("_id"))));
     }
 }

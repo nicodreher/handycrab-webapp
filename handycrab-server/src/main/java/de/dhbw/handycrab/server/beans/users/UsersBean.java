@@ -58,46 +58,56 @@ public class UsersBean implements Users {
 
     @Override
     public User register(String email, String username, String password) {
-        email = email.toLowerCase();
-        username = username.toLowerCase();
-        if(email.matches(EMAIL_REGEX)) {
-            if(username.matches(USERNAME_REGEX)) {
-                if(password.matches(PASSWORD_REGEX)) {
-                    if(!dataSource.contains(Filters.eq("email", email))) {
-                        if(!dataSource.contains(Filters.eq("username", username))) {
-                            User user = new User(email, username, sha512(password));
-                            dataSource.insert(user);
-                            return user;
+        if(email != null && username != null && password != null) {
+            email = email.toLowerCase();
+            username = username.toLowerCase();
+            if(email.matches(EMAIL_REGEX)) {
+                if(username.matches(USERNAME_REGEX)) {
+                    if(password.matches(PASSWORD_REGEX)) {
+                        if(!dataSource.contains(Filters.eq("email", email))) {
+                            if(!dataSource.contains(Filters.eq("username", username))) {
+                                User user = new User(email, username, sha512(password));
+                                dataSource.insert(user);
+                                return user;
+                            }
+                            else {
+                                throw new NameAlreadyUsedException();
+                            }
                         }
                         else {
-                            throw new NameAlreadyUsedException();
+                            throw new AddressAlreadyUsedException();
                         }
                     }
                     else {
-                        throw new AddressAlreadyUsedException();
+                        throw new InvalidPasswordException();
                     }
                 }
                 else {
-                    throw new InvalidPasswordException();
+                    throw new InvalidUsernameException();
                 }
             }
             else {
-                throw new InvalidUsernameException();
+                throw new InvalidMailException();
             }
         }
         else {
-            throw new InvalidMailException();
+            throw new IncompleteRequestException();
         }
     }
 
     @Override
     public User login(String login, String password) {
-        User user = dataSource.findFirst(new RequestBuilder().filter(Filters.and(Filters.or(Filters.eq("email", login.toLowerCase()), Filters.eq("username", login.toLowerCase())), Filters.eq("password", sha512(password)))));
-        if(user != null) {
-            return user;
+        if(login != null && password != null) {
+            User user = dataSource.findFirst(new RequestBuilder().filter(Filters.and(Filters.or(Filters.eq("email", login.toLowerCase()), Filters.eq("username", login.toLowerCase())), Filters.eq("password", sha512(password)))));
+            if(user != null) {
+                return user;
+            }
+            else {
+                throw new InvalidLoginException();
+            }
         }
         else {
-            throw new InvalidLoginException();
+            throw new IncompleteRequestException();
         }
     }
 
