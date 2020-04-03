@@ -10,6 +10,7 @@
 "Fail - Wrong Username Empty Password","test@test.de","testUser","testPass","loginName","","false","true"
 "Fail - Correct Username Wrong Password","test@test.de","testUser","testPass","testUser","loginPass","false","true"
 "Fail - Correct Username Empty Password","test@test.de","testUser","testPass","testUser","","false","true"
+"Fail - Empty Username Empty Password","test@test.de","testUser","testPass","","","false","true"
 "Fail - Login null","test@test.de","testUser","testPass",,"testPass","false","false"
 "Fail - E-MAIL Correct Password null","test@test.de","testUser","testPass","test@test.de",,"false","false"
 "Fail - Username Correct Password null","test@test.de","testUser","testPass","testUser",,"false","false"

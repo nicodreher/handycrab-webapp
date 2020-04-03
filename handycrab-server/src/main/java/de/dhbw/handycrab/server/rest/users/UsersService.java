@@ -27,7 +27,7 @@ public class UsersService {
     @Produces(MEDIA_TYPE)
     public FrontendUser register(@Context HttpServletRequest request, String json) {
         JSONObject entity = new JSONObject(json);
-        return new FrontendUser(users.register(entity.getString("email"), entity.getString("username"), entity.getString("password")));
+        return new FrontendUser(users.register(entity.optString("email", null), entity.optString("username", null), entity.optString("password", null)));
     }
 
     @POST
@@ -36,7 +36,7 @@ public class UsersService {
     @Produces(MEDIA_TYPE)
     public FrontendUser login(@Context HttpServletRequest request, String json) {
         JSONObject entity = new JSONObject(json);
-        User user = users.login(entity.getString("login"), entity.getString("password"));
+        User user = users.login(entity.optString("login", null), entity.optString("password", null));
         request.getSession().setAttribute("userId", user.getID());
         return new FrontendUser(user);
     }
@@ -55,6 +55,6 @@ public class UsersService {
     @Produces(MEDIA_TYPE)
     public RequestResult getName(String json) {
         JSONObject entity = new JSONObject(json);
-        return new RequestResult(users.getUsername(new ObjectId(entity.getString("_id"))));
+        return new RequestResult(users.getUsername(new ObjectId(entity.optString("_id", null))));
     }
 }
