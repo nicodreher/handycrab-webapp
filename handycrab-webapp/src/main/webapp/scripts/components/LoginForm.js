@@ -32,9 +32,8 @@ export class LoginForm extends React.Component {
         fetch("http://handycrab.nico-dreher.de/rest/users/login", {
             method: 'POST',
             cache: 'no-cache',
-            mode: 'no-cors',
             headers: {
-                "Content-Type": "application/json",
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify(
                 {
@@ -43,11 +42,8 @@ export class LoginForm extends React.Component {
                 })
         }).then(response => {
             hasErrorCode = response.ok;
-            console.log("Still okay before logging response");
-            console.log(response);
             return response.json();
         }).then((data) => {
-            console.log("Got to second promise");
             if (hasErrorCode) {
                 //TODO handle errorcodes
                 console.error("Errorcode: " + data.errorCode);

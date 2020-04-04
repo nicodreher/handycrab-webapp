@@ -34,18 +34,11 @@ export class RegisterForm extends React.Component {
     handleSubmit(event) {
         //alert('Submitted [name: ' + this.state.name + ', mail: ' + this.state.mail + ', password: ' + this.state.password + ', repeatPassword: ' + this.state.repeatPassword + ']');
         let hasErrorCode = false;
-        console.log(JSON.stringify(
-            {
-                email: this.state.mail,
-                username: this.state.name,
-                password: this.state.password
-            }));
         fetch("http://handycrab.nico-dreher.de/rest/users/register", {
             method: 'POST',
             cache: 'no-cache',
-            mode: 'no-cors',
             headers: {
-                "Content-Type": "application/json",
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify(
                 {
@@ -54,12 +47,9 @@ export class RegisterForm extends React.Component {
                     password: this.state.password
                 })
         }).then(response => {
-            console.log("Still ok before logging response");
-            console.log(response);
             hasErrorCode = response.ok;
             return response.json();
         }).then((data) => {
-            console.log("Got to second promise");
             if (!hasErrorCode) {
                 //TODO handle success
                 console.log(data);
