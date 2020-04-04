@@ -4,6 +4,8 @@ import ReactDOM from "react-dom"
 import {HomePage} from "./pages/HomePage.js"
 import {AboutPage} from "./pages/AboutPage.js"
 import {ErrorPage} from "./pages/ErrorPage.js"
+import {LoginPage} from "./pages/LoginPage"
+import {RegisterPage} from "./pages/RegisterPage"
 
 import {TitleBar} from "./components/TitleBar.js"
 import {Footer} from "./components/Footer.js"
@@ -17,9 +19,11 @@ class App extends React.Component{
     render(){
         return(
             <div>
-                <TitleBar />
+                <TitleBar/>
                 <Router>
                     <Switch>
+                        <Route exact path="/login" component={LoginPage}/>
+                        <Route exact path="/register" component={RegisterPage}/>
                         <Route exact path="/" component={HomePage} />
                         <Route exact path="/about" component={AboutPage} />
                         <Route component={ErrorPage} />
