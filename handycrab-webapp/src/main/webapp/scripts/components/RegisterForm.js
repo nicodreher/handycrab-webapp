@@ -69,37 +69,37 @@ export class RegisterForm extends React.Component {
             <div>
                 <Form id="register_form" onSubmit={this.handleSubmit}>
                     <Form.Group>
-                        <Form.Label id="username_label" htmlFor="username" column sm="2">
+                        <Form.Label id="username_label" htmlFor="username" column>
                             Benutzername:
                         </Form.Label>
-                        <Col sm="10">
+                        <Col>
                             <Form.Control type="text" required={true} id="username" value={this.state.name}
                                           onChange={this.handleChangedName} aria-describedby="username_label"/>
                         </Col>
                     </Form.Group>
                     <Form.Group>
-                        <Form.Label id="mail_label" htmlFor="usermail" column sm="2">
+                        <Form.Label id="mail_label" htmlFor="usermail" column>
                             E-Mail:
                         </Form.Label>
-                        <Col sm="10">
+                        <Col>
                             <Form.Control type="text" required={true} id="usermail" value={this.state.mail}
                                           onChange={this.handleChangedMail} aria-describedby="mail_label"/>
                         </Col>
                     </Form.Group>
                     <Form.Group>
-                        <Form.Label id="password_label" htmlFor="userpassword" column sm="2">
+                        <Form.Label id="password_label" htmlFor="userpassword" column>
                             Passwort:
                         </Form.Label>
-                        <Col sm="10">
+                        <Col >
                             <Form.Control type="password" id="userpassword" required={true} value={this.state.password}
                                           onChange={this.handleChangedPassword} aria-describedby="password_label"/>
                         </Col>
                     </Form.Group>
                     <Form.Group>
-                        <Form.Label id="password_repeat_label" htmlFor="repeat_password" column sm="2">
+                        <Form.Label id="password_repeat_label" htmlFor="repeat_password" column>
                             Passwort:
                         </Form.Label>
-                        <Col sm="10">
+                        <Col>
                             <Form.Control type="password" id="repeat_password" required={true}
                                           aria-describedby="password_repeat_label"
                                           value={this.state.repeatPassword} onChange={this.handleChangedRepeat}/>

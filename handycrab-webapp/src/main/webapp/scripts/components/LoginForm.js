@@ -11,6 +11,11 @@ export class LoginForm extends React.Component {
         this.handleChangedPassword = this.handleChangedPassword.bind(this);
 
         this.handleSubmit = this.handleSubmit.bind(this);
+
+        this.clearError = this.clearError.bind(this);
+    }
+    clearError() {
+        this.setState({error: ''});
     }
 
     handleChangedLogin(event) {
