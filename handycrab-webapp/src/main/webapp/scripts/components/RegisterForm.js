@@ -34,19 +34,12 @@ export class RegisterForm extends React.Component {
     handleSubmit(event) {
         //alert('Submitted [name: ' + this.state.name + ', mail: ' + this.state.mail + ', password: ' + this.state.password + ', repeatPassword: ' + this.state.repeatPassword + ']');
         let hasErrorCode = false;
-        console.log(JSON.stringify(
-            {
-                email: this.state.mail,
-                username: this.state.name,
-                password: this.state.password
-            }));
         fetch("http://handycrab.nico-dreher.de/rest/users/register", {
             method: 'POST',
             cache: 'no-cache',
-            mode: 'no-cors',
-            headers: {
-                "Content-Type": "application/json",
-            },
+            headers: new Headers({
+                'Content-Type': 'application/json',
+            }),
             body: JSON.stringify(
                 {
                     email: this.state.mail,
@@ -54,12 +47,9 @@ export class RegisterForm extends React.Component {
                     password: this.state.password
                 })
         }).then(response => {
-            console.log("Still ok before logging response");
-            console.log(response);
             hasErrorCode = response.ok;
             return response.json();
         }).then((data) => {
-            console.log("Got to second promise");
             if (!hasErrorCode) {
                 //TODO handle success
                 console.log(data);
@@ -79,37 +69,37 @@ export class RegisterForm extends React.Component {
             <div>
                 <Form id="register_form" onSubmit={this.handleSubmit}>
                     <Form.Group>
-                        <Form.Label id="username_label" htmlFor="username" column sm="2">
+                        <Form.Label id="username_label" htmlFor="username" column>
                             Benutzername:
                         </Form.Label>
-                        <Col sm="10">
+                        <Col>
                             <Form.Control type="text" required={true} id="username" value={this.state.name}
                                           onChange={this.handleChangedName} aria-describedby="username_label"/>
                         </Col>
                     </Form.Group>
                     <Form.Group>
-                        <Form.Label id="mail_label" htmlFor="usermail" column sm="2">
+                        <Form.Label id="mail_label" htmlFor="usermail" column>
                             E-Mail:
                         </Form.Label>
-                        <Col sm="10">
+                        <Col>
                             <Form.Control type="text" required={true} id="usermail" value={this.state.mail}
                                           onChange={this.handleChangedMail} aria-describedby="mail_label"/>
                         </Col>
                     </Form.Group>
                     <Form.Group>
-                        <Form.Label id="password_label" htmlFor="userpassword" column sm="2">
+                        <Form.Label id="password_label" htmlFor="userpassword" column>
                             Passwort:
                         </Form.Label>
-                        <Col sm="10">
+                        <Col >
                             <Form.Control type="password" id="userpassword" required={true} value={this.state.password}
                                           onChange={this.handleChangedPassword} aria-describedby="password_label"/>
                         </Col>
                     </Form.Group>
                     <Form.Group>
-                        <Form.Label id="password_repeat_label" htmlFor="repeat_password" column sm="2">
+                        <Form.Label id="password_repeat_label" htmlFor="repeat_password" column>
                             Passwort:
                         </Form.Label>
-                        <Col sm="10">
+                        <Col>
                             <Form.Control type="password" id="repeat_password" required={true}
                                           aria-describedby="password_repeat_label"
                                           value={this.state.repeatPassword} onChange={this.handleChangedRepeat}/>
