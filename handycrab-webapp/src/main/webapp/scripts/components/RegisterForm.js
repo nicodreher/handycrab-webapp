@@ -50,7 +50,6 @@ export class RegisterForm extends React.Component {
         fetch("http://handycrab.nico-dreher.de/rest/users/register", {
             method: 'POST',
             cache: 'no-cache',
-            mode: 'no-cors',
             headers: {
                 'Content-Type': 'application/json'
             },
