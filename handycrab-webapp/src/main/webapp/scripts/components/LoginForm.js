@@ -29,9 +29,22 @@ export class LoginForm extends React.Component {
                 login: this.state.login,
                 password: this.state.password
             }));
+        let xhr = new XMLHttpRequest();
+        xhr.addEventListener('load', () => {
+            console.log(xhr.responseText)
+        });
+        xhr.open('POST', 'http://handycrab.nico-dreher.de/rest/users/login');
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify(
+            {
+                login: this.state.login,
+                password: this.state.password
+            })
+        )
         fetch("http://handycrab.nico-dreher.de/rest/users/login", {
             method: 'POST',
             cache: 'no-cache',
+            mode: 'no-cors',
             headers: {
                 'Content-Type': 'application/json'
             },

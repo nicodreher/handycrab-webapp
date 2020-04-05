@@ -34,9 +34,23 @@ export class RegisterForm extends React.Component {
     handleSubmit(event) {
         //alert('Submitted [name: ' + this.state.name + ', mail: ' + this.state.mail + ', password: ' + this.state.password + ', repeatPassword: ' + this.state.repeatPassword + ']');
         let hasErrorCode = false;
+        let xhr = new XMLHttpRequest();
+        xhr.addEventListener('load', () => {
+            console.log(xhr.responseText)
+        });
+        xhr.open('POST', 'http://handycrab.nico-dreher.de/rest/users/register');
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify(
+            {
+                email: this.state.mail,
+                username: this.state.name,
+                password: this.state.password
+            })
+        );
         fetch("http://handycrab.nico-dreher.de/rest/users/register", {
             method: 'POST',
             cache: 'no-cache',
+            mode: 'no-cors',
             headers: {
                 'Content-Type': 'application/json'
             },
