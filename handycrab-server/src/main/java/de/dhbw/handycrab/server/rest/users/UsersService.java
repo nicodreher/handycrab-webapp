@@ -27,7 +27,9 @@ public class UsersService {
     @Produces(MEDIA_TYPE)
     public FrontendUser register(@Context HttpServletRequest request, String json) {
         JSONObject entity = new JSONObject(json);
-        return new FrontendUser(users.register(entity.optString("email", null), entity.optString("username", null), entity.optString("password", null)));
+        User user = users.register(entity.optString("email", null), entity.optString("username", null), entity.optString("password", null));
+        request.getSession().setAttribute("userId", user.getID());
+        return new FrontendUser(user);
     }
 
     @POST
@@ -46,7 +48,7 @@ public class UsersService {
     @Consumes(MEDIA_TYPE)
     @Produces(MEDIA_TYPE)
     public void logout(@Context HttpServletRequest request) {
-        request.setAttribute("userId", null);
+        request.getSession().setAttribute("userId", null);
     }
 
     @GET
