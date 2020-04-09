@@ -14,6 +14,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
 import java.util.UUID;
 
 @Path("/users")
@@ -45,10 +46,9 @@ public class UsersService {
 
     @POST
     @Path("/logout")
-    @Consumes(MEDIA_TYPE)
-    @Produces(MEDIA_TYPE)
-    public void logout(@Context HttpServletRequest request) {
+    public Response logout(@Context HttpServletRequest request) {
         request.getSession().setAttribute("userId", null);
+        return Response.ok().build();
     }
 
     @GET

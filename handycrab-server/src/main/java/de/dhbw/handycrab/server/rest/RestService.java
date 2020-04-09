@@ -10,10 +10,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
+import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import de.dhbw.handycrab.server.rest.authorization.Authorized;
+import de.dhbw.handycrab.server.rest.authorization.CurrentUser;
 import org.bson.Document;
 
 @Path("")
@@ -24,6 +30,11 @@ public class RestService {
     private Test<User> test;
     @Resource(lookup = Serializer.LOOKUP)
     private Serializer serializer;
+
+    @Inject
+    @CurrentUser
+    private User currentUser;
+
     @GET
     @Path("/check")
     @Produces(MediaType.TEXT_PLAIN)
@@ -79,5 +90,19 @@ public class RestService {
     public User getUser() {
         User user = new User("King", "King@Kong.com", "test");
         return user;
+    }
+
+    @GET
+    @Path("/authorized")
+    @Authorized
+    public Response authorized() {
+        return Response.ok().build();
+    }
+
+    @GET
+    @Path("/currentuser")
+    @Produces(MediaType.TEXT_PLAIN)
+    public String getCurrentUser() {
+        return currentUser != null ? currentUser.getUsername() : "null";
     }
 }

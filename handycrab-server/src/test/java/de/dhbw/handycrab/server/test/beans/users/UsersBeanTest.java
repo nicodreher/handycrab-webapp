@@ -34,8 +34,8 @@ public class UsersBeanTest {
     private Document generateUser(ObjectId id, String email, String username, String password) {
         Document doc = new Document();
         doc.put("_id", id);
-        doc.put("email", email.toLowerCase());
-        doc.put("username", username.toLowerCase());
+        doc.put("email", email);
+        doc.put("username", username);
         doc.put("password", UsersBean.sha512(password));
         return doc;
     }
@@ -64,7 +64,7 @@ public class UsersBeanTest {
         UsersBean bean = new UsersBean(container.getMongoClient(), new SerializerBean());
         User user = bean.register(email, username, password);
         assertNotNull(user.getID());
-        Bson filter = and(eq("email", user.getEmail().toLowerCase()), eq("username", user.getUsername().toLowerCase()));
+        Bson filter = and(eq("email", user.getEmail()), eq("username", user.getUsername()));
         assertEquals(1, container.getCollection("users").countDocuments(filter));
         FindIterable<Document> result = container.getCollection("users").find(filter);
         Document first = result.first();
@@ -87,13 +87,13 @@ public class UsersBeanTest {
         assertNull(user[0]);
         Bson filter = null;
         if(email != null && username != null) {
-            filter = or(eq("email", email.toLowerCase()), eq("username", username.toLowerCase()));
+            filter = or(eq("email", email), eq("username", username));
         }
         else if(email != null) {
-            filter = eq("email", email.toLowerCase());
+            filter = eq("email", email);
         }
         else if(username != null) {
-            filter = eq("username", username.toLowerCase());
+            filter = eq("username", username);
         }
         if(filter != null && container.getCollection("users").countDocuments(filter) != 0) {
             container.getCollection("users").find(filter).forEach((Consumer<Document>) doc -> {
