@@ -14,25 +14,27 @@ import {
     Route,
     Switch
 } from "react-router-dom"
+import {SearchPage} from "./pages/SearchPage";
 
-class App extends React.Component{
-    render(){
-        return(
+class App extends React.Component {
+    render() {
+        return (
             <div>
                 <TitleBar/>
                 <Router>
                     <Switch>
                         <Route exact path="/login" component={LoginPage}/>
                         <Route exact path="/register" component={RegisterPage}/>
-                        <Route exact path="/" component={HomePage} />
-                        <Route exact path="/about" component={AboutPage} />
-                        <Route component={ErrorPage} />
+                        <Route exact path="/" component={HomePage}/>
+                        <Route exact path="/about" component={AboutPage}/>
+                        <Route exact path="/search" component={SearchPage}/>
+                        <Route component={ErrorPage}/>
                     </Switch>
                 </Router>
-                <Footer />
+                <Footer/>
             </div>
         )
     }
 }
 
-ReactDOM.render(<App />, document.getElementById("app"));
+ReactDOM.render(<App/>, document.getElementById("app"));
