@@ -1,11 +1,12 @@
 import React from "react"
 import Button from "react-bootstrap/Button";
-import {Col, Form} from "react-bootstrap";
+import {Alert, Col, Form} from "react-bootstrap";
+import {errorCodeToMessage} from "../errorCode";
 
 export class RegisterForm extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {name: "", mail: "", password: "", repeatPassword: ""};
+        this.state = {name: "", mail: "", password: "", repeatPassword: "", error: ''};
 
         this.handleChangedPassword = this.handleChangedPassword.bind(this);
         this.handleChangedMail = this.handleChangedMail.bind(this);
@@ -13,6 +14,8 @@ export class RegisterForm extends React.Component {
         this.handleChangedRepeat = this.handleChangedRepeat.bind(this);
 
         this.handleSubmit = this.handleSubmit.bind(this);
+
+        this.clearError = this.clearError.bind(this);
     }
 
     handleChangedPassword(event) {
@@ -23,6 +26,10 @@ export class RegisterForm extends React.Component {
         this.setState({repeatPassword: event.target.value});
     }
 
+    clearError() {
+        this.setState({error: ''});
+    }
+
     handleChangedName(event) {
         this.setState({name: event.target.value});
     }
@@ -31,14 +38,43 @@ export class RegisterForm extends React.Component {
         this.setState({mail: event.target.value});
     }
 
+    validate() {
+        const username_regex = /^[a-zA-Z0-9_]{4,16}$/;
+        const password_regex = /^[a-zA-Z0-9"!#$%&'()*+,\-./:;<=>?@\[\]]{6,100}$/;
+        const mail_regex = /^[\w!#$%&'*+/=?`{|}~^-]+(?:\.[\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,6}$/;
+
+        if (!username_regex.test(this.state.name)) {
+            this.setState({error: 'Ein Benutzername besteht aus 4 bis 16 Zahlen und/oder Buchstaben. "_" ist als Sonderzeichen erlaubt.'});
+            return false;
+        }
+        if (!mail_regex.test(this.state.mail)) {
+            this.setState({error: 'Bitte geben Sie eine gültige E-Mail-Adresse ein.'});
+            return false;
+        }
+        if (!password_regex.test(this.state.password)) {
+            this.setState({error: 'Ein Passwort hat mindestens 6 Zeichen.'});
+            return false;
+        }
+        if (!(this.state.password === this.state.repeatPassword)) {
+            this.setState({error: 'Passwörter stimmen nicht überein.'});
+            return false;
+        }
+        return true;
+    }
+
     handleSubmit(event) {
         //alert('Submitted [name: ' + this.state.name + ', mail: ' + this.state.mail + ', password: ' + this.state.password + ', repeatPassword: ' + this.state.repeatPassword + ']');
+        if (!this.validate()) {
+            event.preventDefault();
+            return;
+        }
+
         let hasErrorCode = false;
         fetch("http://handycrab.nico-dreher.de/rest/users/register", {
             method: 'POST',
             cache: 'no-cache',
             headers: new Headers({
-                'Content-Type': 'application/json',
+                'Content-Type': 'application/json'
             }),
             body: JSON.stringify(
                 {
@@ -47,15 +83,15 @@ export class RegisterForm extends React.Component {
                     password: this.state.password
                 })
         }).then(response => {
-            hasErrorCode = response.ok;
+            hasErrorCode = !response.ok;
             return response.json();
         }).then((data) => {
             if (!hasErrorCode) {
                 //TODO handle success
                 console.log(data);
             } else {
-                //TODO handle errorcode
                 console.error('Errorcode: ' + data.errorCode);
+                this.setState({error: errorCodeToMessage(data.errorCode)});
             }
         }).catch(error => {
             console.error(error);
@@ -65,8 +101,16 @@ export class RegisterForm extends React.Component {
     }
 
     render() {
+        let alert;
+        if (this.state.error) {
+            alert =
+                <Alert variant={"danger"} dismissible={true} onClose={this.clearError}> {this.state.error}  </Alert>;
+        } else {
+            alert = <span/>;
+        }
         return (
             <div>
+                {alert}
                 <Form id="register_form" onSubmit={this.handleSubmit}>
                     <Form.Group>
                         <Form.Label id="username_label" htmlFor="username" column>
@@ -90,7 +134,7 @@ export class RegisterForm extends React.Component {
                         <Form.Label id="password_label" htmlFor="userpassword" column>
                             Passwort:
                         </Form.Label>
-                        <Col >
+                        <Col>
                             <Form.Control type="password" id="userpassword" required={true} value={this.state.password}
                                           onChange={this.handleChangedPassword} aria-describedby="password_label"/>
                         </Col>
