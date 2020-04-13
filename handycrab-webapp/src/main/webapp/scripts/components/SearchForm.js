@@ -1,6 +1,7 @@
 import React from "react"
 import Button from "react-bootstrap/Button";
-import {Col, Form} from "react-bootstrap";
+import {Row, Col, Form} from "react-bootstrap";
+import {FormField} from "./FormField";
 
 export class SearchForm extends React.Component {
     constructor(props) {
@@ -12,7 +13,6 @@ export class SearchForm extends React.Component {
         this.handleChangedRadius = this.handleChangedRadius.bind(this);
         this.handleChangedPostal = this.handleChangedPostal.bind(this);
 
-        this.setPosition = this.setPosition.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
 
     }
@@ -70,42 +70,27 @@ export class SearchForm extends React.Component {
     render() {
         return (
             <div>
+                <div>&nbsp;</div>
                 <Form id="search_form" onSubmit={this.handleSubmit}>
-                    <Form.Group>
-                        <Form.Label id="latitude_label" htmlFor="latitude" column>
-                            Breitengrad:
-                        </Form.Label>
-                        <Col>
-                            <Form.Control type="text" required={true} id="latitude" value={this.state.latitude}
-                                          onChange={this.handleChangedLatitude} aria-describedby="latitude_label"
-                                          disabled={true}/>
-                        </Col>
-                    </Form.Group>
-                    <Form.Group>
-                        <Form.Label id="longitude_label" htmlFor="longitude" column>
-                            Längengrad:
-                        </Form.Label>
-                        <Col>
-                            <Form.Control type="text" required={true} id="longitude" value={this.state.longitude}
-                                          onChange={this.handleChangedLongitude} aria-describedby="longitude_label"
-                                          disabled={true}/>
-                        </Col>
-                    </Form.Group>
-                    <Form.Group>
-                        <Form.Label id="radius_label" htmlFor="radius" column>
+                    <FormField id="latitude" label="Breitengrad" disabled={true} onChange={this.handleChangedLatitude}
+                               value={this.state.latitude}/>
+                    <FormField id="longitude" label="Längengrad" disabled={true} onChange={this.handleChangedLongitude}
+                               value={this.state.longitude}/>
+                    <Form.Group as={Row}>
+                        <Form.Label id="radius_label" htmlFor="radius" column sm="2">
                             Such-Radius (in Meter):
                         </Form.Label>
-                        <Col>
+                        <Col sm="10">
                             <Form.Control type="number" id="radius" value={this.state.radius}
                                           onChange={this.handleChangedRadius} aria-describedby="radius_label" min="5"
                                           max="25"/>
                         </Col>
                     </Form.Group>
-                    <Form.Group>
-                        <Form.Label id="postal_label" htmlFor="postal" column>
+                    <Form.Group as={Row}>
+                        <Form.Label id="postal_label" htmlFor="postal" column sm="2">
                             Postleitzahl:
                         </Form.Label>
-                        <Col>
+                        <Col sm="10">
                             <Form.Control type="number" value={this.state.postal} onChange={this.handleChangedPostal}
                                           aria-describedby="postal_label" min="01001" max="99999"/>
                         </Col>

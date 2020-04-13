@@ -1,7 +1,9 @@
 import React from "react"
 import Button from "react-bootstrap/Button";
-import {Alert, Col, Form} from "react-bootstrap";
+import {Form} from "react-bootstrap";
 import {errorCodeToMessage} from "../errorCode";
+import {FormField} from "./FormField";
+import {OptionalAlert} from "./OptionalAlert";
 
 export class RegisterForm extends React.Component {
     constructor(props) {
@@ -76,6 +78,7 @@ export class RegisterForm extends React.Component {
             headers: new Headers({
                 'Content-Type': 'application/json'
             }),
+            credentials: 'include',
             body: JSON.stringify(
                 {
                     email: this.state.mail,
@@ -101,54 +104,19 @@ export class RegisterForm extends React.Component {
     }
 
     render() {
-        let alert;
-        if (this.state.error) {
-            alert =
-                <Alert variant={"danger"} dismissible={true} onClose={this.clearError}> {this.state.error}  </Alert>;
-        } else {
-            alert = <span/>;
-        }
         return (
             <div>
-                {alert}
+                <OptionalAlert display={this.state.error} error={this.state.error} onClose={this.state.clearError}/>
+                <div>&nbsp;</div>
                 <Form id="register_form" onSubmit={this.handleSubmit}>
-                    <Form.Group>
-                        <Form.Label id="username_label" htmlFor="username" column>
-                            Benutzername:
-                        </Form.Label>
-                        <Col>
-                            <Form.Control type="text" required={true} id="username" value={this.state.name}
-                                          onChange={this.handleChangedName} aria-describedby="username_label"/>
-                        </Col>
-                    </Form.Group>
-                    <Form.Group>
-                        <Form.Label id="mail_label" htmlFor="usermail" column>
-                            E-Mail:
-                        </Form.Label>
-                        <Col>
-                            <Form.Control type="text" required={true} id="usermail" value={this.state.mail}
-                                          onChange={this.handleChangedMail} aria-describedby="mail_label"/>
-                        </Col>
-                    </Form.Group>
-                    <Form.Group>
-                        <Form.Label id="password_label" htmlFor="userpassword" column>
-                            Passwort:
-                        </Form.Label>
-                        <Col>
-                            <Form.Control type="password" id="userpassword" required={true} value={this.state.password}
-                                          onChange={this.handleChangedPassword} aria-describedby="password_label"/>
-                        </Col>
-                    </Form.Group>
-                    <Form.Group>
-                        <Form.Label id="password_repeat_label" htmlFor="repeat_password" column>
-                            Passwort:
-                        </Form.Label>
-                        <Col>
-                            <Form.Control type="password" id="repeat_password" required={true}
-                                          aria-describedby="password_repeat_label"
-                                          value={this.state.repeatPassword} onChange={this.handleChangedRepeat}/>
-                        </Col>
-                    </Form.Group>
+                    <FormField id="username" label="Benutzername" onChange={this.handleChangedName}
+                               value={this.state.name}/>
+                    <FormField id="mail" label="E-Mail" onChange={this.handleChangedMail}
+                               value={this.state.mail}/>
+                    <FormField id="password" label="Passwort" type="password" onChange={this.handleChangedPassword}
+                               value={this.state.password}/>
+                    <FormField id="password_repeat" label="Passwort wiederholen" type="password"
+                               onChange={this.handleChangedRepeat} value={this.state.repeatPassword}/>
                     <Button type={"submit"}>
                         Registrieren
                     </Button>
