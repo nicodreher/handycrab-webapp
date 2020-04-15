@@ -18,7 +18,7 @@ public class CORSFilter implements ContainerResponseFilter {
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)
             throws IOException {
         String host = request.getHeader("Origin");
-        if(host != null && (host.equalsIgnoreCase("http://localhost") || host.equalsIgnoreCase("http://handycrab.nico-dreher.de") || host.equalsIgnoreCase("http://127.0.0.1") || host.equalsIgnoreCase("http://::1"))) {
+        if(host != null && (host.equalsIgnoreCase("http://localhost") || host.equalsIgnoreCase("http://handycrab.nico-dreher.de") || host.equalsIgnoreCase("http://127.0.0.1") || host.equalsIgnoreCase("http://[::1]"))) {
             responseContext.getHeaders().add("Access-Control-Allow-Origin", host);
             responseContext.getHeaders().add("Access-Control-Allow-Credentials", "true");
             responseContext.getHeaders().add("Access-Control-Allow-Headers", "origin, content-type, accept, authorization");
