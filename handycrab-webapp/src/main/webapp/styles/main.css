@@ -21,3 +21,17 @@ body{
 h1{
     font-size: 1em;
 }
+
+#main-menu{
+    position: fixed;
+    background-color: #ffd863;
+    width: 300px;
+    max-width: 300px;
+    max-height: 75%;
+    overflow: auto;
+}
+
+#content-div{
+    margin-top: 0px;
+    margin-bottom: 0px;
+}

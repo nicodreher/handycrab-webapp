@@ -1,0 +1,17 @@
+.menuItem{
+    padding: 5px;
+}
+
+.menuItem:hover{
+    background-color: rgba(255,255,255, 0.19);
+}
+
+.menuItem a{
+    text-decoration: none;
+    color: #000;
+}
+
+.menuItem a:hover{
+    text-decoration: none;
+    color: #000;
+}

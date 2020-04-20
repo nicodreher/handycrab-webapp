@@ -3,10 +3,14 @@ import {MenuButton} from "./MenuButton.js"
 import "../../styles/components/title-bar.css"
 
 export class TitleBar extends React.Component{
+    constructor(props){
+        super(props);
+    }
+
     render(){
         return(
             <div id="titlebar">
-                <MenuButton />
+                <MenuButton menuAction={this.props.menuAction}/>
                 <p id="title">Handycrab</p>
             </div>
         )

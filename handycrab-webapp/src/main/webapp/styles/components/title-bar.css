@@ -1,8 +1,9 @@
 #titlebar{
+    width: 100%;
     display: flex;
     background-color: #ffc90e;
     padding: 10px;
-    height: 25px;
+    height: 45px;
 }
 
 #title{
