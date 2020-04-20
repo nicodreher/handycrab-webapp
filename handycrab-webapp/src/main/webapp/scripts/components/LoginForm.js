@@ -66,10 +66,10 @@ export class LoginForm extends React.Component {
     render() {
         return (
             <div>
-                <OptionalAlert display={this.state.error} error={this.state.error} onClose={this.clearError}/>
                 <div>&nbsp;</div>
+                <OptionalAlert display={this.state.error} error={this.state.error} onClose={this.clearError}/>
                 <Form id="login_form" onSubmit={this.handleSubmit}>
-                    <FormField id="login" value={this.state.login} onChange={this.handleChangedLogin}
+                    <FormField id="login" value={this.state.login} onChange={this.handleChangedLogin} type='text'
                                label="Benutzername oder E-Mail"/>
                     <FormField id="password" type="password" value={this.state.password}
                                onChange={this.handleChangedPassword} label="Passwort"/>
