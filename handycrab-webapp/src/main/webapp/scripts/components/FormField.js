@@ -4,7 +4,7 @@ import React from "react";
 export function FormField(props) {
     const required = props.required !== undefined ? props.required : true;
     const disabled = props.disabled !== undefined ? props.disabled : false;
-    const type = props.type !== undefined ? props.undefined : "text";
+    const type = props.type !== undefined ? props.type : "text";
     return <Form.Group as={Row}>
         <Form.Label id={props.id + '_label'} htmlFor={props.id} column sm="2">
             {props.label}
