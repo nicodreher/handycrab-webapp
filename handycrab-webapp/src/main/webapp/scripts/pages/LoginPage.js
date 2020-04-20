@@ -6,7 +6,7 @@ export function LoginPage(props) {
     return <Container>
         <Row>
             <Col>
-                <LoginForm/>
+                <LoginForm history={props.history}/>
                 <div>Noch keinen Account erstellt? Hier gehts zur <a href="/register">Registrierung</a></div>
             </Col>
         </Row>

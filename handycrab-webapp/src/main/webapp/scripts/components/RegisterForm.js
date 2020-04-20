@@ -66,11 +66,10 @@ export class RegisterForm extends React.Component {
 
     handleSubmit(event) {
         //alert('Submitted [name: ' + this.state.name + ', mail: ' + this.state.mail + ', password: ' + this.state.password + ', repeatPassword: ' + this.state.repeatPassword + ']');
+        event.preventDefault();
         if (!this.validate()) {
-            event.preventDefault();
             return;
         }
-
         let hasErrorCode = false;
         fetch("http://handycrab.nico-dreher.de/rest/users/register", {
             method: 'POST',
@@ -90,17 +89,15 @@ export class RegisterForm extends React.Component {
             return response.json();
         }).then((data) => {
             if (!hasErrorCode) {
-                //TODO handle success
                 console.log(data);
+                this.props.history.push("/search");
             } else {
                 console.error('Errorcode: ' + data.errorCode);
-                this.setState({error: errorCodeToMessage(data.errorCode)});
+                this.setState({error: errorCodeToMessage(data.errorCode), password: '', repeatPassword: ''});
             }
         }).catch(error => {
             console.error(error);
         });
-
-        event.preventDefault();
     }
 
     render() {
@@ -122,7 +119,6 @@ export class RegisterForm extends React.Component {
                     </Button>
                 </Form>
             </div>
-
         );
     }
 }
