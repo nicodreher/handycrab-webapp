@@ -3,7 +3,13 @@ import "../../styles/components/menu-button.css"
 
 export class MenuButton extends React.Component{
 
-    buttonClickHandler(){
+    constructor(props){
+        super(props);
+    }
+
+    buttonClickHandler = () => {
+        this.props.menuAction();
+
         var menubutton = document.getElementById("menubutton");
 
         if (menubutton.classList.contains("opened")){

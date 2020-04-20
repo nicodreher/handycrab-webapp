@@ -1,14 +1,13 @@
 import React from "react";
-import {RegisterForm} from "../components/RegisterForm";
 import {Col, Container, Row} from "react-bootstrap";
+import {SearchForm} from "../components/SearchForm";
 
-export function RegisterPage(props) {
+export function SearchPage(props) {
     return <Container>
         <Row>
             <Col>
-                <RegisterForm history={props.history}/>
+                <SearchForm/>
             </Col>
         </Row>
     </Container>;
-
 }

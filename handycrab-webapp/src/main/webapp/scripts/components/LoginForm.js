@@ -1,11 +1,14 @@
 import React from "react";
 import Button from "react-bootstrap/Button";
-import {Col, Form} from "react-bootstrap";
+import {Form} from "react-bootstrap";
+import {errorCodeToMessage} from "../errorCode";
+import {FormField} from "./FormField";
+import {OptionalAlert} from "./OptionalAlert";
 
 export class LoginForm extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {login: '', password: ''};
+        this.state = {login: '', password: '', error: ''};
 
         this.handleChangedLogin = this.handleChangedLogin.bind(this);
         this.handleChangedPassword = this.handleChangedPassword.bind(this);
@@ -14,6 +17,7 @@ export class LoginForm extends React.Component {
 
         this.clearError = this.clearError.bind(this);
     }
+
     clearError() {
         this.setState({error: ''});
     }
@@ -28,15 +32,12 @@ export class LoginForm extends React.Component {
 
     handleSubmit(event) {
         //alert('Submitted [login: ' + this.state.login + ', password: ' + this.state.password + ']');
+        event.preventDefault();
         let hasErrorCode;
-        console.log(JSON.stringify(
-            {
-                login: this.state.login,
-                password: this.state.password
-            }));
         fetch("http://handycrab.nico-dreher.de/rest/users/login", {
             method: 'POST',
             cache: 'no-cache',
+            credentials: 'include',
             headers: new Headers({
                 'Content-Type': 'application/json'
             }),
@@ -46,47 +47,37 @@ export class LoginForm extends React.Component {
                     password: this.state.password
                 })
         }).then(response => {
-            hasErrorCode = response.ok;
+            hasErrorCode = !response.ok;
             return response.json();
         }).then((data) => {
             if (hasErrorCode) {
-                //TODO handle errorcodes
                 console.error("Errorcode: " + data.errorCode);
+                this.setState({error: errorCodeToMessage(data.errorCode), password: ''});
             } else {
-                //TODO success
                 console.log(data);
+                this.props.history.push("/search");
             }
         }).catch(error => {
-            console.error(error)
+            console.error(error);
+            this.setState({password: '', error: 'Ein unerwarteter Fehler ist aufgetreten'})
         });
-        event.preventDefault();
     }
 
     render() {
         return (
-            <Form id="login_form" onSubmit={this.handleSubmit}>
-                <Form.Group>
-                    <Form.Label id="username_label" htmlFor="username_or_mail" column sm="2">
-                        Benutzername oder E-Mail:
-                    </Form.Label>
-                    <Col sm="10">
-                        <Form.Control type="text" required={true} id="username_or_mail" value={this.state.login}
-                                      onChange={this.handleChangedLogin} aria-describedby="username_label"/>
-                    </Col>
-                </Form.Group>
-                <Form.Group>
-                    <Form.Label id="password_label" htmlFor="userpassword" column sm="2">
-                        Passwort:
-                    </Form.Label>
-                    <Col sm="10">
-                        <Form.Control type="password" id="userpassword" required={true} value={this.state.password}
-                                      onChange={this.handleChangedPassword} aria-describedby="password_label"/>
-                    </Col>
-                </Form.Group>
-                <Button type="submit">
-                    Anmelden
-                </Button>
-            </Form>
+            <div>
+                <div>&nbsp;</div>
+                <OptionalAlert display={this.state.error} error={this.state.error} onClose={this.clearError}/>
+                <Form id="login_form" onSubmit={this.handleSubmit}>
+                    <FormField id="login" value={this.state.login} onChange={this.handleChangedLogin} type='text'
+                               label="Benutzername oder E-Mail"/>
+                    <FormField id="password" type="password" value={this.state.password}
+                               onChange={this.handleChangedPassword} label="Passwort"/>
+                    <Button type="submit">
+                        Anmelden
+                    </Button>
+                </Form>
+            </div>
         );
     }
 }
