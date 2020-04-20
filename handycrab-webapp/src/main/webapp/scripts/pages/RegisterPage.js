@@ -6,7 +6,7 @@ export function RegisterPage(props) {
     return <Container>
         <Row>
             <Col>
-                <RegisterForm/>
+                <RegisterForm history={props.history}/>
             </Col>
         </Row>
     </Container>;

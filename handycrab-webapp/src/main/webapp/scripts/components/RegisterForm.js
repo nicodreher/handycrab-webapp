@@ -40,24 +40,36 @@ export class RegisterForm extends React.Component {
         this.setState({mail: event.target.value});
     }
 
-    validate() {
-        const username_regex = /^[a-zA-Z0-9_]{4,16}$/;
-        const password_regex = /^[a-zA-Z0-9"!#$%&'()*+,\-./:;<=>?@\[\]]{6,100}$/;
-        const mail_regex = /^[\w!#$%&'*+/=?`{|}~^-]+(?:\.[\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,6}$/;
+    isValidUsername(username) {
+        return /^[a-zA-Z0-9_]{4,16}$/.test(username)
+    }
 
-        if (!username_regex.test(this.state.name)) {
+    isValidMail(mail) {
+        return /^[\w!#$%&'*+/=?`{|}~^-]+(?:\.[\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,6}$/.test(mail);
+    }
+
+    isValidPassword(password) {
+        return /^[a-zA-Z0-9"!#$%&'()*+,\-./:;<=>?@\[\]]{6,100}$/.test(password);
+    }
+
+    isValidRepeat(password, repeat) {
+        return password === repeat && this.isValidPassword(repeat);
+    }
+
+    validate() {
+        if (!this.isValidUsername(this.state.name)) {
             this.setState({error: 'Ein Benutzername besteht aus 4 bis 16 Zahlen und/oder Buchstaben. "_" ist als Sonderzeichen erlaubt.'});
             return false;
         }
-        if (!mail_regex.test(this.state.mail)) {
+        if (!this.isValidMail(this.state.mail)) {
             this.setState({error: 'Bitte geben Sie eine gültige E-Mail-Adresse ein.'});
             return false;
         }
-        if (!password_regex.test(this.state.password)) {
+        if (!this.isValidPassword(this.state.password)) {
             this.setState({error: 'Ein Passwort hat mindestens 6 Zeichen.'});
             return false;
         }
-        if (!(this.state.password === this.state.repeatPassword)) {
+        if (!this.isValidRepeat(this.state.password, this.state.repeatPassword)) {
             this.setState({error: 'Passwörter stimmen nicht überein.'});
             return false;
         }
@@ -66,11 +78,10 @@ export class RegisterForm extends React.Component {
 
     handleSubmit(event) {
         //alert('Submitted [name: ' + this.state.name + ', mail: ' + this.state.mail + ', password: ' + this.state.password + ', repeatPassword: ' + this.state.repeatPassword + ']');
+        event.preventDefault();
         if (!this.validate()) {
-            event.preventDefault();
             return;
         }
-
         let hasErrorCode = false;
         fetch("http://handycrab.nico-dreher.de/rest/users/register", {
             method: 'POST',
@@ -90,39 +101,41 @@ export class RegisterForm extends React.Component {
             return response.json();
         }).then((data) => {
             if (!hasErrorCode) {
-                //TODO handle success
                 console.log(data);
+                this.props.history.push("/search");
             } else {
                 console.error('Errorcode: ' + data.errorCode);
-                this.setState({error: errorCodeToMessage(data.errorCode)});
+                this.setState({error: errorCodeToMessage(data.errorCode), password: '', repeatPassword: ''});
             }
         }).catch(error => {
             console.error(error);
         });
-
-        event.preventDefault();
     }
 
     render() {
+        const validPassword = this.isValidPassword(this.state.password);
+        const validMail = this.isValidMail(this.state.mail);
+        const validRepeat = this.isValidRepeat(this.state.password, this.state.repeatPassword);
+        const validUsername = this.isValidUsername(this.state.name);
         return (
             <div>
-                <OptionalAlert display={this.state.error} error={this.state.error} onClose={this.state.clearError}/>
                 <div>&nbsp;</div>
+                <OptionalAlert display={this.state.error} error={this.state.error} onClose={this.clearError}/>
                 <Form id="register_form" onSubmit={this.handleSubmit}>
-                    <FormField id="username" label="Benutzername" onChange={this.handleChangedName}
-                               value={this.state.name}/>
-                    <FormField id="mail" label="E-Mail" onChange={this.handleChangedMail}
-                               value={this.state.mail}/>
+                    <FormField id="username" label="Benutzername" onChange={this.handleChangedName} type='text'
+                               value={this.state.name} isValid={validUsername}/>
+                    <FormField id="mail" label="E-Mail" onChange={this.handleChangedMail} type='text'
+                               value={this.state.mail} isValid={validMail}/>
                     <FormField id="password" label="Passwort" type="password" onChange={this.handleChangedPassword}
-                               value={this.state.password}/>
+                               value={this.state.password} isValid={validPassword}/>
                     <FormField id="password_repeat" label="Passwort wiederholen" type="password"
-                               onChange={this.handleChangedRepeat} value={this.state.repeatPassword}/>
+                               onChange={this.handleChangedRepeat} value={this.state.repeatPassword}
+                               isValid={validRepeat}/>
                     <Button type={"submit"}>
                         Registrieren
                     </Button>
                 </Form>
             </div>
-
         );
     }
 }

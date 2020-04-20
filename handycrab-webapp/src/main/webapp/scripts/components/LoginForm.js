@@ -32,6 +32,7 @@ export class LoginForm extends React.Component {
 
     handleSubmit(event) {
         //alert('Submitted [login: ' + this.state.login + ', password: ' + this.state.password + ']');
+        event.preventDefault();
         let hasErrorCode;
         fetch("http://handycrab.nico-dreher.de/rest/users/login", {
             method: 'POST',
@@ -51,32 +52,32 @@ export class LoginForm extends React.Component {
         }).then((data) => {
             if (hasErrorCode) {
                 console.error("Errorcode: " + data.errorCode);
-                this.setState({error: errorCodeToMessage(data.errorCode)});
+                this.setState({error: errorCodeToMessage(data.errorCode), password: ''});
             } else {
                 console.log(data);
+                this.props.history.push("/search");
             }
         }).catch(error => {
-            console.error(error)
+            console.error(error);
+            this.setState({password: '', error: 'Ein unerwarteter Fehler ist aufgetreten'})
         });
-        event.preventDefault();
     }
 
     render() {
         return (
             <div>
-                <OptionalAlert display={this.state.error} error={this.state.error} onClose={this.clearError}/>
                 <div>&nbsp;</div>
+                <OptionalAlert display={this.state.error} error={this.state.error} onClose={this.clearError}/>
                 <Form id="login_form" onSubmit={this.handleSubmit}>
-                    <FormField id="login"  value={this.state.login} onChange={this.handleChangedLogin} label="Benutzername oder E-Mail"/>
+                    <FormField id="login" value={this.state.login} onChange={this.handleChangedLogin} type='text'
+                               label="Benutzername oder E-Mail"/>
                     <FormField id="password" type="password" value={this.state.password}
                                onChange={this.handleChangedPassword} label="Passwort"/>
                     <Button type="submit">
                         Anmelden
                     </Button>
                 </Form>
-
             </div>
-        )
-            ;
+        );
     }
 }
