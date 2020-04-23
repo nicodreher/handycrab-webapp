@@ -4,6 +4,8 @@ import {Form} from "react-bootstrap";
 import {errorCodeToMessage} from "../errorCode";
 import {FormField} from "./FormField";
 import {OptionalAlert} from "./OptionalAlert";
+import {registerUrl} from "../RestEndpoints";
+import {logIn} from "../Auth";
 
 export class RegisterForm extends React.Component {
     constructor(props) {
@@ -83,7 +85,7 @@ export class RegisterForm extends React.Component {
             return;
         }
         let hasErrorCode = false;
-        fetch("http://handycrab.nico-dreher.de/rest/users/register", {
+        fetch(registerUrl, {
             method: 'POST',
             cache: 'no-cache',
             headers: new Headers({
@@ -102,6 +104,7 @@ export class RegisterForm extends React.Component {
         }).then((data) => {
             if (!hasErrorCode) {
                 console.log(data);
+                logIn();
                 this.props.history.push("/search");
             } else {
                 console.error('Errorcode: ' + data.errorCode);
