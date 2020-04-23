@@ -1,4 +1,4 @@
-const baseUrl = 'http://handycrab.nico-dreher.de/rest'
+const baseUrl = 'http://handycrab.nico-dreher.de/rest';
 
 export const loginUrl = baseUrl + '/users/login';
 export const registerUrl = baseUrl + '/users/register';

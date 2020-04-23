@@ -61,7 +61,7 @@ class App extends React.Component {
                                       url="/about"/>
                         {isLoggedIn() &&
                         <MainMenuItem icon="images/icons/logout_icon.svg" altText="logout" title="Abmelden"
-                                      url="/login" onClick={logout}/>}
+                                      onClick={logout}/>}
                     </div>
                     <Router>
                         <Switch>

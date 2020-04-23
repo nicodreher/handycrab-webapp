@@ -20,7 +20,10 @@ export function logout() {
         cache: "no-cache",
         mode: "cors"
     }).then((response) => {
-        console.log("got response for logout");
-        console.log(response);
-    }).catch(error => console.log(error));
+        window.location.pathname = "/login";
+    }).catch((error) => {
+            console.log(error);
+            window.location.pathname = "/error";
+        }
+    );
 }
