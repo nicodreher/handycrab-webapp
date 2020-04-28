@@ -52,7 +52,7 @@ metadata:
   namespace: handycrab
   annotations:
     ingress.kubernetes.io/rewrite-target: "/"
-    ingress.kubernetes.io/ssl-redirect: "true"
+    ingress.kubernetes.io/ssl-redirect: "false"
 spec:
   rules:
     - host: handycrab.nico-dreher.de
