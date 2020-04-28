@@ -2,6 +2,7 @@ package de.dhbw.handycrab.server.beans.barriers;
 
 import com.mongodb.MongoClient;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.geojson.Point;
 import com.mongodb.client.model.geojson.Position;
 import de.dhbw.handycrab.api.barriers.*;
@@ -48,6 +49,7 @@ public class BarriersBean implements Barriers {
     @PostConstruct
     private void construct() {
         dataSource = new DataSource<>(Barrier.class, "barriers", serializer, client);
+        dataSource.getCollection().createIndex(Indexes.geo2dsphere("point"));
     }
 
     @Override
