@@ -1,6 +1,8 @@
 package de.dhbw.handycrab.server.beans.utils;
 
 import com.google.gson.*;
+import com.mongodb.client.model.geojson.Point;
+import com.mongodb.client.model.geojson.Position;
 import de.dhbw.handycrab.api.utils.Serializer;
 import org.bson.types.ObjectId;
 import org.json.JSONArray;
@@ -29,7 +31,22 @@ public class SerializerBean implements Serializer {
             .registerTypeAdapter(JSONObject.class,
                     (JsonDeserializer<JSONObject>) (json, typeofT, context) -> new JSONObject(json.toString()))
             .registerTypeAdapter(JSONArray.class,
-                    (JsonDeserializer<JSONArray>) (json, typeofT, context) -> new JSONArray(json.toString()));
+                    (JsonDeserializer<JSONArray>) (json, typeofT, context) -> new JSONArray(json.toString()))
+            .registerTypeAdapter(Point.class,
+                    (JsonDeserializer<Point>) (json, typeofT, context) -> {
+                        var coordinateArray = json.getAsJsonObject().getAsJsonArray("coordinates");
+                        return new Point(new Position(coordinateArray.get(0).getAsDouble(), coordinateArray.get(1).getAsDouble()));
+                    })
+            .registerTypeAdapter(Point.class,
+                    (JsonSerializer<Point>) (src, typeOfSrc, context) -> {
+                        var obj = new JsonObject();
+                        obj.add("type", new JsonPrimitive("Point"));
+                        var coordinates = new JsonArray();
+                        coordinates.add(src.getPosition().getValues().get(0));
+                        coordinates.add(src.getPosition().getValues().get(1));
+                        obj.add("coordinates", coordinates);
+                        return obj;
+                    });
 
 
     private static final GsonBuilder restGsonBuilder = new GsonBuilder()
@@ -43,7 +60,22 @@ public class SerializerBean implements Serializer {
             .registerTypeAdapter(JSONObject.class,
                     (JsonDeserializer<JSONObject>) (json, typeofT, context) -> new JSONObject(json.toString()))
             .registerTypeAdapter(JSONArray.class,
-                    (JsonDeserializer<JSONArray>) (json, typeofT, context) -> new JSONArray(json.toString()));
+                    (JsonDeserializer<JSONArray>) (json, typeofT, context) -> new JSONArray(json.toString()))
+            .registerTypeAdapter(Point.class,
+                    (JsonDeserializer<Point>) (json, typeofT, context) -> {
+                        var coordinateArray = json.getAsJsonObject().getAsJsonArray("coordinates");
+                        return new Point(new Position(coordinateArray.get(0).getAsDouble(), coordinateArray.get(1).getAsDouble()));
+                    })
+            .registerTypeAdapter(Point.class,
+                    (JsonSerializer<Point>) (src, typeOfSrc, context) -> {
+                        var obj = new JsonObject();
+                        obj.add("type", new JsonPrimitive("Point"));
+                        var coordinates = new JsonArray();
+                        coordinates.add(src.getPosition().getValues().get(0));
+                        coordinates.add(src.getPosition().getValues().get(1));
+                        obj.add("coordinates", coordinates);
+                        return obj;
+                    });
 
     private Gson gson;
     private Gson restGson;
