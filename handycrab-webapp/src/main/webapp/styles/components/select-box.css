@@ -1,0 +1,26 @@
+.select-box{
+    display: inline-block;
+    margin: auto 5px auto 5px;
+    vertical-align: middle;
+}
+
+.select-box *{
+    display: inline-block;
+}
+
+.select-box p{
+    margin: auto 5px auto 0;
+    padding: 0;
+    transform: translateY(3px);
+}
+
+.select-box select{
+    width: 110px;
+}
+
+@media only screen and (max-width: 768px) {
+    .select-box *{
+        display: block;
+        z-index: 101;
+    }
+}

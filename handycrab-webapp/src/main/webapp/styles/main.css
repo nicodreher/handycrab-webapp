@@ -19,7 +19,30 @@ body{
 }
 
 h1{
-    font-size: 1em;
+     font-size: 1em;
+}
+
+select{
+    cursor: pointer;
+    display: inline-block;
+    border-radius: 2px;
+    border: 1px solid #ffc90e;
+    background-color: #fffcf2;
+    font-size: 14pt;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding-right: 15px;
+    background-image: url("../images/icons/select_arrow.svg");
+    background-size: 14px auto;
+    background-repeat: no-repeat;
+    background-position: right center;
+    vertical-align: middle;
+    height: 22px;
+}
+
+select option{
+    font-size: 10pt;
 }
 
 #main-menu{
@@ -29,9 +52,11 @@ h1{
     max-width: 300px;
     max-height: 75%;
     overflow: auto;
+    z-index: 1000;
 }
 
 #content-div{
-    margin-top: 0px;
-    margin-bottom: 0px;
+  position: relative;
+  height: calc(100vh - 32px - 45px);
+  overflow-y: auto;
 }
