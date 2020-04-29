@@ -18,15 +18,18 @@ import {
     Switch
 } from "react-router-dom"
 import {SearchPage} from "./pages/SearchPage";
+import {isLoggedIn, logout} from "./Auth";
+import {ProtectedRoute} from "./components/ProtectedRoute";
+
 class App extends React.Component {
 
-    constructor(props){
+    constructor(props) {
         super(props);
-        this.state = {menuOpen: false, loggedIn: false};
+        this.state = {menuOpen: false};
     }
 
     toggleMenu = () => {
-        if (this.state.menuOpen){
+        if (this.state.menuOpen) {
             this.setState({menuOpen: false});
         } else {
             this.setState({menuOpen: true});
@@ -34,6 +37,14 @@ class App extends React.Component {
     }
 
     render() {
+        const needToRedirectToHttps = window.location.protocol === "http:";
+        if (needToRedirectToHttps) {
+            if (window.location.hostname.includes("localhost") || window.location.hostname.includes("127.0.0.1")) {
+                console.log("Debug environment, skipping redirect")
+            } else {
+                window.location.href = window.location.href.replace("http://", "https://");
+            }
+        }
         return (
             <div id="app-flex-div">
                 <TitleBar menuAction={this.toggleMenu}/>
@@ -50,7 +61,7 @@ class App extends React.Component {
                         <Switch>
                             <Route exact path="/login" component={LoginPage}/>
                             <Route exact path="/register" component={RegisterPage}/>
-                            <Route exact path="/" component={HomePage}/>
+                            <ProtectedRoute exact path="/" component={HomePage}/>
                             <Route exact path="/about" component={AboutPage}/>
                             <Route exact path="/search" component={SearchPage}/>
                             <Route exact path="/results" component={SearchResultsPage}/>

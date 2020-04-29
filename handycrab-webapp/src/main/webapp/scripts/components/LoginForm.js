@@ -4,6 +4,8 @@ import {Form} from "react-bootstrap";
 import {errorCodeToMessage} from "../errorCode";
 import {FormField} from "./FormField";
 import {OptionalAlert} from "./OptionalAlert";
+import {loginUrl} from "../RestEndpoints";
+import {logIn} from "../Auth";
 
 export class LoginForm extends React.Component {
     constructor(props) {
@@ -34,7 +36,7 @@ export class LoginForm extends React.Component {
         //alert('Submitted [login: ' + this.state.login + ', password: ' + this.state.password + ']');
         event.preventDefault();
         let hasErrorCode;
-        fetch("http://handycrab.nico-dreher.de/rest/users/login", {
+        fetch(loginUrl, {
             method: 'POST',
             cache: 'no-cache',
             credentials: 'include',
@@ -55,6 +57,7 @@ export class LoginForm extends React.Component {
                 this.setState({error: errorCodeToMessage(data.errorCode), password: ''});
             } else {
                 console.log(data);
+                logIn();
                 this.props.history.push("/search");
             }
         }).catch(error => {
