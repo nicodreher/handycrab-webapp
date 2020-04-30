@@ -42,7 +42,7 @@ class App extends React.Component {
                 <TitleBar menuAction={this.toggleMenu}/>
                 <div id="content-div">
                     <div id="main-menu" style={{visibility: this.state.menuOpen ? "visible" : "hidden"}}>
-                        <MainMenuItem icon="images/icons/menu/home_icon.png" altText="hom  e" title="Home" url="/" />
+                        <MainMenuItem icon="images/icons/menu/home_icon.png" altText="home" title="Home" url="/" />
                         <MainMenuItem icon="images/icons/menu/login_icon.png" altText="login" title="Anmeldung" url="/login" />
                         <MainMenuItem icon="images/icons/menu/register_icon.png" altText="register" title="Registrierung" url="/register" />
                         {isLoggedIn() &&
