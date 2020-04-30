@@ -58,7 +58,8 @@ export class LoginForm extends React.Component {
             } else {
                 console.log(data);
                 logIn();
-                this.props.history.push("/search");
+                const destination = sessionStorage.getItem("destination");
+                this.props.history.push(destination  ? destination : "/search");
             }
         }).catch(error => {
             console.error(error);
