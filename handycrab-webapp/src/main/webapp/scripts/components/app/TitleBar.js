@@ -1,6 +1,6 @@
 import React from "react"
 import {MenuButton} from "./MenuButton.js"
-import "../../styles/components/title-bar.css"
+import "../../../styles/components/app/title-bar.css"
 
 export class TitleBar extends React.Component{
     constructor(props){

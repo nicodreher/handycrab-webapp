@@ -22,7 +22,7 @@ export class HomePage extends React.Component{
     render(){
         return(
             <div>
-                <p id="demo-div">Hello World um {this.state.time}</p>
+                <p id="demo-div">Hello World um {this.state.time} <br />This page is under construction!</p>
             </div>
         )
     }

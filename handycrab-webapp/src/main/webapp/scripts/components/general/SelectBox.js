@@ -1,5 +1,5 @@
 import React from "react"
-import "../../styles/components/select-box.css"
+import "../../../styles/components/general/select-box.css"
 
 export class SelectBox extends React.Component{
 

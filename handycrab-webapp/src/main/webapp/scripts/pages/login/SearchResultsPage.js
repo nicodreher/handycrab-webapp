@@ -1,9 +1,9 @@
 import React from "react";
-import {BarrierPreview} from "../components/BarrierPreview";
-import {errorCodeToMessage} from "../errorCode";
-import {OptionalAlert} from "../components/OptionalAlert";
-import {SelectBox} from "../components/SelectBox";
-import "../../styles/pages/search-results-page.css"
+import {BarrierPreview} from "../../components/search/BarrierPreview";
+import {errorCodeToMessage} from "../../util/errorCode";
+import {OptionalAlert} from "../../components/app/OptionalAlert";
+import {SelectBox} from "../../components/general/SelectBox";
+import "../../../styles/pages/login/search-results-page.css"
 
 export class SearchResultsPage extends React.Component{
 

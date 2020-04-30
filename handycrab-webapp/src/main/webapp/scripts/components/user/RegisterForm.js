@@ -1,11 +1,11 @@
 import React from "react"
 import Button from "react-bootstrap/Button";
 import {Form} from "react-bootstrap";
-import {errorCodeToMessage} from "../errorCode";
-import {FormField} from "./FormField";
-import {OptionalAlert} from "./OptionalAlert";
-import {registerUrl} from "../RestEndpoints";
-import {logIn} from "../Auth";
+import {errorCodeToMessage} from "../../util/errorCode";
+import {FormField} from "../general/FormField";
+import {OptionalAlert} from "../app/OptionalAlert";
+import {registerUrl} from "../../util/RestEndpoints";
+import {logIn} from "../../util/Auth";
 
 export class RegisterForm extends React.Component {
     constructor(props) {

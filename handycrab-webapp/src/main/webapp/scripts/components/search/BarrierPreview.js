@@ -1,5 +1,5 @@
 import React from "react"
-import "../../styles/components/barrier-preview.css"
+import "../../../styles/components/search/barrier-preview.css"
 
 export class BarrierPreview extends React.Component{
 

@@ -1,5 +1,5 @@
 import React from "react";
- import "../../styles/components/main-menu-item.css"
+ import "../../../styles/components/app/main-menu-item.css"
 
  export class MainMenuItem extends React.Component{
      constructor(props){

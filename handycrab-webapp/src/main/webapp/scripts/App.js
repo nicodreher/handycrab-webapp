@@ -1,25 +1,25 @@
 import React from "react"
 import ReactDOM from "react-dom"
 
-import {HomePage} from "./pages/HomePage.js"
-import {AboutPage} from "./pages/AboutPage.js"
-import {ErrorPage} from "./pages/ErrorPage.js"
-import {LoginPage} from "./pages/LoginPage"
-import {RegisterPage} from "./pages/RegisterPage"
-import {SearchResultsPage} from "./pages/SearchResultsPage"
+import {HomePage} from "./pages/public/HomePage"
+import {AboutPage} from "./pages/public/AboutPage"
+import {ErrorPage} from "./pages/public/ErrorPage"
+import {LoginPage} from "./pages/public/LoginPage"
+import {RegisterPage} from "./pages/public/RegisterPage"
+import {SearchPage} from "./pages/login/SearchPage";
+import {SearchResultsPage} from "./pages/login/SearchResultsPage"
 
-import {TitleBar} from "./components/TitleBar.js"
-import {Footer} from "./components/Footer.js"
-import {MainMenuItem} from "./components/MainMenuItem.js"
+import {TitleBar} from "./components/app/TitleBar"
+import {Footer} from "./components/app/Footer"
+import {MainMenuItem} from "./components/app/MainMenuItem"
 
 import {
     BrowserRouter as Router,
     Route,
     Switch
 } from "react-router-dom"
-import {SearchPage} from "./pages/SearchPage";
-import {isLoggedIn, logout} from "./Auth";
-import {ProtectedRoute} from "./components/ProtectedRoute";
+import {isLoggedIn, logout} from "./util/Auth";
+import {ProtectedRoute} from "./components/app/ProtectedRoute";
 
 class App extends React.Component {
 
@@ -50,12 +50,17 @@ class App extends React.Component {
                 <TitleBar menuAction={this.toggleMenu}/>
                 <div id="content-div">
                     <div id="main-menu" style={{visibility: this.state.menuOpen ? "visible" : "hidden"}}>
-                        <MainMenuItem icon="images/icons/home_icon.png" altText="hom  e" title="Home" url="/" />
-                        <MainMenuItem icon="images/icons/login_icon.png" altText="login" title="Anmeldung" url="/login" />
-                        <MainMenuItem icon="images/icons/register_icon.png" altText="register" title="Registrierung" url="/register" />
-                        {this.state.loggedIn &&
-                        <MainMenuItem icon="images/icons/search_icon.png" altText="search" title="Suche" url="/search" />}
-                        <MainMenuItem icon="images/icons/info_icon.png" altText="about" title="Über die Anwendung" url="/about" />
+                        <MainMenuItem icon="images/icons/menu/home_icon.png" altText="home" title="Home" url="/" />
+                        <MainMenuItem icon="images/icons/menu/login_icon.png" altText="login" title="Anmeldung"
+                         url="/login" />
+                        <MainMenuItem icon="images/icons/menu/register_icon.png" altText="register"
+                         title="Registrierung" url="/register" />
+                        {isLoggedIn() &&
+                            <MainMenuItem icon="images/icons/menu/search_icon.png" altText="search" title="Suche"
+                             url="/search" />
+                        }
+                        <MainMenuItem icon="images/icons/menu/info_icon.png" altText="about" title="Über die Anwendung"
+                         url="/about" />
                     </div>
                     <Router>
                         <Switch>
@@ -63,8 +68,8 @@ class App extends React.Component {
                             <Route exact path="/register" component={RegisterPage}/>
                             <ProtectedRoute exact path="/" component={HomePage}/>
                             <Route exact path="/about" component={AboutPage}/>
-                            <Route exact path="/search" component={SearchPage}/>
-                            <Route exact path="/results" component={SearchResultsPage}/>
+                            <ProtectedRoute exact path="/search" component={SearchPage}/>
+                            <ProtectedRoute exact path="/results" component={SearchResultsPage}/>
                             <Route component={ErrorPage}/>
                         </Switch>
                     </Router>

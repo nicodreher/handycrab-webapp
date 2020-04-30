@@ -1,9 +1,9 @@
 import React from "react"
 import Button from "react-bootstrap/Button";
 import {Form, Row} from "react-bootstrap";
-import {FormField} from "./FormField";
+import {FormField} from "../general/FormField";
 import FormCheck from "react-bootstrap/FormCheck";
-import {OptionalAlert} from "./OptionalAlert";
+import {OptionalAlert} from "../app/OptionalAlert";
 import Col from "react-bootstrap/Col";
 
 export class SearchForm extends React.Component {
