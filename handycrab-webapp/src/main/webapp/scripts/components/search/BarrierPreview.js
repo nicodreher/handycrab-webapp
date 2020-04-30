@@ -22,16 +22,16 @@ export class BarrierPreview extends React.Component{
 
     decideOnUpvoteImg(){
         if (this.state.vote == "UP"){
-            return "images/icons/upvote_clicked.svg";
+            return "images/icons/uicomponents/upvote_clicked.svg";
         }
-        return "images/icons/upvote.svg";
+        return "images/icons/uicomponents/upvote.svg";
     }
 
     decideOnDownvoteImg(){
             if (this.state.vote == "DOWN"){
-                return "images/icons/downvote_clicked.svg";
+                return "images/icons/uicomponents/downvote_clicked.svg";
             }
-            return "images/icons/downvote.svg";
+            return "images/icons/uicomponents/downvote.svg";
     }
 
     render(){
@@ -46,7 +46,7 @@ export class BarrierPreview extends React.Component{
 
             <div>
                 <span className="metric-distance">
-                    <img src="images/icons/pin.png" />
+                    <img src="images/icons/uicomponents/pin.png" />
                     <p>{this.props.distance}m Abstand</p>
                 </span>
                 <img className="vote-image" src={this.decideOnUpvoteImg()} onClick={this.onUpvoteClick}/>

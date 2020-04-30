@@ -201,7 +201,7 @@ export class SearchResultsPage extends React.Component{
 
                         <img className="filter-icon" onClick={() => this.state.filterOpen ?
                          this.setState({filterOpen : false}) : this.setState({filterOpen : true})}
-                         src="images/icons/filter.png" />
+                         src="images/icons/uicomponents/filter.png" />
                     </div>
                 </div>
                 <div className="results-content">
