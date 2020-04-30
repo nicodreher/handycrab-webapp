@@ -37,30 +37,19 @@ class App extends React.Component {
     }
 
     render() {
-        const needToRedirectToHttps = window.location.protocol === "http:";
-        if (needToRedirectToHttps) {
-            if (window.location.hostname.includes("localhost") || window.location.hostname.includes("127.0.0.1")) {
-                console.log("Debug environment, skipping redirect")
-            } else {
-                window.location.href = window.location.href.replace("http://", "https://");
-            }
-        }
         return (
             <div id="app-flex-div">
                 <TitleBar menuAction={this.toggleMenu}/>
                 <div id="content-div">
                     <div id="main-menu" style={{visibility: this.state.menuOpen ? "visible" : "hidden"}}>
-                        <MainMenuItem icon="images/icons/menu/home_icon.png" altText="home" title="Home" url="/" />
-                        <MainMenuItem icon="images/icons/menu/login_icon.png" altText="login" title="Anmeldung"
-                         url="/login" />
-                        <MainMenuItem icon="images/icons/menu/register_icon.png" altText="register"
-                         title="Registrierung" url="/register" />
+                        <MainMenuItem icon="images/icons/home_icon.png" altText="hom  e" title="Home" url="/" />
+                        <MainMenuItem icon="images/icons/login_icon.png" altText="login" title="Anmeldung" url="/login" />
+                        <MainMenuItem icon="images/icons/register_icon.png" altText="register" title="Registrierung" url="/register" />
                         {isLoggedIn() &&
-                            <MainMenuItem icon="images/icons/menu/search_icon.png" altText="search" title="Suche"
-                             url="/search" />
-                        }
-                        <MainMenuItem icon="images/icons/menu/info_icon.png" altText="about" title="Über die Anwendung"
-                         url="/about" />
+                        <MainMenuItem icon="images/icons/search_icon.png" altText="search" title="Suche" url="/search" />}
+                        <MainMenuItem icon="images/icons/info_icon.png" altText="about" title="Über die Anwendung" url="/about" />
+                        {isLoggedIn() &&
+                        <MainMenuItem icon="images/icons/logout_icon.svg" altText="logout" title="Abmelden" onClick={logout} />}
                     </div>
                     <Router>
                         <Switch>
