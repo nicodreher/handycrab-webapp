@@ -98,15 +98,16 @@ export class SearchForm extends React.Component {
                                value={this.state.latitude.toFixed(3)} type='text'/>
                     <FormField id="longitude" label="Längengrad" disabled={true} onChange={this.handleChangedLongitude}
                                value={this.state.longitude.toFixed(3)} type='text'/>
-                    <Form.Group as={Row}>
+                    <Form.Group as={Row} controlId={"radius_selection"}>
                         <Form.Label as="legend" column sm={2}>
                             Such-Radius (in Meter)
                         </Form.Label>
                         <Col sm={10}>
                             {radii.map(r => <FormCheck key={r} type={'radio'} checked={this.state.radius === r}
-                                                      inline label={r} onChange={() => {
-                                this.setState({radius: r})
-                            }}/>)}
+                                                       disabled={!this.state.searchByPosition} inline label={r}
+                                                       onChange={() => {
+                                                           this.setState({radius: r})
+                                                       }}/>)}
                         </Col>
                     </Form.Group>
                     <FormField id='postalcode' type='number' value={this.state.postal}

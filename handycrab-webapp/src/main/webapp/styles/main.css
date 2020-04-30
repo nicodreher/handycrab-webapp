@@ -33,7 +33,7 @@ select{
     -moz-appearance: none;
     appearance: none;
     padding-right: 15px;
-    background-image: url("../images/icons/select_arrow.svg");
+    background-image: url("../images/icons/uicomponents/select_arrow.svg");
     background-size: 14px auto;
     background-repeat: no-repeat;
     background-position: right center;
