@@ -35,8 +35,6 @@ public class BarriersBean implements Barriers {
 
     private DataSource<Barrier> dataSource;
 
-    private DataSource<Solution> solutionDataSource;
-
     public BarriersBean() {
     }
 
@@ -129,7 +127,7 @@ public class BarriersBean implements Barriers {
             if (vote == Vote.UP && !upVotes.contains(userId)) {
                 downVotes.remove(userId);
                 upVotes.add(userId);
-            } else if (vote == Vote.DOWN && downVotes.contains(userId)) {
+            } else if (vote == Vote.DOWN && !downVotes.contains(userId)) {
                 upVotes.remove(userId);
                 downVotes.add(userId);
             } else if (vote == Vote.NONE) {

@@ -7,10 +7,7 @@ import de.dhbw.handycrab.api.barriers.Solution;
 import de.dhbw.handycrab.api.barriers.Vote;
 import de.dhbw.handycrab.server.beans.barriers.BarriersBean;
 import de.dhbw.handycrab.server.beans.utils.SerializerBean;
-import de.dhbw.handycrab.server.exceptions.BarrierNotFoundException;
-import de.dhbw.handycrab.server.exceptions.IncompleteRequestException;
-import de.dhbw.handycrab.server.exceptions.InvalidGeoPositionException;
-import de.dhbw.handycrab.server.exceptions.InvalidUserIdException;
+import de.dhbw.handycrab.server.exceptions.*;
 import de.dhbw.handycrab.server.test.mongo.MongoContainer;
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -86,7 +83,6 @@ class BarriersBeanTest {
     void getBarrier_onId_ReturnsBarrier() {
         var _id = new ObjectId("000000000000000000000000");
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
-        var idAsJSON = new JSONObject().put("_id", _id).toString();
 
         FrontendBarrier bar = bean.getBarrier(_id, REQUESTERID);
 
@@ -253,7 +249,179 @@ class BarriersBeanTest {
         var solutionId = bean.getBarrier(_id, userId).getSolutions().get(0).get_id();
         bean.addVoteToSolution(solutionId, Vote.UP, userId);
 
-        assertEquals(1, bean.getBarrier(_id, userId).getSolutions().get(0).getUpVotes());
-        assertEquals(0, bean.getBarrier(_id, userId).getSolutions().get(0).getDownVotes());
+        var solution = bean.getBarrier(_id, userId).getSolutions().get(0);
+        assertEquals(1, solution.getUpVotes());
+        assertEquals(0, solution.getDownVotes());
+        assertEquals(Vote.UP, solution.getVote());
+    }
+
+    @Test
+    void addVoteToSolution_DOWNVote_savedInMongoDB() {
+        var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
+        var _id = new ObjectId("000000000000000000000000");
+        var userId = new ObjectId("000000000000000000000000");
+        bean.addSolution(_id, "Neue Lösung", userId);
+        var solutionId = bean.getBarrier(_id, userId).getSolutions().get(0).get_id();
+
+        bean.addVoteToSolution(solutionId, Vote.DOWN, userId);
+
+        var solution = bean.getBarrier(_id, userId).getSolutions().get(0);
+        assertEquals(0, solution.getUpVotes());
+        assertEquals(1, solution.getDownVotes());
+        assertEquals(Vote.DOWN, solution.getVote());
+    }
+
+    @Test
+    void addVoteSolutions_NONEVote_RemovesAllVotes() {
+        var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
+        var _id = new ObjectId("000000000000000000000000");
+        var userId = new ObjectId("000000000000000000000000");
+        bean.addSolution(_id, "Neue Lösung", userId);
+        var solutionId = bean.getBarrier(_id, userId).getSolutions().get(0).get_id();
+        //Add DOWN Vote to Remove
+        bean.addVoteToSolution(solutionId, Vote.DOWN, userId);
+
+        bean.addVoteToSolution(solutionId, Vote.NONE, userId);
+
+        var solution = bean.getBarrier(_id, userId).getSolutions().get(0);
+        assertNotNull(solution);
+        assertEquals(0, solution.getDownVotes());
+        assertEquals(0, solution.getUpVotes());
+        assertEquals(Vote.NONE, solution.getVote());
+    }
+
+    @Test
+    void addVoteToSolution_differentUsersAndVotes_savedInMongoDB() {
+        var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
+        var _id = new ObjectId("000000000000000000000000");
+        var userId = new ObjectId("000000000000000000000001");
+        var userId2 = new ObjectId("000000000000000000000002");
+        var userId3 = new ObjectId("000000000000000000000003");
+        bean.addSolution(_id, "new Solution", userId);
+        var solutionId = bean.getBarrier(_id, userId).getSolutions().get(0).get_id();
+
+        bean.addVoteToSolution(solutionId, Vote.UP, userId);
+        bean.addVoteToSolution(solutionId, Vote.DOWN, userId2);
+        bean.addVoteToSolution(solutionId, Vote.DOWN, userId3);
+
+        var solution = bean.getBarrier(_id, userId).getSolutions().get(0);
+        assertNotNull(solution);
+        assertEquals(1, solution.getUpVotes());
+        assertEquals(2, solution.getDownVotes());
+        assertEquals(Vote.UP, solution.getVote());
+    }
+
+    @Test
+    void addVoteToSolution_UPtoDOWN_onlyDownSavedInMongoDB() {
+        var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
+        var _id = new ObjectId("000000000000000000000000");
+        var userId = new ObjectId("000000000000000000000000");
+        bean.addSolution(_id, "New Solution", userId);
+        var solutionId = bean.getBarrier(_id, userId).getSolutions().get(0).get_id();
+        bean.addVoteToSolution(solutionId, Vote.UP, userId);
+
+        bean.addVoteToSolution(solutionId, Vote.DOWN, userId);
+
+        var solution = bean.getBarrier(_id, userId).getSolutions().get(0);
+        assertNotNull(solution);
+        assertEquals(Vote.DOWN, solution.getVote());
+        assertEquals(1, solution.getDownVotes());
+        assertEquals(0, solution.getUpVotes());
+    }
+
+    @Test
+    void addVoteToSolution_invalidSolutionId_throwsSolutionNotFoundException() {
+        var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
+        var userId = new ObjectId("000000000000000000000000");
+        var solutionId = new ObjectId("000000000000000000000000");
+
+        assertThrows(SolutionNotFoundException.class, () -> bean.addVoteToSolution(solutionId, Vote.UP, userId));
+    }
+
+    @Test
+    void addVoteToBarrier_UPVote_savedInMongoDB() {
+        var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
+        var _id = new ObjectId("000000000000000000000000");
+        var userId = new ObjectId("000000000000000000000000");
+
+        bean.putVote(_id, Vote.UP, userId);
+
+        var barrier = bean.getBarrier(_id, userId);
+        assertEquals(Vote.UP, barrier.getVote());
+        assertEquals(1, barrier.getUpVotes());
+        assertEquals(0, barrier.getDownVotes());
+    }
+
+    @Test
+    void addVoteToBarrier_DOWNVote_savedInMongoDB() {
+        var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
+        var _id = new ObjectId("000000000000000000000000");
+        var userId = new ObjectId("000000000000000000000000");
+
+        bean.putVote(_id, Vote.DOWN, userId);
+
+        var barrier = bean.getBarrier(_id, userId);
+        assertEquals(Vote.DOWN, barrier.getVote());
+        assertEquals(1, barrier.getDownVotes());
+        assertEquals(0, barrier.getUpVotes());
+    }
+
+    @Test
+    void addVoteToBarrier_NONEVote_removesCurrentVotes() {
+        var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
+        var _id = new ObjectId("000000000000000000000000");
+        var userId = new ObjectId("000000000000000000000000");
+        bean.putVote(_id, Vote.UP, userId);
+
+        bean.putVote(_id, Vote.NONE, userId);
+
+        var barrier = bean.getBarrier(_id, userId);
+        assertEquals(Vote.NONE, barrier.getVote());
+        assertEquals(0, barrier.getUpVotes());
+        assertEquals(0, barrier.getDownVotes());
+    }
+
+    @Test
+    void addVoteToBarrier_MultipleVotes_savedInMongoDB() {
+        var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
+        var _id = new ObjectId("000000000000000000000000");
+        var userId = new ObjectId("000000000000000000000001");
+        var userId2 = new ObjectId("000000000000000000000002");
+        var userId3 = new ObjectId("000000000000000000000003");
+        var userId4 = new ObjectId("000000000000000000000004");
+
+        bean.putVote(_id, Vote.UP, userId);
+        bean.putVote(_id, Vote.DOWN, userId2);
+        bean.putVote(_id, Vote.NONE, userId3);
+        bean.putVote(_id, Vote.UP, userId4);
+
+        var barrier = bean.getBarrier(_id, userId);
+        assertEquals(Vote.UP, barrier.getVote());
+        assertEquals(2, barrier.getUpVotes());
+        assertEquals(1, barrier.getDownVotes());
+    }
+
+    @Test
+    void addVoteToBarrier_invalidBarrierId_throwsBarrierNotFoundException() {
+        var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
+        var userId = new ObjectId("000000000000000000000000");
+        var _id = new ObjectId("000000320000000000000000");
+
+        assertThrows(BarrierNotFoundException.class, () -> bean.putVote(_id, Vote.UP, userId));
+    }
+
+    @Test
+    void addVoteToBarrier_UPtoDOWN_onlyDOWNsavedInMongoDB() {
+        var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
+        var userId = new ObjectId("000000000000000000000000");
+        var _id = new ObjectId("000000000000000000000000");
+        bean.putVote(_id, Vote.UP, userId);
+
+        bean.putVote(_id, Vote.DOWN, userId);
+
+        var barrier = bean.getBarrier(_id, userId);
+        assertEquals(Vote.DOWN, barrier.getVote());
+        assertEquals(0, barrier.getUpVotes());
+        assertEquals(1, barrier.getDownVotes());
     }
 }
