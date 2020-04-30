@@ -10,7 +10,7 @@ import React from "react";
          return(
              <div>
                  <div className="menuItem">
-                     <a style={{display: "inline-block", width:"100%"}} href={this.props.url}>
+                     <a style={{display: "inline-block", width:"100%"}} href={this.props.url} onClick={this.props.onClick}>
                          <img style={{width: "25px", height: "auto", display: "inline-block", borderRadius: "50%",
                           marginRight: "5px"}} src={this.props.icon} alt={this.props.altText} />
                          {this.props.title}
