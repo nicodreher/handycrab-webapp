@@ -75,12 +75,18 @@ export class SearchForm extends React.Component {
     }
 
     handleSubmit(event) {
-        //alert('Submitted [name: ' + this.state.name + ', mail: ' + this.state.mail + ', password: ' + this.state.password + ', repeatPassword: ' + this.state.repeatPassword + ']');
         event.preventDefault();
-        console.log("Submitted the search form");
+        let search;
+        if (this.state.searchByPosition) {
+            search = "lo=" + this.state.longitude + "&la=" + this.state.latitude + "&ra=" + this.state.radius;
+        } else {
+            search = "plz=" + this.state.postal;
+        }
+        window.location.replace(window.location.origin + "/results?" + search);
     }
 
     render() {
+        const radii = [10, 25, 50, 100];
         return (
             <div>
                 <div>&nbsp;</div>
@@ -92,9 +98,17 @@ export class SearchForm extends React.Component {
                                value={this.state.latitude.toFixed(3)} type='text'/>
                     <FormField id="longitude" label="Längengrad" disabled={true} onChange={this.handleChangedLongitude}
                                value={this.state.longitude.toFixed(3)} type='text'/>
-                    <FormField id='radius' label='Such-Radius (in Meter)' type='number' min='5' max='25'
-                               onChange={this.handleChangedRadius} value={this.state.radius}
-                               disabled={!this.state.searchByPosition}/>
+                    <Form.Group as={Row}>
+                        <Form.Label as="legend" column sm={2}>
+                            Such-Radius (in Meter)
+                        </Form.Label>
+                        <Col sm={10}>
+                            {radii.map(r => <FormCheck key={r} type={'radio'} checked={this.state.radius === r}
+                                                      inline label={r} onChange={() => {
+                                this.setState({radius: r})
+                            }}/>)}
+                        </Col>
+                    </Form.Group>
                     <FormField id='postalcode' type='number' value={this.state.postal}
                                onChange={this.handleChangedPostal} min='01001' max='99999' label='Postleitzahl'
                                disabled={this.state.searchByPosition}/>
