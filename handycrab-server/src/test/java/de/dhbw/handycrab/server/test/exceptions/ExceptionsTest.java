@@ -8,7 +8,7 @@ import org.junit.jupiter.params.provider.CsvFileSource;
 
 import java.lang.reflect.InvocationTargetException;
 
-public class Exceptions {
+public class ExceptionsTest {
 
     @ParameterizedTest(name = "[{index}] Exception: {0} Http Status Code: {1} Handycrab Error Code: {2}")
     @CsvFileSource(resources = "/exceptions/exceptions.csv")
