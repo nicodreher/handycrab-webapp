@@ -21,6 +21,8 @@ build:
   stage: build
   image: maven:latest
   script:
+    - mvn javadoc:aggregate -Dmaven.test.skip=true
+    - cp target/site/apidocs/ handycrab-webapp/src/main/webapp/javadoc
     - mvn $MAVEN_CLI_OPTS -Dmaven.test.skip=true clean compile package
   artifacts:
     paths:

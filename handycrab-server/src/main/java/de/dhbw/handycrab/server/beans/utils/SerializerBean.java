@@ -11,10 +11,18 @@ import org.json.JSONObject;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 
+/**
+ * Implementation of the {@link Serializer} interface.
+ * @author Nico Dreher
+ */
 @Stateless
 @Remote(Serializer.class)
 public class SerializerBean implements Serializer {
 
+    /**
+     * GsonBuilder for serialization and deserialization of object for the database.
+     * The difference is in the ObjectId TypeAdapter.
+     */
     private static final GsonBuilder gsonBuilder = new GsonBuilder()
             .setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
             .registerTypeAdapter(ObjectId.class, (JsonSerializer<ObjectId>) (src, typeOfSrc, context) -> {
@@ -49,6 +57,10 @@ public class SerializerBean implements Serializer {
                     });
 
 
+    /**
+     * GsonBuilder for serialization and deserialization of object for the REST-Services
+     * The difference is in the ObjectId TypeAdapter.
+     */
     private static final GsonBuilder restGsonBuilder = new GsonBuilder()
             .setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
             .registerTypeAdapter(ObjectId.class, (JsonSerializer<ObjectId>) (src, typeOfSrc, context) -> new JsonPrimitive(src.toHexString()))

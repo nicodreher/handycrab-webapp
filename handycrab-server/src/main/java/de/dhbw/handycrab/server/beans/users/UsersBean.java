@@ -19,12 +19,25 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+/**
+ * Implementation of the {@link Users} interface.
+ * @author Nico Dreher
+ */
 @Stateless
 @Remote(Users.class)
 public class UsersBean implements Users {
 
+    /**
+     * The regex pattern for the E-Mail addresses
+     */
     private static final String EMAIL_REGEX = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
+    /**
+     * The regex pattern for the username
+     */
     private static final String USERNAME_REGEX = "[a-zA-Z0-9_]{4,16}";
+    /**
+     * The regex pattern for the password
+     */
     private static final String PASSWORD_REGEX = "[a-zA-Z0-9\"!#$%&'()*+,\\-./:;<=>?@\\[\\]]{6,100}";
 
     @Resource(lookup = "java:global/MongoClient")
@@ -135,6 +148,11 @@ public class UsersBean implements Users {
         }
     }
 
+    /**
+     * Generates the sha512 hash value of a string
+     * @param value
+     * @return The hashed string
+     */
     public static String sha512(String value) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-512");

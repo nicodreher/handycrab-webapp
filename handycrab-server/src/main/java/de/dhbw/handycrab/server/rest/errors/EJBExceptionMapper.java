@@ -10,7 +10,7 @@ import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 /**
- * The HandyCrabExceptionMapper is used to decide what happens if a HandyCrabException is thrown in a RestService
+ * The HandyCrabExceptionMapper is used to decide what happens if a {@link EJBException} is thrown in a RestService
  *
  * @author Nico Dreher
  * @see ExceptionMapper

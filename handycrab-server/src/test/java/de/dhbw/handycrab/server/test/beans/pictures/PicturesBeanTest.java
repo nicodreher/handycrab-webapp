@@ -19,13 +19,24 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import java.io.IOException;
 import java.util.Base64;
 
+/**
+ * Tests for the {@link PicturesBean} class.
+ *
+ * @author Nico Dreher
+ */
 @Testcontainers
-public class PicturesBeanTest {
+class PicturesBeanTest {
 
     @Container
     private MongoContainer container = new MongoContainer();
 
-    public void placePicture(ObjectId objectId, String base64, String contentType) {
+    /**
+     * Place a picture in the mongodb.
+     * @param objectId
+     * @param base64 The base64 encoded picture
+     * @param contentType The http media type of the picture
+     */
+    private void placePicture(ObjectId objectId, String base64, String contentType) {
         Document doc = new Document();
         doc.put("_id", objectId);
         doc.put("base64", base64);
@@ -33,13 +44,22 @@ public class PicturesBeanTest {
         container.getCollection("pictures").insertOne(doc);
     }
 
-    public void placePictures(Object[][] data) {
+    /**
+     * Inserts the array of pictures into the mongodb.
+     * @param data The array of the picture data
+     */
+    private void placePictures(Object[][] data) {
         for(Object[] picture : data) {
             placePicture((ObjectId) picture[0], (String) picture[1], (String) picture[2]);
         }
     }
 
-    public Object[][] getDemoPictures() throws IOException {
+    /**
+     * Generates six valid pictures.
+     * @return The data of the pictures in a array
+     * @throws IOException
+     */
+    private Object[][] getDemoPictures() throws IOException {
         return new Object[][]{{new ObjectId("000000000000000000000000"), getFileAsBase64("/pictures/images/success/jpeg1.jpg"), "image/jpeg"},
                 {new ObjectId("000000000000000000000001"), getFileAsBase64("/pictures/images/success/jpeg2.jpeg"), "image/jpeg"},
                 {new ObjectId("000000000000000000000002"), getFileAsBase64("/pictures/images/success/jpeg3.jpg"), "image/jpeg"},
@@ -48,16 +68,28 @@ public class PicturesBeanTest {
                 {new ObjectId("000000000000000000000005"), getFileAsBase64("/pictures/images/success/png3.png"), "image/png"}};
     }
 
-    public String getFileAsBase64(String path) throws IOException {
+    /**
+     * Generates a base64 String of a file in the package
+     * @param path The path to the file in the package
+     * @return The file content as base64 String
+     * @throws IOException
+     */
+    private String getFileAsBase64(String path) throws IOException {
         return Base64.getEncoder().encodeToString(IOUtils.toByteArray(getClass().getResourceAsStream(path)));
     }
 
+    /**
+     * Tests the {@link PicturesBean#put(String)} function with valid images.
+     * @param picturePath
+     * @param format The http media type of the picture
+     * @throws IOException
+     */
     @ParameterizedTest(name = "[{index}] Path: {0} Format: {1}")
     @CsvFileSource(resources = "/pictures/put.csv")
-    public void putTest(String picturePath, String format) throws IOException {
+    void putTest(String picturePath, String format) throws IOException {
         PicturesBean bean = new PicturesBean(container.getMongoClient());
 
-        String base64 = Base64.getEncoder().encodeToString(IOUtils.toByteArray(getClass().getResourceAsStream(picturePath)));
+        String base64 = getFileAsBase64(picturePath);
         Picture picture = bean.put(base64);
         assertNotNull(picture);
         assertEquals(format, picture.getContentType());
@@ -68,12 +100,19 @@ public class PicturesBeanTest {
         assertEquals(format, doc.getString("contentType"));
     }
 
+    /**
+     * Tests the {@link PicturesBean#put(String)} function with invalid images.
+     * @param picturePath
+     * @param expectedException The exception which should be thrown
+     * @throws IOException
+     * @throws ClassNotFoundException If the Class of the exception cant't be found
+     */
     @ParameterizedTest(name = "[{index}] Path: {0} ExpectedException {1}")
     @CsvFileSource(resources = "/pictures/failPut.csv")
-    public void failPutTest(String picturePath, String expectedException) throws IOException, ClassNotFoundException {
+    void failPutTest(String picturePath, String expectedException) throws IOException, ClassNotFoundException {
         PicturesBean bean = new PicturesBean(container.getMongoClient());
 
-        String base64 = picturePath != null ? Base64.getEncoder().encodeToString(IOUtils.toByteArray(getClass().getResourceAsStream(picturePath))) : null;
+        String base64 = picturePath != null ? getFileAsBase64(picturePath) : null;
         Class<? extends Throwable> exception = (Class<? extends Throwable>) Class.forName(expectedException);
 
         final Picture[] picture = new Picture[1];
@@ -82,8 +121,12 @@ public class PicturesBeanTest {
         assertEquals(0, container.getCollection("pictures").countDocuments(eq("base64", base64)));
     }
 
+    /**
+     * Tests the {@link PicturesBean#get(ObjectId)} function with existing PictureIds.
+     * @throws IOException
+     */
     @Test
-    public void getTest() throws IOException {
+    void getTest() throws IOException {
         PicturesBean bean = new PicturesBean(container.getMongoClient());
 
         Object[][] pictures = getDemoPictures();
@@ -98,8 +141,12 @@ public class PicturesBeanTest {
         }
     }
 
+    /**
+     * Tests the {@link PicturesBean#get(ObjectId)} with non existing pictures.
+     * @throws IOException
+     */
     @Test
-    public void failGetTest() throws IOException {
+    void failGetTest() throws IOException {
         PicturesBean bean = new PicturesBean(container.getMongoClient());
 
         Object[][] pictures = getDemoPictures();

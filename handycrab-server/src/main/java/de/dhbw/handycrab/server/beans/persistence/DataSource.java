@@ -222,7 +222,7 @@ public class DataSource<T> {
      * @param document the document to deserialize
      * @return the object
      */
-    T fromBson(Document document) {
+    private T fromBson(Document document) {
         return document != null ? serializer.deserialize(document.toJson(), type) : null;
     }
 
@@ -232,7 +232,7 @@ public class DataSource<T> {
      * @param object the object to serialize
      * @return the Bson Document
      */
-    Document toBson(T object) {
+    private Document toBson(T object) {
         return Document.parse(serializer.serialize(object));
     }
 }

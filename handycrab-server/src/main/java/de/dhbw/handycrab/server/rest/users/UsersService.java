@@ -17,6 +17,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import java.util.UUID;
 
+/**
+ * REST-Services for the {@link de.dhbw.handycrab.server.beans.users.UsersBean}
+ * @author Nico Dreher
+ */
 @Path("/users")
 public class UsersService {
     @Resource(lookup = Users.LOOKUP)

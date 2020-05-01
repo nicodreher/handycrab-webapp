@@ -16,6 +16,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.ext.Provider;
 import java.io.IOException;
 
+/**
+ * Provides the {@link CurrentUser} Fields an the {@link Authorized} annotated functions.
+ * @author Nico Dreher
+ */
 @Provider
 @Priority(Priorities.AUTHENTICATION)
 public class AuthorizationProvider implements ContainerRequestFilter {

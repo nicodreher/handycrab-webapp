@@ -9,6 +9,11 @@ import javax.ws.rs.ext.Provider;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * A Implementation of the ContainerResponseFilter to set the correct CORS-Header for all requests.
+ * @author Nico Dreher
+ * @see ContainerResponseFilter
+ */
 @Provider
 public class CORSFilter implements ContainerResponseFilter {
     @Context

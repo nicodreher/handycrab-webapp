@@ -18,7 +18,7 @@ import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
 /**
- * The GsonProvieder provides a MessageBodyWriter and a MessageBodyReader to serialize and deserialize all incoming json
+ * The GsonProvider provides a MessageBodyWriter and a MessageBodyReader to serialize and deserialize all incoming json
  * messages
  *
  * @param <T> the type of the java objects

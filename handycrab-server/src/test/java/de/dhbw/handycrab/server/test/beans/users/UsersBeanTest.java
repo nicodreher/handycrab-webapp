@@ -25,12 +25,25 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 
+/**
+ * Tests for the {@link UsersBean} class.
+ *
+ * @author Nico Dreher
+ */
 @Testcontainers
-public class UsersBeanTest {
+class UsersBeanTest {
 
     @Container
     private MongoContainer container = new MongoContainer();
 
+    /**
+     * Generates a bson {@link Document} with userdata in it.
+     * @param id
+     * @param email
+     * @param username
+     * @param password the plain password of the account
+     * @return the user document
+     */
     private Document generateUser(ObjectId id, String email, String username, String password) {
         Document doc = new Document();
         doc.put("_id", id);
@@ -40,6 +53,10 @@ public class UsersBeanTest {
         return doc;
     }
 
+    /**
+     * Generates four user documents.
+     * @return four user documents
+     */
     private Document[] generateUsers() {
         return new Document[]{generateUser(new ObjectId("000000000000000000000000"), "bla@blabla.de", "blabla", "pass1234"),
                 generateUser(new ObjectId("000000000000000000000001"), "nanana@nanana.de", "nanana", "nanapass"),
@@ -47,7 +64,11 @@ public class UsersBeanTest {
                 generateUser(new ObjectId("000000000000000000000003"), "king@kong.de", "king", "kingpass")};
     }
 
-    public Map<String, ObjectId> insertUsers() {
+    /**
+     * Inserts users into the mongodb
+     * @return a map of the username and the id of the inserted users
+     */
+    private Map<String, ObjectId> insertUsers() {
         Document[] docs = generateUsers();
         Map<String, ObjectId> users = new HashMap<>();
         for(Document doc : docs) {
@@ -57,9 +78,15 @@ public class UsersBeanTest {
         return users;
     }
 
+    /**
+     * Tests the {@link UsersBean#register(String, String, String)} function with valid inputs.
+     * @param email
+     * @param username
+     * @param password the plain password
+     */
     @ParameterizedTest(name = "[{index}] Email: {0} Username: {1} Password: {2}")
     @CsvFileSource(resources = "/users/register.csv")
-    public void registerTest(String email, String username, String password) {
+    void registerTest(String email, String username, String password) {
         insertUsers();
         UsersBean bean = new UsersBean(container.getMongoClient(), new SerializerBean());
         User user = bean.register(email, username, password);
@@ -72,9 +99,17 @@ public class UsersBeanTest {
         assertEquals(user.getID(), first.getObjectId("_id"));
     }
 
+    /**
+     * Tests the {@link UsersBean#register(String, String, String)} function with invalid data.
+     * @param comment Information about the invalid data
+     * @param email
+     * @param username
+     * @param password
+     * @param expectedException The exception which should be thrown
+     */
     @ParameterizedTest(name = "[{index}] {0}")
     @CsvFileSource(resources = "/users/failregister.csv")
-    public void failRegisterTest(String comment, String email, String username, String password, String expectedException) {
+    void failRegisterTest(String comment, String email, String username, String password, String expectedException) {
         Map<String, ObjectId> users = insertUsers();
         UsersBean bean = new UsersBean(container.getMongoClient(), new SerializerBean());
         final User[] user = new User[1];
@@ -102,9 +137,21 @@ public class UsersBeanTest {
             });
         }
     }
+
+    /**
+     * Tests the {@link UsersBean#login(String, String)} function with valid and invalid data.
+     * @param comment Information about the data
+     * @param email E-Mail address of the generated user
+     * @param username Username of the generated user
+     * @param password Plain password of the generated user
+     * @param login The username or password of the login
+     * @param loginPassword The login password
+     * @param correct True if the login should be successful
+     * @param complete True if the request ist complete
+     */
     @ParameterizedTest(name = "[{index}] {0}")
     @CsvFileSource(resources = "/users/login.csv")
-    public void loginTest(String comment, String email, String username, String password, String login, String loginPassword, boolean correct, boolean complete) {
+    void loginTest(String comment, String email, String username, String password, String login, String loginPassword, boolean correct, boolean complete) {
         Document doc = generateUser(new ObjectId(), email, username, password);
         container.getCollection("users").insertOne(doc);
         UsersBean bean = new UsersBean(container.getMongoClient(), new SerializerBean());
@@ -121,23 +168,32 @@ public class UsersBeanTest {
         }
     }
 
+    /**
+     * Get a user with UserId equals null.
+     */
     @Test
-    public void getUserNullTest() {
+    void getUserNullTest() {
         UsersBean bean = new UsersBean(container.getMongoClient(), new SerializerBean());
         final User[] user = new User[1];
         assertThrows(NullPointerException.class, () -> user[0] = bean.getUser(null));
         assertNull(user[0]);
     }
 
+    /**
+     * Test to get a non existing user.
+     */
     @Test
-    public void getUserNotExistingTest() {
+    void getUserNotExistingTest() {
         UsersBean bean = new UsersBean(container.getMongoClient(), new SerializerBean());
         User user = bean.getUser(new ObjectId());
         assertNull(user);
     }
 
+    /**
+     * Test to get a existing User.
+     */
     @Test
-    public void getUserExistingTest() {
+    void getUserExistingTest() {
         insertUsers();
         UsersBean bean = new UsersBean(container.getMongoClient(), new SerializerBean());
         var user1 = bean.getUser(new ObjectId("000000000000000000000000"));
@@ -169,8 +225,11 @@ public class UsersBeanTest {
         assertEquals(UsersBean.sha512("kingpass"), user4.getPassword());
     }
 
+    /**
+     * Test the {@link UsersBean#getUser(ObjectId)} function with existing and not existing UserIds.
+     */
     @Test
-    public void getUserNameTest() {
+    void getUserNameTest() {
         UsersBean bean = new UsersBean(container.getMongoClient(), new SerializerBean());
         Map<String, ObjectId> users = insertUsers();
         for(String username : users.keySet()) {
@@ -181,8 +240,11 @@ public class UsersBeanTest {
         assertThrows(UserNotFoundException.class, () -> bean.getUsername(new ObjectId("000000000000000000000005")));
     }
 
+    /**
+     * Test the {@link UsersBean#checkAuthorized(ObjectId)} function with valid and invalid UserIds.
+     */
     @Test
-    public void checkAuthorizedTest() {
+    void checkAuthorizedTest() {
         UsersBean bean = new UsersBean(container.getMongoClient(), new SerializerBean());
         Map<String, ObjectId> users = insertUsers();
         for(ObjectId user : users.values()) {
@@ -192,8 +254,6 @@ public class UsersBeanTest {
         assertThrows(UnauthorizedException.class, () -> bean.checkAuthorized(new ObjectId("000000000000000000000004")));
         assertThrows(UnauthorizedException.class, () -> bean.checkAuthorized(new ObjectId("000000000000000000000005")));
     }
-
-
 }
 
 
