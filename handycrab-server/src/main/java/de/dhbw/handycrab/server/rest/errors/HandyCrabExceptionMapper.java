@@ -1,6 +1,6 @@
 package de.dhbw.handycrab.server.rest.errors;
 
-import de.dhbw.handycrab.server.exceptions.HandyCrabException;
+import de.dhbw.handycrab.exceptions.HandyCrabException;
 import org.json.JSONObject;
 
 import javax.ws.rs.core.MediaType;

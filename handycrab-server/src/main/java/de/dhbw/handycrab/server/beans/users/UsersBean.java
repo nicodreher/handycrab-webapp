@@ -7,8 +7,8 @@ import de.dhbw.handycrab.api.users.Users;
 import de.dhbw.handycrab.api.utils.Serializer;
 import de.dhbw.handycrab.server.beans.persistence.DataSource;
 import de.dhbw.handycrab.server.beans.persistence.RequestBuilder;
-import de.dhbw.handycrab.server.exceptions.*;
-import de.dhbw.handycrab.server.exceptions.users.*;
+import de.dhbw.handycrab.exceptions.*;
+import de.dhbw.handycrab.exceptions.users.*;
 import org.bson.types.ObjectId;
 
 import javax.annotation.PostConstruct;
@@ -69,7 +69,7 @@ public class UsersBean implements Users {
     }
 
     @Override
-    public User register(String email, String username, String password) {
+    public User register(String email, String username, String password) throws NameAlreadyUsedException, AddressAlreadyUsedException, InvalidPasswordException, InvalidUsernameException{
         if(email != null && username != null && password != null) {
             if(email.matches(EMAIL_REGEX)) {
                 if(username.matches(USERNAME_REGEX)) {

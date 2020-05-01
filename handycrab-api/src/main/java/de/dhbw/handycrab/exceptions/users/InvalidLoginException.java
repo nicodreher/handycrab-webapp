@@ -1,6 +1,6 @@
-package de.dhbw.handycrab.server.exceptions.users;
+package de.dhbw.handycrab.exceptions.users;
 
-import de.dhbw.handycrab.server.exceptions.HandyCrabException;
+import de.dhbw.handycrab.exceptions.HandyCrabException;
 
 public class InvalidLoginException extends HandyCrabException {
     public InvalidLoginException() {

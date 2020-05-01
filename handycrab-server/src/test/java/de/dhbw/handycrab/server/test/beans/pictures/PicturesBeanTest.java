@@ -5,7 +5,7 @@ import static com.mongodb.client.model.Filters.*;
 
 import de.dhbw.handycrab.api.pictures.Picture;
 import de.dhbw.handycrab.server.beans.pictures.PicturesBean;
-import de.dhbw.handycrab.server.exceptions.pictures.PictureNotFoundException;
+import de.dhbw.handycrab.exceptions.pictures.PictureNotFoundException;
 import de.dhbw.handycrab.server.test.mongo.MongoContainer;
 import org.apache.commons.compress.utils.IOUtils;
 import org.bson.Document;

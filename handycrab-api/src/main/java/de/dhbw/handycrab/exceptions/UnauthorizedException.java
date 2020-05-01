@@ -1,4 +1,4 @@
-package de.dhbw.handycrab.server.exceptions;
+package de.dhbw.handycrab.exceptions;
 
 public class UnauthorizedException extends HandyCrabException {
     public UnauthorizedException() {

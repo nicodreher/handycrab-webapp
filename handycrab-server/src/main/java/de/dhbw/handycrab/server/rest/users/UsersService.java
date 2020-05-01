@@ -3,8 +3,6 @@ import de.dhbw.handycrab.api.RequestResult;
 import de.dhbw.handycrab.api.users.FrontendUser;
 import de.dhbw.handycrab.api.users.User;
 import de.dhbw.handycrab.api.users.Users;
-import de.dhbw.handycrab.server.exceptions.IncompleteRequestException;
-import de.dhbw.handycrab.server.exceptions.UnauthorizedException;
 import org.bson.types.ObjectId;
 import org.json.JSONObject;
 
@@ -15,7 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
-import java.util.UUID;
 
 /**
  * REST-Services for the {@link de.dhbw.handycrab.server.beans.users.UsersBean}

@@ -2,7 +2,7 @@ package de.dhbw.handycrab.server.test.exceptions;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import de.dhbw.handycrab.server.exceptions.HandyCrabException;
+import de.dhbw.handycrab.exceptions.HandyCrabException;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 

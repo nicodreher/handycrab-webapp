@@ -1,4 +1,4 @@
-package de.dhbw.handycrab.server.exceptions;
+package de.dhbw.handycrab.exceptions;
 
 public class SolutionNotFoundException extends HandyCrabException {
     public SolutionNotFoundException() {
