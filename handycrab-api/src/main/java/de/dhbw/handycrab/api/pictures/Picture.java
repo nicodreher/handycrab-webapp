@@ -22,4 +22,8 @@ public class Picture implements Serializable {
     public String getContentType() {
         return contentType;
     }
+
+    public ObjectId getID() {
+        return _id;
+    }
 }

@@ -32,7 +32,7 @@ test:
   variables:
     mongo_database: handycrab
   script:
-    - mvn $MAVEN_CLI_OPTS -pl handycrab-server,handycrab-api test
+    - mvn $MAVEN_CLI_OPTS -pl handycrab-server,handycrab-api --fail-never test
   artifacts:
     reports:
       junit:

@@ -1,6 +1,5 @@
 package de.dhbw.handycrab.server.beans.users;
 
-import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
 import com.mongodb.client.model.Filters;
 import de.dhbw.handycrab.api.users.User;
@@ -9,6 +8,7 @@ import de.dhbw.handycrab.api.utils.Serializer;
 import de.dhbw.handycrab.server.beans.persistence.DataSource;
 import de.dhbw.handycrab.server.beans.persistence.RequestBuilder;
 import de.dhbw.handycrab.server.exceptions.*;
+import de.dhbw.handycrab.server.exceptions.users.*;
 import org.bson.types.ObjectId;
 
 import javax.annotation.PostConstruct;

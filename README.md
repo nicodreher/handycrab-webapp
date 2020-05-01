@@ -1,4 +1,5 @@
 # HandyCrap
+Bilder in handycrab-server/test/resources/pictures/images sind von Pixabay.com
 ## Datentypen:
 
 ### enum Vote:
@@ -59,6 +60,9 @@ Alles Ander Explizit definiert sein\
 11| 404 | Solution not Found
 12 | 400 | Invalid Username
 13 | 400 | Invalid Password
+14 | 400 | Picture To Big
+15 | 400 | Invalid Picture Format
+16 | 404 | Picture Not Found
 
 ## REST-Schnittstellen
 ### Registrierung:
@@ -96,12 +100,12 @@ Alles Ander Explizit definiert sein\
     .../barriers/add POST
     Login: true
     {title, longitude, latitude, picture? (Base64), description?, postcode, solution?} -> {Barrier}
-    ErrorCodes: 8
+    ErrorCodes: 8, 14, 15
 
 ### Barrier-Modify:
     .../barriers/modify PUT
     {_id (BarrierId), title?, picture? (Base64)?, description?} -> {Barrier}
-    ErrorCodes: 1
+    ErrorCodes: 1, 14, 15
 ### Barrier-Vote: 
     .../barriers/vote PUT
     {_id (BarrierId), vote: Vote}
@@ -116,3 +120,8 @@ Alles Ander Explizit definiert sein\
     .../barriers/solutions/vote PUT
     {_id (SolutionId), vote: Vote}
     ErrorCodes: 1, 11
+    
+### Pictures-Get:
+    .../pictures/<objectId> GET
+    () -> Binary Picture as image/jpeg or image/png
+    ErrorCodes: 16
