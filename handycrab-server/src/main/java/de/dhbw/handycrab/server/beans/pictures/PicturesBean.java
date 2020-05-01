@@ -19,6 +19,15 @@ public class PicturesBean implements Pictures {
     private static final ObjectId example = new ObjectId("5e8350d411c3931b216a67a4");
     @Resource(lookup = "java:global/MongoClient")
     private MongoClient client;
+
+    public PicturesBean() {
+
+    }
+
+    public PicturesBean(MongoClient client) {
+        this.client = client;
+    }
+
     @Override
     public Picture get(ObjectId uuid) {
         //TODO: Nicer Implementation
@@ -27,7 +36,7 @@ public class PicturesBean implements Pictures {
     }
 
     @Override
-    public ObjectId put(Picture picture) {
+    public Picture put(String base64) {
         return null;
     }
 }
