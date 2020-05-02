@@ -13,6 +13,11 @@ import javax.ejb.Stateless;
 import javax.print.Doc;
 import java.util.UUID;
 
+/**
+ * Implementation of the {@link Pictures} Interface
+ * @author Lukas Lautenschlager
+ * @see Pictures
+ */
 @Stateless
 @Remote(Pictures.class)
 public class PicturesBean implements Pictures {

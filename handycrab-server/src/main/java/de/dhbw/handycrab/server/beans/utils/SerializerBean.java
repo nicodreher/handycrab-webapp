@@ -10,6 +10,7 @@ import org.json.JSONObject;
 
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
+import java.util.Date;
 
 /**
  * Implementation of the {@link Serializer} interface.
@@ -54,7 +55,13 @@ public class SerializerBean implements Serializer {
                         coordinates.add(src.getPosition().getValues().get(1));
                         obj.add("coordinates", coordinates);
                         return obj;
-                    });
+                    })
+            .registerTypeAdapter(Date.class, (JsonSerializer<Date>) (src, typeOfSrc, context) -> {
+                JsonObject obj = new JsonObject();
+                obj.add("$date", new JsonPrimitive(src.getTime()));
+                return obj;
+            })
+            .registerTypeAdapter(Date.class, (JsonDeserializer<Date>) (json, typeofT, context) -> new Date(json.getAsJsonObject().get("$date").getAsLong()));
 
 
     /**

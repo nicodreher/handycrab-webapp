@@ -4,7 +4,6 @@ stages:
   - push
   - deploy
 
-
 variables:
   MAVEN_CLI_OPTS: "-s .m2/settings.xml --batch-mode"
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
@@ -21,9 +20,9 @@ build:
   stage: build
   image: maven:latest
   script:
-    - mvn javadoc:aggregate -Dmaven.test.skip=true
+    - mvn clean javadoc:aggregate -Dmaven.test.skip=true
     - cp -r target/site/apidocs/ handycrab-webapp/src/main/webapp/javadoc
-    - mvn $MAVEN_CLI_OPTS -Dmaven.test.skip=true clean compile package
+    - mvn $MAVEN_CLI_OPTS -Dmaven.test.skip=true compile package
   artifacts:
     paths:
       - handycrab-ear/target/handycrab-ear-1.0-SNAPSHOT.ear
