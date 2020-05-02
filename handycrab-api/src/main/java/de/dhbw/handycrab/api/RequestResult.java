@@ -3,7 +3,7 @@ package de.dhbw.handycrab.api;
 import java.io.Serializable;
 
 /**
- * The holder to serialize primitive objects as json.
+ * The holder to serialize primitive objects as json
  * @author Nico Dreher
  */
 public class RequestResult implements Serializable {

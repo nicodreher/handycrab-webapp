@@ -1,7 +1,7 @@
 package de.dhbw.handycrab.api.utils;
 
 /**
- * A EJB-Interface to serialize an deserialize objects with Gson.
+ * A EJB-Interface to serialize an deserialize objects with Gson
  * @author Nico Dreher
  */
 public interface Serializer {

@@ -26,14 +26,14 @@ public interface Users {
     String PASSWORD_REGEX = "[a-zA-Z0-9\"!#$%&'()*+,\\-./:;<=>?@\\[\\]]{6,100}";
 
     /**
-     * Get the user by the UserId.
+     * Get the user by the UserId
      * @param id
      * @return The user if it exists. Otherwise returns null
      */
     User getUser(ObjectId id);
 
     /**
-     * Register a new User.
+     * Register a new User
      * @param email
      * @param username
      * @param password
@@ -50,7 +50,7 @@ public interface Users {
             NameAlreadyUsedException;
 
     /**
-     * Log the user in with the credentials.
+     * Log the user in with the credentials
      * @param login The E-Mail address or the username
      * @param password
      * @return The logged in user
@@ -60,7 +60,7 @@ public interface Users {
     LoggedInUser login(String login, String password, boolean createToken) throws IncompleteRequestException, InvalidLoginException;
 
     /**
-     * Get the username by the UserId.
+     * Get the username by the UserId
      * @param id
      * @return The username
      * @throws IncompleteRequestException If a argument is null
@@ -69,18 +69,29 @@ public interface Users {
     String getUsername(ObjectId id) throws IncompleteRequestException, UserNotFoundException;
 
     /**
-     * Check if a user with the UserId exists.
+     * Check if a user with the UserId exists
      * @param id
      * @return True if the user exists
      */
     boolean isAuthorized(ObjectId id);
 
+    /**
+     * Check if a authentication token with the UserId exists
+     * @param id
+     * @param token
+     * @return True if the token exists.
+     */
     boolean isAuthorized(ObjectId id, String token);
 
+    /**
+     * Removes a token from the database
+     * @param id
+     * @param token
+     */
     void removeToken(ObjectId id, String token);
 
     /**
-     * Check if a user with the UserId exists.
+     * Check if a user with the UserId exists
      * @param id
      * @throws UnauthorizedException if the user does not exist
      */

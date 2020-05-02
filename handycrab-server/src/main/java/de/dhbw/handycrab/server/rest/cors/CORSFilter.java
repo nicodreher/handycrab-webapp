@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * A Implementation of the ContainerResponseFilter to set the correct CORS-Header for all requests.
+ * A Implementation of the ContainerResponseFilter to set the correct CORS-Header for all requests
  * @author Nico Dreher
  * @see ContainerResponseFilter
  */
@@ -20,8 +20,7 @@ public class CORSFilter implements ContainerResponseFilter {
     private HttpServletRequest request;
 
     @Override
-    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)
-            throws IOException {
+    public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) {
         String host = request.getHeader("Origin");
         if(host != null && (host.equalsIgnoreCase("http://localhost") || host.equalsIgnoreCase("http://handycrab.nico-dreher.de") || host.equalsIgnoreCase("http://127.0.0.1") || host.equalsIgnoreCase("http://[::1]"))) {
             responseContext.getHeaders().add("Access-Control-Allow-Origin", host);

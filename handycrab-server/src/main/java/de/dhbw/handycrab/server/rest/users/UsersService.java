@@ -4,6 +4,7 @@ import de.dhbw.handycrab.api.users.FrontendUser;
 import de.dhbw.handycrab.api.users.LoggedInUser;
 import de.dhbw.handycrab.api.users.User;
 import de.dhbw.handycrab.api.users.Users;
+import de.dhbw.handycrab.exceptions.users.InvalidLoginException;
 import de.dhbw.handycrab.server.rest.authorization.Authorized;
 import de.dhbw.handycrab.server.rest.authorization.CurrentUser;
 import org.bson.types.ObjectId;
@@ -40,27 +41,12 @@ public class UsersService {
     public FrontendUser getCurrentUser() {
         return new FrontendUser(currentUser);
     }
-    @POST
-    @Path("/register")
-    @Consumes(MEDIA_TYPE)
-    @Produces(MEDIA_TYPE)
-    public FrontendUser register(@Context HttpServletRequest request, String json) {
-        JSONObject entity = new JSONObject(json);
-        User user = users.register(entity.optString("email", null), entity.optString("username", null), entity.optString("password", null));
-        request.getSession().setAttribute("userId", user.getID());
-        return new FrontendUser(user);
-    }
 
-    @POST
-    @Path("/login")
-    @Consumes(MEDIA_TYPE)
-    @Produces(MEDIA_TYPE)
-    public Response login(@Context HttpServletRequest request, String json) {
+    private Response login(HttpServletRequest request, String login, String password, boolean createToken) {
         if(request.getSession().getAttribute("userId") != null) {
             logout(request);
         }
-        JSONObject entity = new JSONObject(json);
-        LoggedInUser loggedInUser = users.login(entity.optString("login", null), entity.optString("password", null), entity.optBoolean("createToken", false));
+        LoggedInUser loggedInUser = users.login(login, password, createToken);
         request.getSession().setAttribute("userId", loggedInUser.getUser().getID());
         Response.ResponseBuilder builder = Response.ok().entity(new FrontendUser(loggedInUser.getUser()));
         if(loggedInUser.getToken() != null) {
@@ -68,6 +54,31 @@ public class UsersService {
             builder.cookie(cookie);
         }
         return builder.build();
+    }
+
+    @POST
+    @Path("/register")
+    @Consumes(MEDIA_TYPE)
+    @Produces(MEDIA_TYPE)
+    public Response register(@Context HttpServletRequest request, String json) {
+        JSONObject entity = new JSONObject(json);
+        User user = users.register(entity.optString("email", null), entity.optString("username", null), entity.optString("password", null));
+        try {
+            return login(request, user.getEmail(), entity.optString("password"), entity.optBoolean("createToken", false));
+        }
+        catch(InvalidLoginException e) {
+            e.printStackTrace();
+            return Response.ok(user).build();
+        }
+    }
+
+    @POST
+    @Path("/login")
+    @Consumes(MEDIA_TYPE)
+    @Produces(MEDIA_TYPE)
+    public Response login(@Context HttpServletRequest request, String json) {
+        JSONObject entity = new JSONObject(json);
+        return login(request, entity.optString("login", null), entity.optString("password", null), entity.optBoolean("createToken", false));
     }
 
     @POST

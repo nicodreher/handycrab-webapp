@@ -5,7 +5,7 @@ import org.bson.types.ObjectId;
 import java.io.Serializable;
 
 /**
- * A representation of a registered user for the REST-Clients
+ * A representation of a registered user without the password field for the REST-Clients
  * @author Nico Dreher
  */
 public class FrontendUser implements Serializable {

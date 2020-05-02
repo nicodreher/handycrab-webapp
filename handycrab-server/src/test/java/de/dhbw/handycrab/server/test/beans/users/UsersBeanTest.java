@@ -30,7 +30,7 @@ import java.util.Random;
 import java.util.function.Consumer;
 
 /**
- * Tests for the {@link UsersBean} class.
+ * Tests for the {@link UsersBean} class
  *
  * @author Nico Dreher
  */
@@ -41,7 +41,7 @@ class UsersBeanTest {
     private MongoContainer container = new MongoContainer();
 
     /**
-     * Generates a bson {@link Document} with userdata in it.
+     * Generates a bson {@link Document} with userdata in it
      * @param id
      * @param email
      * @param username
@@ -58,7 +58,7 @@ class UsersBeanTest {
     }
 
     /**
-     * Generates four user documents.
+     * Generates four user documents
      * @return four user documents
      */
     private Document[] generateUsers() {
@@ -83,7 +83,7 @@ class UsersBeanTest {
     }
 
     /**
-     * Tests the {@link UsersBean#register(String, String, String)} function with valid inputs.
+     * Tests the {@link UsersBean#register(String, String, String)} function with valid inputs
      * @param email
      * @param username
      * @param password the plain password
@@ -104,7 +104,7 @@ class UsersBeanTest {
     }
 
     /**
-     * Tests the {@link UsersBean#register(String, String, String)} function with invalid data.
+     * Tests the {@link UsersBean#register(String, String, String)} function with invalid data
      * @param comment Information about the invalid data
      * @param email
      * @param username
@@ -143,7 +143,7 @@ class UsersBeanTest {
     }
 
     /**
-     * Tests the {@link UsersBean#login(String, String, boolean)} function with valid and invalid data without creating a token.
+     * Tests the {@link UsersBean#login(String, String, boolean)} function with valid and invalid data without creating a token
      * @param comment Information about the data
      * @param email E-Mail address of the generated user
      * @param username Username of the generated user
@@ -176,7 +176,7 @@ class UsersBeanTest {
 
 
     /**
-     * Tests the {@link UsersBean#login(String, String, boolean)} function with the creation of keep signed in tokens.
+     * Tests the {@link UsersBean#login(String, String, boolean)} function with the creation of keep signed in tokens
      * @param comment Information about the data
      * @param email E-Mail address of the generated user
      * @param username Username of the generated user
@@ -215,7 +215,7 @@ class UsersBeanTest {
 
 
     /**
-     * Tests the {@link UsersBean#isAuthorized(ObjectId, String)} function with valid and invalid userIds and tokens.
+     * Tests the {@link UsersBean#isAuthorized(ObjectId, String)} function with valid and invalid userIds and tokens
      */
     @Test
     public void authWithTokenTest() {
@@ -240,7 +240,7 @@ class UsersBeanTest {
     }
 
     /**
-     * Test the {@link UsersBean#removeToken(ObjectId, String)} function with valid and invalid input.
+     * Test the {@link UsersBean#removeToken(ObjectId, String)} function with valid and invalid input
      */
     @Test
     void removeTokenTest() {
@@ -278,7 +278,7 @@ class UsersBeanTest {
     }
 
     /**
-     * Get a user with UserId equals null.
+     * Get a user with UserId equals null
      */
     @Test
     void getUserNullTest() {
@@ -289,7 +289,7 @@ class UsersBeanTest {
     }
 
     /**
-     * Test to get a non existing user.
+     * Test to get a non existing user
      */
     @Test
     void getUserNotExistingTest() {
@@ -299,7 +299,7 @@ class UsersBeanTest {
     }
 
     /**
-     * Test to get a existing User.
+     * Test to get a existing User
      */
     @Test
     void getUserExistingTest() {
@@ -350,7 +350,7 @@ class UsersBeanTest {
     }
 
     /**
-     * Test the {@link UsersBean#checkAuthorized(ObjectId)} function with valid and invalid UserIds.
+     * Test the {@link UsersBean#checkAuthorized(ObjectId)} function with valid and invalid UserIds
      */
     @Test
     void checkAuthorizedTest() {

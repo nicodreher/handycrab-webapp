@@ -7,7 +7,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * A Annotation to make a REST-Function only acessable by logged in users.
+ * A Annotation to make a REST-Function only acessable by logged in users
+ * @author Nico Dreher
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)

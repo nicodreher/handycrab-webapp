@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.util.Base64;
 
 /**
- * Tests for the {@link PicturesBean} class.
+ * Tests for the {@link PicturesBean} class
  *
  * @author Nico Dreher
  */
@@ -31,7 +31,7 @@ class PicturesBeanTest {
     private MongoContainer container = new MongoContainer();
 
     /**
-     * Place a picture in the mongodb.
+     * Place a picture in the mongodb
      * @param objectId
      * @param base64 The base64 encoded picture
      * @param contentType The http media type of the picture
@@ -45,7 +45,7 @@ class PicturesBeanTest {
     }
 
     /**
-     * Inserts the array of pictures into the mongodb.
+     * Inserts the array of pictures into the mongodb
      * @param data The array of the picture data
      */
     private void placePictures(Object[][] data) {
@@ -55,7 +55,7 @@ class PicturesBeanTest {
     }
 
     /**
-     * Generates six valid pictures.
+     * Generates six valid pictures
      * @return The data of the pictures in a array
      * @throws IOException
      */
@@ -79,7 +79,7 @@ class PicturesBeanTest {
     }
 
     /**
-     * Tests the {@link PicturesBean#put(String)} function with valid images.
+     * Tests the {@link PicturesBean#put(String)} function with valid images
      * @param picturePath
      * @param format The http media type of the picture
      * @throws IOException
@@ -101,7 +101,7 @@ class PicturesBeanTest {
     }
 
     /**
-     * Tests the {@link PicturesBean#put(String)} function with invalid images.
+     * Tests the {@link PicturesBean#put(String)} function with invalid images
      * @param picturePath
      * @param expectedException The exception which should be thrown
      * @throws IOException
@@ -122,7 +122,7 @@ class PicturesBeanTest {
     }
 
     /**
-     * Tests the {@link PicturesBean#get(ObjectId)} function with existing PictureIds.
+     * Tests the {@link PicturesBean#get(ObjectId)} function with existing PictureIds
      * @throws IOException
      */
     @Test
@@ -142,7 +142,7 @@ class PicturesBeanTest {
     }
 
     /**
-     * Tests the {@link PicturesBean#get(ObjectId)} with non existing pictures.
+     * Tests the {@link PicturesBean#get(ObjectId)} with non existing pictures
      * @throws IOException
      */
     @Test

@@ -27,7 +27,7 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Implementation of the {@link Users} interface.
+ * Implementation of the {@link Users} interface
  * @author Nico Dreher
  *
  * @see Users

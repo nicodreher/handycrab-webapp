@@ -199,6 +199,10 @@ public class DataSource<T> {
         }
     }
 
+    /**
+     * Delete one document with a given id
+     * @param _id
+     */
     public void deleteOne(Object _id) {
         if(_id != null) {
             deleteOne(Filters.eq("_id", _id));
@@ -208,10 +212,18 @@ public class DataSource<T> {
         }
     }
 
+    /**
+     * Delete one document matching the filter
+     * @param filter
+     */
     public void deleteOne(Bson filter) {
         getCollection().findOneAndDelete(filter);
     }
 
+    /**
+     * Get the {@link MongoCollection} of the DataSource
+     * @return
+     */
     public MongoCollection<Document> getCollection() {
         return client.getDatabase(System.getenv("mongo_database")).getCollection(collection);
     }

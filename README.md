@@ -68,15 +68,19 @@ Alles Ander Explizit definiert sein\
 ### Registrierung:
     .../users/register POST
     Login: false
-    {email, username, password} -> {User}
-    SESSION-COOKIE
+    {email, username, password, createToken?} -> {User}
+    SESSION-COOKIE TOKEN-COOKIE
     ErrorCodes: 1, 3, 4, 5, 12, 13
 ### Login:
     .../users/login POST
     Login: false
-    {email|username, password} -> {User}
-    SESSION-COOKIE
+    {login(email|username), password, createToken?} -> {User}
+    SESSION-COOKIE TOKEN-COOKIE
     ErrorCodes: 1, 6
+### CurrentUser:
+    .../users/currentuser GET
+    Login: true
+    {} -> {User}
 ### Logout:
     .../users/logout POST
     Login: true (Unchecked)

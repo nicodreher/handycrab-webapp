@@ -8,7 +8,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * A annotation to inject the currently logged in user.
+ * A annotation to inject the currently logged in user
  * @author Nico Dreher
  */
 @Qualifier
