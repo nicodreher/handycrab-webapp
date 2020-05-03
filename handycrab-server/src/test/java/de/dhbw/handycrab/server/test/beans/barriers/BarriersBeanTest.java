@@ -5,9 +5,9 @@ import com.mongodb.client.model.geojson.Position;
 import de.dhbw.handycrab.api.barriers.FrontendBarrier;
 import de.dhbw.handycrab.api.barriers.Solution;
 import de.dhbw.handycrab.api.barriers.Vote;
+import de.dhbw.handycrab.exceptions.*;
 import de.dhbw.handycrab.server.beans.barriers.BarriersBean;
 import de.dhbw.handycrab.server.beans.utils.SerializerBean;
-import de.dhbw.handycrab.exceptions.*;
 import de.dhbw.handycrab.server.test.mongo.MongoContainer;
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -108,6 +108,7 @@ class BarriersBeanTest {
                 barrier.optString("title", null),
                 barrier.optDouble("longitude", 200d),
                 barrier.optDouble("latitude", 200d),
+                barrier.optString("picture", null),
                 barrier.optString("postcode", null),
                 barrier.optString("description", null),
                 barrier.optString("solution", null),
@@ -134,6 +135,7 @@ class BarriersBeanTest {
                         barrier.optString("title", null),
                         barrier.optDouble("longitude", 200d),
                         barrier.optDouble("latitude", 200d),
+                        barrier.optString("picture", null),
                         barrier.optString("postcode", null),
                         barrier.optString("description", null),
                         barrier.optString("solution", null),
@@ -147,7 +149,7 @@ class BarriersBeanTest {
         var userId = new ObjectId("000000000000000000000000");
         var barrier = generateBarrierWithIncompleteInfo();
 
-        assertThrows(IncompleteRequestException.class, () -> bean.addBarrier(barrier.optString("title", null), barrier.optDouble("longitude", 200d), barrier.optDouble("latitude", 200d), barrier.optString("postcode", null), barrier.optString("description", null), barrier.optString("solution", null), userId));
+        assertThrows(IncompleteRequestException.class, () -> bean.addBarrier(barrier.optString("title", null), barrier.optDouble("longitude", 200d), barrier.optDouble("latitude", 200d), barrier.optString("picture", null), barrier.optString("postcode", null), barrier.optString("description", null), barrier.optString("solution", null), userId));
     }
 
     private JSONObject generateBarrierWithIncompleteInfo() {
@@ -175,8 +177,7 @@ class BarriersBeanTest {
         var title = "Changed title";
         var description = "Changed description and title";
 
-
-        bean.modifyBarrier(_id, title, description, REQUESTERID);
+        bean.modifyBarrier(_id, title, null, description, REQUESTERID);
 
         FrontendBarrier result = bean.getBarrier(_id, REQUESTERID);
         assertNotNull(result);
@@ -188,7 +189,7 @@ class BarriersBeanTest {
     void modifyBarrier_noId_throwsIncompleteRequestException() {
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
 
-        assertThrows(IncompleteRequestException.class, () -> bean.modifyBarrier(null, "test", "test", REQUESTERID));
+        assertThrows(IncompleteRequestException.class, () -> bean.modifyBarrier(null, "test", "", "test", REQUESTERID));
     }
 
     @Test

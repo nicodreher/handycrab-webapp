@@ -4,11 +4,11 @@ import com.mongodb.MongoClient;
 import de.dhbw.handycrab.api.pictures.Picture;
 import de.dhbw.handycrab.api.pictures.Pictures;
 import de.dhbw.handycrab.api.utils.Serializer;
+import de.dhbw.handycrab.exceptions.IncompleteRequestException;
+import de.dhbw.handycrab.exceptions.pictures.InvalidPictureFormatException;
+import de.dhbw.handycrab.exceptions.pictures.PictureNotFoundException;
+import de.dhbw.handycrab.exceptions.pictures.PictureToBigException;
 import de.dhbw.handycrab.server.beans.persistence.DataSource;
-import de.dhbw.handycrab.server.exceptions.IncompleteRequestException;
-import de.dhbw.handycrab.server.exceptions.pictures.InvalidPictureFormatException;
-import de.dhbw.handycrab.server.exceptions.pictures.PictureNotFoundException;
-import de.dhbw.handycrab.server.exceptions.pictures.PictureToBigException;
 import org.bson.types.ObjectId;
 
 import javax.annotation.PostConstruct;
@@ -39,7 +39,6 @@ public class PicturesBean implements Pictures {
     private DataSource<Picture> dataSource;
 
     public PicturesBean() {
-
     }
 
     public PicturesBean(MongoClient client, Serializer serializer) {

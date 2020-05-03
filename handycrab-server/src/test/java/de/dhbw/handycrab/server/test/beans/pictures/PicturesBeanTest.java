@@ -1,12 +1,9 @@
 package de.dhbw.handycrab.server.test.beans.pictures;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static com.mongodb.client.model.Filters.*;
-
 import de.dhbw.handycrab.api.pictures.Picture;
+import de.dhbw.handycrab.exceptions.pictures.PictureNotFoundException;
 import de.dhbw.handycrab.server.beans.pictures.PicturesBean;
 import de.dhbw.handycrab.server.beans.utils.SerializerBean;
-import de.dhbw.handycrab.server.exceptions.pictures.PictureNotFoundException;
 import de.dhbw.handycrab.server.test.mongo.MongoContainer;
 import org.apache.commons.compress.utils.IOUtils;
 import org.bson.Document;
@@ -19,6 +16,9 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.io.IOException;
 import java.util.Base64;
+
+import static com.mongodb.client.model.Filters.eq;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Tests for the {@link PicturesBean} class

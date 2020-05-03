@@ -35,6 +35,11 @@ public class BarrierBuilder {
         return this;
     }
 
+    public BarrierBuilder picture(ObjectId picture) {
+        barrier.setPicture(picture);
+        return this;
+    }
+
     public Barrier build() {
         return barrier;
     }

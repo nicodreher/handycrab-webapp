@@ -52,7 +52,7 @@ public class BarriersService {
     @Produces(MEDIA_TYPE)
     public FrontendBarrier addBarrier(@Context HttpServletRequest request, String json) {
         JSONObject obj = new JSONObject(json);
-        return barriers.addBarrier(obj.optString("title", null), obj.optDouble("longitude", 200), obj.optDouble("latitude", 100), obj.optString("postcode", null), obj.optString("description", null), obj.optString("solution", null), user.getID());
+        return barriers.addBarrier(obj.optString("title", null), obj.optDouble("longitude", 200), obj.optDouble("latitude", 100), obj.optString("picture", null), obj.optString("postcode", null), obj.optString("description", null), obj.optString("solution", null), user.getID());
     }
 
     @PUT
@@ -62,7 +62,7 @@ public class BarriersService {
     @Produces(MEDIA_TYPE)
     public FrontendBarrier modifyBarrier(@Context HttpServletRequest request, String json) {
         JSONObject obj = new JSONObject(json);
-        return barriers.modifyBarrier(new ObjectId(obj.optString("_id", null)), obj.optString("title", null), obj.optString("description", null), user.getID());
+        return barriers.modifyBarrier(new ObjectId(obj.optString("_id", null)), obj.optString("title", null), obj.optString("picture", null), obj.optString("description", null), user.getID());
     }
 
     @POST

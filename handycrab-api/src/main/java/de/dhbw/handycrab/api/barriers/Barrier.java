@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +19,7 @@ public class Barrier implements Serializable {
     private double longitude;
     private double latitude;
     private Point point;
-    private URL picture;
+    private ObjectId picture;
     private String description;
     private String postcode;
     private List<Solution> solutions = new ArrayList<>();
@@ -43,11 +42,11 @@ public class Barrier implements Serializable {
         this.title = title;
     }
 
-    public URL getPicture() {
+    public ObjectId getPicture() {
         return picture;
     }
 
-    public void setPicture(URL picture) {
+    public void setPicture(ObjectId picture) {
         this.picture = picture;
     }
 

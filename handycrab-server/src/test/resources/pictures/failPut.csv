@@ -8,4 +8,4 @@
 "/pictures/images/fail/svg2.svg", "de.dhbw.handycrab.exceptions.pictures.InvalidPictureFormatException"
 "/pictures/images/fail/unsinn1.png", "de.dhbw.handycrab.exceptions.pictures.InvalidPictureFormatException"
 "/pictures/images/fail/unsinn2.jpg", "de.dhbw.handycrab.exceptions.pictures.InvalidPictureFormatException"
-,"java.lang.NullPointerException"
+,"de.dhbw.handycrab.exceptions.IncompleteRequestException"

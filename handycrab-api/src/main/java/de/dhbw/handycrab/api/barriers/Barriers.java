@@ -13,9 +13,9 @@ public interface Barriers {
 
     List<FrontendBarrier> getBarrier(double longitude, double latitude, int radius, ObjectId requesterId);
 
-    FrontendBarrier addBarrier(String title, double longitude, double latitude, String postalCode, String description, String solution, ObjectId requesterId);
+    FrontendBarrier addBarrier(String title, double longitude, double latitude, String picture, String postalCode, String description, String solution, ObjectId requesterId);
 
-    FrontendBarrier modifyBarrier(ObjectId id, String title, String description, ObjectId requesterId);
+    FrontendBarrier modifyBarrier(ObjectId id, String title, String picture, String description, ObjectId requesterId);
 
     FrontendBarrier putVote(ObjectId id, Vote vote, ObjectId requesterId);
 

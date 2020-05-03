@@ -6,11 +6,12 @@ import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.geojson.Point;
 import com.mongodb.client.model.geojson.Position;
 import de.dhbw.handycrab.api.barriers.*;
-import de.dhbw.handycrab.api.users.Users;
+import de.dhbw.handycrab.api.pictures.Pictures;
 import de.dhbw.handycrab.api.utils.Serializer;
+import de.dhbw.handycrab.exceptions.*;
 import de.dhbw.handycrab.server.beans.persistence.DataSource;
 import de.dhbw.handycrab.server.beans.persistence.RequestBuilder;
-import de.dhbw.handycrab.exceptions.*;
+import de.dhbw.handycrab.server.beans.pictures.PicturesBean;
 import org.bson.types.ObjectId;
 
 import javax.annotation.PostConstruct;
@@ -30,8 +31,8 @@ public class BarriersBean implements Barriers {
     @Resource(lookup = Serializer.LOOKUP)
     private Serializer serializer;
 
-    @Resource(lookup = Users.LOOKUP)
-    private Users userBean;
+    @Resource(lookup = Pictures.LOOKUP)
+    private PicturesBean picturesBean;
 
     private DataSource<Barrier> dataSource;
 
@@ -83,7 +84,7 @@ public class BarriersBean implements Barriers {
     }
 
     @Override
-    public FrontendBarrier addBarrier(String title, double longitude, double latitude, String postalCode, String description, String solution, ObjectId userId) {
+    public FrontendBarrier addBarrier(String title, double longitude, double latitude, String picture, String postalCode, String description, String solution, ObjectId userId) {
         if (title != null && postalCode != null && description != null) {
             if (longitude <= 90 && latitude <= 180) {
                 var barrier = new BarrierBuilder().title(title).point(longitude, latitude).postalCode(postalCode).description(description).userId(userId);
@@ -92,6 +93,10 @@ public class BarriersBean implements Barriers {
                     solObject.setText(solution);
                     solObject.setUserId(userId);
                     barrier.solution(solObject);
+                }
+                if (picture != null) {
+                    var pic = picturesBean.put(picture);
+                    barrier.picture(pic.getID());
                 }
                 var bar = barrier.build();
                 dataSource.insert(bar);
@@ -104,7 +109,7 @@ public class BarriersBean implements Barriers {
     }
 
     @Override
-    public FrontendBarrier modifyBarrier(ObjectId id, String title, String description, ObjectId userId) {
+    public FrontendBarrier modifyBarrier(ObjectId id, String title, String picture, String description, ObjectId userId) {
         if (id != null) {
             Barrier barrier = dataSource.get(id);
             if (!barrier.getUserId().equals(userId))
@@ -113,6 +118,10 @@ public class BarriersBean implements Barriers {
                 barrier.setTitle(title);
             if (description != null)
                 barrier.setDescription(description);
+            if (picture != null) {
+                var pic = picturesBean.put(picture);
+                barrier.setPicture(pic.getID());
+            }
             dataSource.update(barrier);
             return new FrontendBarrier(barrier, userId);
         } else {
