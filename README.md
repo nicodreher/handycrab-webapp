@@ -32,7 +32,7 @@ postcode: string\
 solution: Solution[]\
 upvotes: int\
 downvotes: int\
-vote: Vote\
+vote: Vote
 
 ## Return-Codes: 
 200 - OK (Immer möglich)\
