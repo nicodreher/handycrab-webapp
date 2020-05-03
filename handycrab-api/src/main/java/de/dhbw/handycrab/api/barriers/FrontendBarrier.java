@@ -122,4 +122,12 @@ public class FrontendBarrier implements Serializable {
     public void setVote(Vote vote) {
         this.vote = vote;
     }
+
+    public ObjectId getPictureId() {
+        return pictureId;
+    }
+
+    public void setPictureId(ObjectId pictureId) {
+        this.pictureId = pictureId;
+    }
 }

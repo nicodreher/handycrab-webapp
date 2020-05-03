@@ -82,7 +82,7 @@ public class BarriersService {
     @Produces(MEDIA_TYPE)
     public FrontendBarrier addVote(@Context HttpServletRequest request, String json) {
         JSONObject obj = new JSONObject(json);
-        return barriers.putVote(new ObjectId(obj.optString("_id")), Vote.valueOf(obj.optString("vote", null)), user.getID());
+        return barriers.addVoteToBarrier(new ObjectId(obj.optString("_id")), Vote.valueOf(obj.optString("vote", null)), user.getID());
     }
 
     @PUT

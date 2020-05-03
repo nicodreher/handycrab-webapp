@@ -45,6 +45,13 @@ public class BarriersBean implements Barriers {
         construct();
     }
 
+    public BarriersBean(MongoClient client, Serializer serializer, PicturesBean pictures) {
+        this.client = client;
+        this.serializer = serializer;
+        this.picturesBean = pictures;
+        construct();
+    }
+
     @PostConstruct
     private void construct() {
         dataSource = new DataSource<>(Barrier.class, "barriers", serializer, client);
@@ -76,7 +83,7 @@ public class BarriersBean implements Barriers {
 
     @Override
     public List<FrontendBarrier> getBarrier(double longitude, double latitude, int radius, ObjectId userId) {
-        if (latitude <= 180 && latitude >= -180 && longitude <= 90 && longitude >= -90) {
+        if (longitude <= 180 && longitude >= -180 && latitude <= 90 && latitude >= -90) {
             Point point = new Point(new Position(longitude, latitude));
             return dataSource.find(new RequestBuilder().filter(Filters.nearSphere("point", point, (double) radius, 0d)))
                     .map(e -> new FrontendBarrier(e, userId)).collect(Collectors.toList());
@@ -130,7 +137,7 @@ public class BarriersBean implements Barriers {
     }
 
     @Override
-    public FrontendBarrier putVote(ObjectId id, Vote vote, ObjectId userId) {
+    public FrontendBarrier addVoteToBarrier(ObjectId id, Vote vote, ObjectId userId) {
         if (dataSource.contains(id)) {
             Barrier barrier = dataSource.get(id);
             var upVotes = barrier.getUpVotes();
@@ -153,8 +160,8 @@ public class BarriersBean implements Barriers {
 
     @Override
     public FrontendBarrier addSolution(ObjectId id, String solution, ObjectId userId) {
-        if (dataSource.contains(id)) {
-            if (userId != null) {
+        if (id != null && solution != null && userId != null) {
+            if (dataSource.contains(id)) {
                 var barrier = dataSource.get(id);
                 var solutionToAdd = new Solution();
                 solutionToAdd.setText(solution);
@@ -163,9 +170,9 @@ public class BarriersBean implements Barriers {
                 dataSource.update(barrier);
                 return new FrontendBarrier(barrier, userId);
             } else
-                throw new InvalidUserIdException();
+                throw new BarrierNotFoundException();
         } else
-            throw new BarrierNotFoundException();
+            throw new IncompleteRequestException();
     }
 
     @Override

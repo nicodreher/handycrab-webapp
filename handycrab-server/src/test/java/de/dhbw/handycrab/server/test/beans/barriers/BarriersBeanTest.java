@@ -7,8 +7,10 @@ import de.dhbw.handycrab.api.barriers.Solution;
 import de.dhbw.handycrab.api.barriers.Vote;
 import de.dhbw.handycrab.exceptions.*;
 import de.dhbw.handycrab.server.beans.barriers.BarriersBean;
+import de.dhbw.handycrab.server.beans.pictures.PicturesBean;
 import de.dhbw.handycrab.server.beans.utils.SerializerBean;
 import de.dhbw.handycrab.server.test.mongo.MongoContainer;
+import org.apache.commons.compress.utils.IOUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.json.JSONObject;
@@ -17,13 +19,20 @@ import org.junit.jupiter.api.Test;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Test for the {@link BarriersBean} class
+ *
+ * @author Lukas Lautenschlager
+ */
 @Testcontainers
 class BarriersBeanTest {
 
@@ -31,13 +40,27 @@ class BarriersBeanTest {
     @Container
     private MongoContainer container = new MongoContainer();
 
+    /**
+     * Generates a Barrier as bson document
+     *
+     * @param id
+     * @param userId
+     * @param title
+     * @param longitude
+     * @param latitude
+     * @param description
+     * @param postcode
+     * @param solutions
+     * @param votes
+     * @return
+     */
     private Document generateBarrier(ObjectId id, ObjectId userId, String title, double longitude, double latitude, String description, String postcode, List<Solution> solutions, List<Vote> votes) {
-        var position = new Point(new Position(longitude, latitude));
+        var point = new Point(new Position(longitude, latitude));
         Document doc = new Document();
         doc.put("_id", id);
         doc.put("userId", userId);
         doc.put("title", title);
-        doc.put("position", position);
+        doc.put("point", point);
         doc.put("description", description);
         doc.put("postcode", postcode);
         doc.put("solutions", solutions);
@@ -45,26 +68,41 @@ class BarriersBeanTest {
         return doc;
     }
 
+    /**
+     * Generates multiple barriers
+     *
+     * @return array of documents
+     */
     private Document[] generateBarriers() {
         return new Document[]{
                 generateBarrier(new ObjectId("000000000000000000000000"), new ObjectId("000000000000000000000000"), "Bordstein behindert mich", 60, 40, "Der Bordstein behindert mich", "XYZ123", new ArrayList<>(), new ArrayList<>()),
                 generateBarrier(new ObjectId("000000000000000000000001"), new ObjectId("000000000000000000000001"), "Treppe nicht barrierefrei", 60, 40, "Treppe nicht barrierefrei", "ABC123", new ArrayList<>(), new ArrayList<>()),
-                generateBarrier(new ObjectId("000000000000000000000002"), new ObjectId("000000000000000000000002"), "Keine Behindertenparkplätze", 60, 40, "Keine Behindertenparkplätze", "XYZ123", new ArrayList<>(), new ArrayList<>()),
-                generateBarrier(new ObjectId("000000000000000000000003"), new ObjectId("000000000000000000000003"), "Vorsicht Pflasterstein", 60, 40, "Vorsicht Pflasterstein", "ABC123", new ArrayList<>(), new ArrayList<>()),
-                generateBarrier(new ObjectId("000000000000000000000004"), new ObjectId("000000000000000000000004"), "ABC", 60, 40, "ABC", "ABC123", new ArrayList<>(), new ArrayList<>())
+                generateBarrier(new ObjectId("000000000000000000000002"), new ObjectId("000000000000000000000002"), "Keine Behindertenparkplätze", 30, 50, "Keine Behindertenparkplätze", "XYZ123", new ArrayList<>(), new ArrayList<>()),
+                generateBarrier(new ObjectId("000000000000000000000003"), new ObjectId("000000000000000000000003"), "Vorsicht Pflasterstein", 61, 41, "Vorsicht Pflasterstein", "ABC123", new ArrayList<>(), new ArrayList<>()),
+                generateBarrier(new ObjectId("000000000000000000000004"), new ObjectId("000000000000000000000004"), "ABC", 60.00001, 40.00001, "ABC", "ABC123", new ArrayList<>(), new ArrayList<>())
         };
     }
 
+    /**
+     * Initializes a bean before each unit test
+     */
     @BeforeEach
     public void initializeBean() {
         insertBarriers();
     }
 
+    /**
+     * Insert the generated documents into a MongoDB
+     */
     public void insertBarriers() {
         var docs = generateBarriers();
         container.getCollection("barriers").insertMany(Arrays.stream(docs).collect(Collectors.toList()));
     }
 
+    /**
+     * Test the {@link BarriersBean#getBarrier(String, ObjectId) with valid inputs},
+     * dependent on a postal code and a userId
+     */
     @Test
     void getBarrier_onPostCode_ReturnsBarriers() {
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
@@ -79,6 +117,68 @@ class BarriersBeanTest {
         assertEquals(new ObjectId("000000000000000000000002"), bar.get(1).get_id());
     }
 
+    /**
+     * Test for the {@link BarriersBean#getBarrier(String, ObjectId)} with incomplete request information.
+     */
+    @Test
+    void getBarrier_onPostCodeWithInvalidRequestInformation_throwsIncompleteRequestException() {
+        String postcode = null;
+        var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
+
+        assertThrows(IncompleteRequestException.class, () -> bean.getBarrier(postcode, REQUESTERID));
+    }
+
+    /**
+     * Test for the {@link BarriersBean#getBarrier(double, double, int, ObjectId)} with valid inputs.
+     * Dependent on geological position and radius.
+     */
+    @Test
+    void getBarrier_onPosition_returnsBarriers() {
+        var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
+        double longitude = 60;
+        double latitude = 40;
+        int radius = 10;
+
+        var result = bean.getBarrier(longitude, latitude, radius, REQUESTERID);
+
+        assertNotNull(result);
+        assertEquals(3, result.size());
+        var resultIds = result.stream().map(e -> e.get_id().toString()).collect(Collectors.toList());
+        assertTrue(resultIds.contains("000000000000000000000000"));
+        assertTrue(resultIds.contains("000000000000000000000001"));
+        assertTrue(resultIds.contains("000000000000000000000004"));
+    }
+
+    /**
+     * Test for the {@link BarriersBean#getBarrier(double, double, int, ObjectId)} with invalid longitude
+     */
+    @Test
+    void getBarrier_onPositionWithInvalidGeoPosition_throwsInvalidGeoPositionException() {
+        var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
+        double longitude = 300;
+        double latitude = 40;
+        int radius = 10;
+
+        assertThrows(InvalidGeoPositionException.class, () -> bean.getBarrier(longitude, latitude, radius, REQUESTERID));
+    }
+
+    /**
+     * Test for the {@link BarriersBean#getBarrier(double, double, int, ObjectId)} with invalid latitude
+     */
+    @Test
+    void getBarrier_OnPositionInvalidLatitude_throwsInvalidGeoPositionException() {
+        var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
+        double longitude = 90;
+        double latitude = 120;
+        int radius = 10;
+
+        assertThrows(InvalidGeoPositionException.class, () -> bean.getBarrier(longitude, latitude, radius, REQUESTERID));
+    }
+
+    /**
+     * Test the {@link BarriersBean#getBarrier(ObjectId, ObjectId) with valid inputs},
+     * dependent on an identifier and a userId
+     */
     @Test
     void getBarrier_onId_ReturnsBarrier() {
         var _id = new ObjectId("000000000000000000000000");
@@ -90,6 +190,21 @@ class BarriersBeanTest {
         assertEquals(_id, bar.get_id());
     }
 
+    /**
+     * Test for the {@link BarriersBean#getBarrier(ObjectId, ObjectId)} with incomplete request info.
+     */
+    @Test
+    void getBarrier_onId_throwsIncompleteRequestException() {
+        ObjectId _id = null;
+        var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
+
+        assertThrows(IncompleteRequestException.class, () -> bean.getBarrier(_id, REQUESTERID));
+    }
+
+    /**
+     * Test the {@link BarriersBean#getBarrier(String, ObjectId) with invalid inputs},
+     * with an unknown Identifier.
+     */
     @Test
     void getBarrier_onIdInvalidBarrier_throwsBarrierNotFoundException() {
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
@@ -98,10 +213,15 @@ class BarriersBeanTest {
         assertThrows(BarrierNotFoundException.class, () -> bean.getBarrier(_id, REQUESTERID));
     }
 
+    /**
+     * Test the {@link BarriersBean#addBarrier(String, double, double, String, String, String, String, ObjectId)}
+     * with valid inputs
+     */
     @Test
-    void addBarrier_validBarrier_BarrierSavedInMongoDB() {
+    void addBarrier_validBarrier_BarrierSavedInMongoDB() throws IOException {
         var userId = new ObjectId("000000000000000000000000");
-        var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
+        var picturesBean = new PicturesBean(container.getMongoClient(), new SerializerBean());
+        var bean = new BarriersBean(container.getMongoClient(), new SerializerBean(), picturesBean);
         var barrier = generateValidBarrierAsJSON();
 
         bean.addBarrier(
@@ -122,8 +242,26 @@ class BarriersBeanTest {
         assertEquals(40d, resultBar.getLongitude());
         assertEquals(30d, resultBar.getLatitude());
         assertEquals("70000", resultBar.getPostcode());
+        assertEquals(barrier.getString("picture"), picturesBean.get(resultBar.getPictureId()).getBase64());
     }
 
+    /**
+     * Generates a valid JSON Object for processing
+     *
+     * @return request as JSON Object
+     */
+    private JSONObject generateValidBarrierAsJSON() throws IOException {
+        var bar = new JSONObject();
+        var pic = Base64.getEncoder().encodeToString(IOUtils.toByteArray(getClass().getResourceAsStream("/pictures/images/success/jpeg1.jpg")));
+        bar.put("title", "TestBarrier").put("latitude", 30d).put("longitude", 40d).put("postcode", "70000").put("description", "Beschreibung")
+                .put("solution", "Eine von Vielen").put("picture", pic);
+        return bar;
+    }
+
+    /**
+     * Test the {@link BarriersBean#addBarrier(String, double, double, String, String, String, String, ObjectId)}
+     * with invalid GeoPositions
+     */
     @Test
     void addBarrier_BarrierWithInvalidGeoPos_ThrowsInvalidGeoException() {
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
@@ -143,6 +281,22 @@ class BarriersBeanTest {
 
     }
 
+
+    /**
+     * Generates a request with invalid GeoPosition
+     *
+     * @return request with invalid GeoPosition
+     */
+    private JSONObject generateBarrierWithInvalidGeoPositionAsJSON() {
+        var bar = new JSONObject();
+        bar.put("title", "TestBarrier").put("latitude", 300d).put("longitude", 40d).put("postcode", "70000").put("description", "Beschreibung");
+        return bar;
+    }
+
+    /**
+     * Test the {@link BarriersBean#addBarrier(String, double, double, String, String, String, String, ObjectId)}
+     * with incomplete request data
+     */
     @Test
     void addBarrier_IncompleteBarrier_ThrowsIncompleteRequestException() {
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
@@ -152,39 +306,43 @@ class BarriersBeanTest {
         assertThrows(IncompleteRequestException.class, () -> bean.addBarrier(barrier.optString("title", null), barrier.optDouble("longitude", 200d), barrier.optDouble("latitude", 200d), barrier.optString("picture", null), barrier.optString("postcode", null), barrier.optString("description", null), barrier.optString("solution", null), userId));
     }
 
+    /**
+     * generates a JSON Object with incomplete information for processing
+     *
+     * @return request as JSON Object
+     */
     private JSONObject generateBarrierWithIncompleteInfo() {
         var bar = new JSONObject();
         bar.put("latitude", 30d).put("longitude", 40d);
         return bar;
     }
 
-    private JSONObject generateValidBarrierAsJSON() {
-        var bar = new JSONObject();
-        bar.put("title", "TestBarrier").put("latitude", 30d).put("longitude", 40d).put("postcode", "70000").put("description", "Beschreibung");
-        return bar;
-    }
-
-    private JSONObject generateBarrierWithInvalidGeoPositionAsJSON() {
-        var bar = new JSONObject();
-        bar.put("title", "TestBarrier").put("latitude", 300d).put("longitude", 40d).put("postcode", "70000").put("description", "Beschreibung");
-        return bar;
-    }
-
+    /**
+     * Test for the {@link BarriersBean#modifyBarrier(ObjectId, String, String, String, ObjectId)}
+     * with valid inputs
+     */
     @Test
-    void modifyBarrier_validBarrier_savedInMongoDB() {
-        var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
+    void modifyBarrier_validBarrier_savedInMongoDB() throws IOException {
+        var picturesBean = new PicturesBean(container.getMongoClient(), new SerializerBean());
+        var bean = new BarriersBean(container.getMongoClient(), new SerializerBean(), picturesBean);
         var _id = new ObjectId("000000000000000000000000");
         var title = "Changed title";
         var description = "Changed description and title";
+        var pic = Base64.getEncoder().encodeToString(IOUtils.toByteArray(getClass().getResourceAsStream("/pictures/images/success/jpeg1.jpg")));
 
-        bean.modifyBarrier(_id, title, null, description, REQUESTERID);
+        bean.modifyBarrier(_id, title, pic, description, REQUESTERID);
 
         FrontendBarrier result = bean.getBarrier(_id, REQUESTERID);
         assertNotNull(result);
         assertEquals(title, result.getTitle());
+        assertEquals(pic, picturesBean.get(result.getPictureId()).getBase64());
         assertEquals(description, result.getDescription());
     }
 
+    /**
+     * Test for the {@link BarriersBean#modifyBarrier(ObjectId, String, String, String, ObjectId)}
+     * with no identifier of the barrier
+     */
     @Test
     void modifyBarrier_noId_throwsIncompleteRequestException() {
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
@@ -192,14 +350,34 @@ class BarriersBeanTest {
         assertThrows(IncompleteRequestException.class, () -> bean.modifyBarrier(null, "test", "", "test", REQUESTERID));
     }
 
+    /**
+     * Test for the {@link BarriersBean#modifyBarrier(ObjectId, String, String, String, ObjectId)}
+     * with userId != userId of the creator
+     */
     @Test
-    void putVote_upVoteBarrier_voteSavedInMongoDB() {
+    void modifyBarrier_invalidUserId_throwsInvalidUserIdException() throws IOException {
+        var picturesBean = new PicturesBean(container.getMongoClient(), new SerializerBean());
+        var bean = new BarriersBean(container.getMongoClient(), new SerializerBean(), picturesBean);
+        var _id = new ObjectId("000000000000000000000000");
+        var userId = new ObjectId("000000000000000000000012");
+        var title = "Neuer Titel";
+        var description = "Neue Beschreibung";
+        var pic = Base64.getEncoder().encodeToString(IOUtils.toByteArray(getClass().getResourceAsStream("/pictures/images/success/jpeg1.jpg")));
+
+        assertThrows(InvalidUserIdException.class, () -> bean.modifyBarrier(_id, title, pic, description, userId));
+    }
+
+    /**
+     * Test for the {@link BarriersBean#addVoteToBarrier(ObjectId, Vote, ObjectId)} with valid inputs
+     */
+    @Test
+    void addVoteToBarrier_upVoteBarrier_voteSavedInMongoDB() {
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
         var _id = new ObjectId("000000000000000000000000");
         var userId = new ObjectId("000000000000000000000000");
         var vote = Vote.UP;
 
-        bean.putVote(_id, vote, userId);
+        bean.addVoteToBarrier(_id, vote, userId);
 
         var barrier = bean.getBarrier(_id, userId);
         assertNotNull(barrier);
@@ -207,8 +385,11 @@ class BarriersBeanTest {
         assertEquals(1, barrier.getUpVotes());
     }
 
+    /**
+     * Test for the {@link BarriersBean#addSolution(ObjectId, String, ObjectId)} with valid inputs
+     */
     @Test
-    void addSolution_savedInMongoDB() {
+    void addSolution_validInputs_savedInMongoDB() {
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
         var _id = new ObjectId("000000000000000000000000");
         var userId = new ObjectId("000000000000000000000000");
@@ -221,16 +402,24 @@ class BarriersBeanTest {
         assertEquals(solution, result.getSolutions().get(0).getText());
     }
 
+    /**
+     * Test for the {@link BarriersBean#addSolution(ObjectId, String, ObjectId)}
+     * with invalid userId
+     */
     @Test
-    void addSolution_invalidUserId_throwsInvalidUserIdException() {
+    void addSolution_invalidUserId_throwsIncompleteRequestException() {
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
         var _id = new ObjectId("000000000000000000000000");
         ObjectId userId = null;
         var solution = "New solution for barrier";
 
-        assertThrows(InvalidUserIdException.class, () -> bean.addSolution(_id, solution, userId));
+        assertThrows(IncompleteRequestException.class, () -> bean.addSolution(_id, solution, userId));
     }
 
+    /**
+     * Test for the {@link BarriersBean#addSolution(ObjectId, String, ObjectId)}
+     * with invalid identifier of the barrier
+     */
     @Test
     void addSolution_invalidBarrierId_throwsBarrierNotFoundException() {
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
@@ -241,6 +430,10 @@ class BarriersBeanTest {
         assertThrows(BarrierNotFoundException.class, () -> bean.addSolution(_id, solution, userId));
     }
 
+    /**
+     * Test for the {@link BarriersBean#addVoteToSolution(ObjectId, Vote, ObjectId)}
+     * with valid inputs (Upvote)
+     */
     @Test
     void addVoteToSolution_UPVote_savedInMongoDB() {
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
@@ -257,6 +450,10 @@ class BarriersBeanTest {
         assertEquals(Vote.UP, solution.getVote());
     }
 
+    /**
+     * Test for the {@link BarriersBean#addVoteToSolution(ObjectId, Vote, ObjectId)}
+     * with valid inputs (Downvote)
+     */
     @Test
     void addVoteToSolution_DOWNVote_savedInMongoDB() {
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
@@ -273,6 +470,10 @@ class BarriersBeanTest {
         assertEquals(Vote.DOWN, solution.getVote());
     }
 
+    /**
+     * Test for the {@link BarriersBean#addVoteToSolution(ObjectId, Vote, ObjectId)}
+     * with valid inputs with NONE Vote, that removes existing votes
+     */
     @Test
     void addVoteSolutions_NONEVote_RemovesAllVotes() {
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
@@ -280,7 +481,6 @@ class BarriersBeanTest {
         var userId = new ObjectId("000000000000000000000000");
         bean.addSolution(_id, "Neue Lösung", userId);
         var solutionId = bean.getBarrier(_id, userId).getSolutions().get(0).get_id();
-        //Add DOWN Vote to Remove
         bean.addVoteToSolution(solutionId, Vote.DOWN, userId);
 
         bean.addVoteToSolution(solutionId, Vote.NONE, userId);
@@ -292,6 +492,10 @@ class BarriersBeanTest {
         assertEquals(Vote.NONE, solution.getVote());
     }
 
+    /**
+     * Test for the {@link BarriersBean#addVoteToSolution(ObjectId, Vote, ObjectId)} with multiple votes from different users,
+     * correct amount of Up- and Downvotes saved and vote of user is correct.
+     */
     @Test
     void addVoteToSolution_differentUsersAndVotes_savedInMongoDB() {
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
@@ -313,6 +517,10 @@ class BarriersBeanTest {
         assertEquals(Vote.UP, solution.getVote());
     }
 
+    /**
+     * Test for the {@link BarriersBean#addVoteToSolution(ObjectId, Vote, ObjectId)}
+     * with valid inputs. Upvote is removed by Downvote.
+     */
     @Test
     void addVoteToSolution_UPtoDOWN_onlyDownSavedInMongoDB() {
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
@@ -331,6 +539,9 @@ class BarriersBeanTest {
         assertEquals(0, solution.getUpVotes());
     }
 
+    /**
+     * Test for the {@link BarriersBean#addVoteToSolution(ObjectId, Vote, ObjectId)} with invalid solutionId
+     */
     @Test
     void addVoteToSolution_invalidSolutionId_throwsSolutionNotFoundException() {
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
@@ -340,13 +551,17 @@ class BarriersBeanTest {
         assertThrows(SolutionNotFoundException.class, () -> bean.addVoteToSolution(solutionId, Vote.UP, userId));
     }
 
+    /**
+     * Test for the {@link BarriersBean#addVoteToBarrier(ObjectId, Vote, ObjectId)}
+     * with valid inputs (Upvote)
+     */
     @Test
     void addVoteToBarrier_UPVote_savedInMongoDB() {
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
         var _id = new ObjectId("000000000000000000000000");
         var userId = new ObjectId("000000000000000000000000");
 
-        bean.putVote(_id, Vote.UP, userId);
+        bean.addVoteToBarrier(_id, Vote.UP, userId);
 
         var barrier = bean.getBarrier(_id, userId);
         assertEquals(Vote.UP, barrier.getVote());
@@ -354,13 +569,16 @@ class BarriersBeanTest {
         assertEquals(0, barrier.getDownVotes());
     }
 
+    /**
+     * Test for the {@link BarriersBean#addVoteToBarrier(ObjectId, Vote, ObjectId)} with valid inputs (Downvote)
+     */
     @Test
     void addVoteToBarrier_DOWNVote_savedInMongoDB() {
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
         var _id = new ObjectId("000000000000000000000000");
         var userId = new ObjectId("000000000000000000000000");
 
-        bean.putVote(_id, Vote.DOWN, userId);
+        bean.addVoteToBarrier(_id, Vote.DOWN, userId);
 
         var barrier = bean.getBarrier(_id, userId);
         assertEquals(Vote.DOWN, barrier.getVote());
@@ -368,14 +586,18 @@ class BarriersBeanTest {
         assertEquals(0, barrier.getUpVotes());
     }
 
+    /**
+     * Test for the {@link BarriersBean#addVoteToBarrier(ObjectId, Vote, ObjectId)} with valid inputs.
+     * NONE Vote removes existing votes of user.
+     */
     @Test
     void addVoteToBarrier_NONEVote_removesCurrentVotes() {
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
         var _id = new ObjectId("000000000000000000000000");
         var userId = new ObjectId("000000000000000000000000");
-        bean.putVote(_id, Vote.UP, userId);
+        bean.addVoteToBarrier(_id, Vote.UP, userId);
 
-        bean.putVote(_id, Vote.NONE, userId);
+        bean.addVoteToBarrier(_id, Vote.NONE, userId);
 
         var barrier = bean.getBarrier(_id, userId);
         assertEquals(Vote.NONE, barrier.getVote());
@@ -383,6 +605,9 @@ class BarriersBeanTest {
         assertEquals(0, barrier.getDownVotes());
     }
 
+    /**
+     * Test for the {@link BarriersBean#addVoteToBarrier(ObjectId, Vote, ObjectId)} with votes from multiple users.
+     */
     @Test
     void addVoteToBarrier_MultipleVotes_savedInMongoDB() {
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
@@ -392,10 +617,10 @@ class BarriersBeanTest {
         var userId3 = new ObjectId("000000000000000000000003");
         var userId4 = new ObjectId("000000000000000000000004");
 
-        bean.putVote(_id, Vote.UP, userId);
-        bean.putVote(_id, Vote.DOWN, userId2);
-        bean.putVote(_id, Vote.NONE, userId3);
-        bean.putVote(_id, Vote.UP, userId4);
+        bean.addVoteToBarrier(_id, Vote.UP, userId);
+        bean.addVoteToBarrier(_id, Vote.DOWN, userId2);
+        bean.addVoteToBarrier(_id, Vote.NONE, userId3);
+        bean.addVoteToBarrier(_id, Vote.UP, userId4);
 
         var barrier = bean.getBarrier(_id, userId);
         assertEquals(Vote.UP, barrier.getVote());
@@ -403,23 +628,30 @@ class BarriersBeanTest {
         assertEquals(1, barrier.getDownVotes());
     }
 
+    /**
+     * Test for the {@link BarriersBean#addVoteToBarrier(ObjectId, Vote, ObjectId)} with invalid identifier for the barrier
+     */
     @Test
     void addVoteToBarrier_invalidBarrierId_throwsBarrierNotFoundException() {
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
         var userId = new ObjectId("000000000000000000000000");
         var _id = new ObjectId("000000320000000000000000");
 
-        assertThrows(BarrierNotFoundException.class, () -> bean.putVote(_id, Vote.UP, userId));
+        assertThrows(BarrierNotFoundException.class, () -> bean.addVoteToBarrier(_id, Vote.UP, userId));
     }
 
+    /**
+     * Test for the {@link BarriersBean#addVoteToBarrier(ObjectId, Vote, ObjectId)} with valid inputs.
+     * Upvote removes Downvote.
+     */
     @Test
     void addVoteToBarrier_UPtoDOWN_onlyDOWNsavedInMongoDB() {
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
         var userId = new ObjectId("000000000000000000000000");
         var _id = new ObjectId("000000000000000000000000");
-        bean.putVote(_id, Vote.UP, userId);
+        bean.addVoteToBarrier(_id, Vote.UP, userId);
 
-        bean.putVote(_id, Vote.DOWN, userId);
+        bean.addVoteToBarrier(_id, Vote.DOWN, userId);
 
         var barrier = bean.getBarrier(_id, userId);
         assertEquals(Vote.DOWN, barrier.getVote());

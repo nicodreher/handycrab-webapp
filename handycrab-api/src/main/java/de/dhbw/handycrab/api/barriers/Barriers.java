@@ -17,7 +17,7 @@ public interface Barriers {
 
     FrontendBarrier modifyBarrier(ObjectId id, String title, String picture, String description, ObjectId requesterId);
 
-    FrontendBarrier putVote(ObjectId id, Vote vote, ObjectId requesterId);
+    FrontendBarrier addVoteToBarrier(ObjectId id, Vote vote, ObjectId requesterId);
 
     FrontendBarrier addSolution(ObjectId id, String solution, ObjectId requesterId);
 
