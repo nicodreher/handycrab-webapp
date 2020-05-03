@@ -5,7 +5,7 @@ import de.dhbw.handycrab.api.barriers.Barriers;
 import de.dhbw.handycrab.api.barriers.FrontendBarrier;
 import de.dhbw.handycrab.api.barriers.Vote;
 import de.dhbw.handycrab.api.users.User;
-import de.dhbw.handycrab.server.exceptions.IncompleteRequestException;
+import de.dhbw.handycrab.exceptions.IncompleteRequestException;
 import de.dhbw.handycrab.server.rest.authorization.Authorized;
 import de.dhbw.handycrab.server.rest.authorization.CurrentUser;
 import org.bson.types.ObjectId;

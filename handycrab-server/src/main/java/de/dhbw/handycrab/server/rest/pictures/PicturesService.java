@@ -9,6 +9,10 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.util.Base64;
 
+/**
+ * The REST-Service to retrieve uploaded pictures using the {@link de.dhbw.handycrab.server.beans.pictures.PicturesBean}
+ * @author Nico Dreher
+ */
 @Path("/pictures")
 public class PicturesService {
     @Resource(lookup = Pictures.LOOKUP)

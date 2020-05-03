@@ -3,8 +3,11 @@ package de.dhbw.handycrab.api.users;
 import org.bson.types.ObjectId;
 
 import java.io.Serializable;
-import java.util.UUID;
 
+/**
+ * A representation of a registered user without the password field for the REST-Clients
+ * @author Nico Dreher
+ */
 public class FrontendUser implements Serializable {
     private ObjectId _id;
     private String username;

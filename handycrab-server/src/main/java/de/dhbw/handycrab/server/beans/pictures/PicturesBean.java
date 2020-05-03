@@ -22,6 +22,11 @@ import java.io.IOException;
 import java.util.Base64;
 import java.util.Iterator;
 
+/**
+ * Implementation of the {@link Pictures} Interface
+ * @author Lukas Lautenschlager
+ * @see Pictures
+ */
 @Stateless
 @Remote(Pictures.class)
 public class PicturesBean implements Pictures {

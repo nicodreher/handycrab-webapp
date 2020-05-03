@@ -1,6 +1,6 @@
 package de.dhbw.handycrab.server.rest.errors;
 
-import de.dhbw.handycrab.server.exceptions.HandyCrabException;
+import de.dhbw.handycrab.exceptions.HandyCrabException;
 import org.json.JSONObject;
 
 import javax.ws.rs.core.MediaType;
@@ -9,7 +9,7 @@ import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 /**
- * The HandyCrabExceptionMapper is used to decide what happens if a HandyCrabException is thrown in a RestService
+ * The HandyCrabExceptionMapper is used to decide what happens if a {@link HandyCrabException} is thrown in a RestService
  *
  * @author Nico Dreher
  * @see javax.ws.rs.ext.ExceptionMapper

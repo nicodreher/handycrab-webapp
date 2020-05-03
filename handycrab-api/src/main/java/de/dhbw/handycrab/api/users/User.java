@@ -3,12 +3,18 @@ package de.dhbw.handycrab.api.users;
 import org.bson.types.ObjectId;
 
 import java.io.Serializable;
-import java.util.UUID;
 
+/**
+ * The representation of a registered user
+ * @author Nico Dreher
+ */
 public class User implements Serializable {
     private ObjectId _id;
     private String username;
     private String email;
+    /**
+     * The sha512 hashed password
+     */
     private String password;
 
     public User(String email, String username, String password) {

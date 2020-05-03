@@ -199,6 +199,10 @@ public class DataSource<T> {
         }
     }
 
+    /**
+     * Delete one document with a given id
+     * @param _id
+     */
     public void deleteOne(Object _id) {
         if(_id != null) {
             deleteOne(Filters.eq("_id", _id));
@@ -208,10 +212,18 @@ public class DataSource<T> {
         }
     }
 
+    /**
+     * Delete one document matching the filter
+     * @param filter
+     */
     public void deleteOne(Bson filter) {
         getCollection().findOneAndDelete(filter);
     }
 
+    /**
+     * Get the {@link MongoCollection} of the DataSource
+     * @return
+     */
     public MongoCollection<Document> getCollection() {
         return client.getDatabase(System.getenv("mongo_database")).getCollection(collection);
     }
@@ -222,7 +234,7 @@ public class DataSource<T> {
      * @param document the document to deserialize
      * @return the object
      */
-    T fromBson(Document document) {
+    private T fromBson(Document document) {
         return document != null ? serializer.deserialize(document.toJson(), type) : null;
     }
 
@@ -232,7 +244,7 @@ public class DataSource<T> {
      * @param object the object to serialize
      * @return the Bson Document
      */
-    Document toBson(T object) {
+    private Document toBson(T object) {
         return Document.parse(serializer.serialize(object));
     }
 }

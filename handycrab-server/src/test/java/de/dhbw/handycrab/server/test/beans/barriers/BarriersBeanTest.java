@@ -7,7 +7,7 @@ import de.dhbw.handycrab.api.barriers.Solution;
 import de.dhbw.handycrab.api.barriers.Vote;
 import de.dhbw.handycrab.server.beans.barriers.BarriersBean;
 import de.dhbw.handycrab.server.beans.utils.SerializerBean;
-import de.dhbw.handycrab.server.exceptions.*;
+import de.dhbw.handycrab.exceptions.*;
 import de.dhbw.handycrab.server.test.mongo.MongoContainer;
 import org.bson.Document;
 import org.bson.types.ObjectId;

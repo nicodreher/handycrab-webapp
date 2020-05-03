@@ -2,13 +2,17 @@ package de.dhbw.handycrab.server.beans.users;
 
 import com.mongodb.MongoClient;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.IndexOptions;
+import de.dhbw.handycrab.api.users.LoggedInUser;
+import de.dhbw.handycrab.api.users.Token;
 import de.dhbw.handycrab.api.users.User;
 import de.dhbw.handycrab.api.users.Users;
 import de.dhbw.handycrab.api.utils.Serializer;
 import de.dhbw.handycrab.server.beans.persistence.DataSource;
 import de.dhbw.handycrab.server.beans.persistence.RequestBuilder;
-import de.dhbw.handycrab.server.exceptions.*;
-import de.dhbw.handycrab.server.exceptions.users.*;
+import de.dhbw.handycrab.exceptions.*;
+import de.dhbw.handycrab.exceptions.users.*;
+import org.bson.Document;
 import org.bson.types.ObjectId;
 
 import javax.annotation.PostConstruct;
@@ -18,14 +22,19 @@ import javax.ejb.Stateless;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
+/**
+ * Implementation of the {@link Users} interface
+ * @author Nico Dreher
+ *
+ * @see Users
+ */
 @Stateless
 @Remote(Users.class)
 public class UsersBean implements Users {
-
-    private static final String EMAIL_REGEX = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
-    private static final String USERNAME_REGEX = "[a-zA-Z0-9_]{4,16}";
-    private static final String PASSWORD_REGEX = "[a-zA-Z0-9\"!#$%&'()*+,\\-./:;<=>?@\\[\\]]{6,100}";
 
     @Resource(lookup = "java:global/MongoClient")
     private MongoClient client;
@@ -34,20 +43,33 @@ public class UsersBean implements Users {
     private Serializer serializer;
 
     private DataSource<User> dataSource;
+    private DataSource<Token> tokensDataSource;
+    private Random random;
+
+    private long tokenTTL = 60 * 60 * 24 * 30;
 
     public UsersBean() {
 
     }
 
     public UsersBean(MongoClient client, Serializer serializer) {
+        this(client, serializer, 60 * 60 * 24 * 30);
+    }
+
+    public UsersBean(MongoClient client, Serializer serializer, long tokenTTL) {
         this.client = client;
         this.serializer = serializer;
+        this.tokenTTL = tokenTTL;
         construct();
     }
 
     @PostConstruct
     private void construct() {
         dataSource = new DataSource<>(User.class, "users", serializer, client);
+        tokensDataSource = new DataSource<>(Token.class, "tokens", serializer, client);
+        IndexOptions options = new IndexOptions().name("ttl").expireAfter(tokenTTL, TimeUnit.SECONDS);
+        client.getDatabase(System.getenv("mongo_database")).getCollection("tokens").createIndex(new Document("created", 1), options);
+        random = new Random();
     }
 
     @Override
@@ -56,7 +78,7 @@ public class UsersBean implements Users {
     }
 
     @Override
-    public User register(String email, String username, String password) {
+    public User register(String email, String username, String password) throws NameAlreadyUsedException, AddressAlreadyUsedException, InvalidPasswordException, InvalidUsernameException{
         if(email != null && username != null && password != null) {
             if(email.matches(EMAIL_REGEX)) {
                 if(username.matches(USERNAME_REGEX)) {
@@ -93,11 +115,19 @@ public class UsersBean implements Users {
     }
 
     @Override
-    public User login(String login, String password) {
+    public LoggedInUser login(String login, String password, boolean createToken) {
         if(login != null && password != null) {
             User user = dataSource.findFirst(new RequestBuilder().filter(Filters.and(Filters.or(Filters.regex("email", "^" + login + "$", "i"), Filters.regex("username", "^" + login + "$", "i")), Filters.eq("password", sha512(password)))));
             if(user != null) {
-                return user;
+                String token = null;
+                if(createToken) {
+                    byte[] randomBytes = new byte[2048];
+                    random.nextBytes(randomBytes);
+                    token = Base64.getEncoder().encodeToString(randomBytes);
+                    Token t = new Token(user.getID(), token);
+                    tokensDataSource.insert(t);
+                }
+                return new LoggedInUser(user, token);
             }
             else {
                 throw new InvalidLoginException();
@@ -129,12 +159,32 @@ public class UsersBean implements Users {
     }
 
     @Override
+    public boolean isAuthorized(ObjectId id, String token) {
+        if(id != null && token != null && !token.isEmpty()) {
+            return tokensDataSource.contains(Filters.and(Filters.eq("userId", id), Filters.eq("token", token)));
+        }
+        return false;
+    }
+
+    @Override
     public void checkAuthorized(ObjectId id) {
         if(!isAuthorized(id)) {
             throw new UnauthorizedException();
         }
     }
 
+    @Override
+    public void removeToken(ObjectId id, String token) {
+        if(id != null && token != null) {
+            tokensDataSource.deleteOne(Filters.and(Filters.eq("userId", id), Filters.eq("token", token)));
+        }
+    }
+
+    /**
+     * Generates the sha512 hash value of a string
+     * @param value
+     * @return The hashed string
+     */
     public static String sha512(String value) {
         try {
             MessageDigest md = MessageDigest.getInstance("SHA-512");

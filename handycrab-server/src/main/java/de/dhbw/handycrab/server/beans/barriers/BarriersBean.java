@@ -10,7 +10,7 @@ import de.dhbw.handycrab.api.users.Users;
 import de.dhbw.handycrab.api.utils.Serializer;
 import de.dhbw.handycrab.server.beans.persistence.DataSource;
 import de.dhbw.handycrab.server.beans.persistence.RequestBuilder;
-import de.dhbw.handycrab.server.exceptions.*;
+import de.dhbw.handycrab.exceptions.*;
 import org.bson.types.ObjectId;
 
 import javax.annotation.PostConstruct;
