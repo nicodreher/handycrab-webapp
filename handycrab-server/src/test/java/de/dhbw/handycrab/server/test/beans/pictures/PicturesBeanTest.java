@@ -1,6 +1,7 @@
 package de.dhbw.handycrab.server.test.beans.pictures;
 
 import de.dhbw.handycrab.api.pictures.Picture;
+import de.dhbw.handycrab.exceptions.IncompleteRequestException;
 import de.dhbw.handycrab.exceptions.pictures.PictureNotFoundException;
 import de.dhbw.handycrab.server.beans.pictures.PicturesBean;
 import de.dhbw.handycrab.server.beans.utils.SerializerBean;
@@ -140,6 +141,7 @@ class PicturesBeanTest {
             assertEquals(p.getBase64(), picture[1]);
             assertEquals(p.getContentType(), picture[2]);
         }
+
     }
 
     /**
@@ -155,6 +157,9 @@ class PicturesBeanTest {
 
         Picture[] picture = new Picture[1];
         assertThrows(PictureNotFoundException.class, () -> picture[0] = bean.get(new ObjectId("000000000000000000000006")));
+        assertNull(picture[0]);
+
+        assertThrows(IncompleteRequestException.class, () -> picture[0] = bean.get(null));
         assertNull(picture[0]);
     }
 }

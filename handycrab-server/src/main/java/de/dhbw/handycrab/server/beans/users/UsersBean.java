@@ -46,20 +46,15 @@ public class UsersBean implements Users {
     private DataSource<Token> tokensDataSource;
     private Random random;
 
-    private long tokenTTL = 60 * 60 * 24 * 30;
+    public static final long TOKEN_TTL = 60 * 60 * 24 * 30;
 
     public UsersBean() {
 
     }
 
     public UsersBean(MongoClient client, Serializer serializer) {
-        this(client, serializer, 60 * 60 * 24 * 30);
-    }
-
-    public UsersBean(MongoClient client, Serializer serializer, long tokenTTL) {
         this.client = client;
         this.serializer = serializer;
-        this.tokenTTL = tokenTTL;
         construct();
     }
 
@@ -67,7 +62,7 @@ public class UsersBean implements Users {
     private void construct() {
         dataSource = new DataSource<>(User.class, "users", serializer, client);
         tokensDataSource = new DataSource<>(Token.class, "tokens", serializer, client);
-        IndexOptions options = new IndexOptions().name("ttl").expireAfter(tokenTTL, TimeUnit.SECONDS);
+        IndexOptions options = new IndexOptions().name("ttl").expireAfter(TOKEN_TTL, TimeUnit.SECONDS);
         client.getDatabase(System.getenv("mongo_database")).getCollection("tokens").createIndex(new Document("created", 1), options);
         random = new Random();
     }

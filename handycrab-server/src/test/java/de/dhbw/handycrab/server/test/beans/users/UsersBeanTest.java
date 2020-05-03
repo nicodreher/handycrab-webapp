@@ -192,7 +192,7 @@ class UsersBeanTest {
         Document doc = generateUser(new ObjectId(), email, username, password);
         container.getCollection("users").insertOne(doc);
 
-        UsersBean bean = new UsersBean(container.getMongoClient(), new SerializerBean(), 5);
+        UsersBean bean = new UsersBean(container.getMongoClient(), new SerializerBean());
         if(correct) {
             LoggedInUser user = bean.login(login, loginPassword, true);
             assertNotNull(user);
