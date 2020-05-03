@@ -1,10 +1,8 @@
 package de.dhbw.handycrab.server.test.beans.pictures;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static com.mongodb.client.model.Filters.*;
-
 import de.dhbw.handycrab.api.pictures.Picture;
 import de.dhbw.handycrab.server.beans.pictures.PicturesBean;
+import de.dhbw.handycrab.server.beans.utils.SerializerBean;
 import de.dhbw.handycrab.server.exceptions.pictures.PictureNotFoundException;
 import de.dhbw.handycrab.server.test.mongo.MongoContainer;
 import org.apache.commons.compress.utils.IOUtils;
@@ -18,6 +16,9 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.io.IOException;
 import java.util.Base64;
+
+import static com.mongodb.client.model.Filters.eq;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Testcontainers
 public class PicturesBeanTest {
@@ -55,7 +56,7 @@ public class PicturesBeanTest {
     @ParameterizedTest(name = "[{index}] Path: {0} Format: {1}")
     @CsvFileSource(resources = "/pictures/put.csv")
     public void putTest(String picturePath, String format) throws IOException {
-        PicturesBean bean = new PicturesBean(container.getMongoClient());
+        PicturesBean bean = new PicturesBean(container.getMongoClient(), new SerializerBean());
 
         String base64 = Base64.getEncoder().encodeToString(IOUtils.toByteArray(getClass().getResourceAsStream(picturePath)));
         Picture picture = bean.put(base64);
@@ -71,7 +72,7 @@ public class PicturesBeanTest {
     @ParameterizedTest(name = "[{index}] Path: {0} ExpectedException {1}")
     @CsvFileSource(resources = "/pictures/failPut.csv")
     public void failPutTest(String picturePath, String expectedException) throws IOException, ClassNotFoundException {
-        PicturesBean bean = new PicturesBean(container.getMongoClient());
+        PicturesBean bean = new PicturesBean(container.getMongoClient(), new SerializerBean());
 
         String base64 = picturePath != null ? Base64.getEncoder().encodeToString(IOUtils.toByteArray(getClass().getResourceAsStream(picturePath))) : null;
         Class<? extends Throwable> exception = (Class<? extends Throwable>) Class.forName(expectedException);
@@ -79,12 +80,12 @@ public class PicturesBeanTest {
         final Picture[] picture = new Picture[1];
         assertThrows(exception, () -> picture[0] = bean.put(base64));
         assertNull(picture[0]);
-        assertEquals(0, container.getCollection("pictures").countDocuments(eq("base64", base64)));
+        assertEquals(0, container.getCollection("pictures").countDocuments());
     }
 
     @Test
     public void getTest() throws IOException {
-        PicturesBean bean = new PicturesBean(container.getMongoClient());
+        PicturesBean bean = new PicturesBean(container.getMongoClient(), new SerializerBean());
 
         Object[][] pictures = getDemoPictures();
         placePictures(pictures);
@@ -100,7 +101,7 @@ public class PicturesBeanTest {
 
     @Test
     public void failGetTest() throws IOException {
-        PicturesBean bean = new PicturesBean(container.getMongoClient());
+        PicturesBean bean = new PicturesBean(container.getMongoClient(), new SerializerBean());
 
         Object[][] pictures = getDemoPictures();
         placePictures(pictures);

@@ -107,6 +107,8 @@ public class BarriersBean implements Barriers {
     public FrontendBarrier modifyBarrier(ObjectId id, String title, String description, ObjectId userId) {
         if (id != null) {
             Barrier barrier = dataSource.get(id);
+            if (!barrier.getUserId().equals(userId))
+                throw new InvalidUserIdException();
             if (title != null)
                 barrier.setTitle(title);
             if (description != null)

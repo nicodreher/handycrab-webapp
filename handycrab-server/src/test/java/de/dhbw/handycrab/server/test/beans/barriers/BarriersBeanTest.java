@@ -172,8 +172,9 @@ class BarriersBeanTest {
     void modifyBarrier_validBarrier_savedInMongoDB() {
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
         var _id = new ObjectId("000000000000000000000000");
-        var description = "Changed description and title";
         var title = "Changed title";
+        var description = "Changed description and title";
+
 
         bean.modifyBarrier(_id, title, description, REQUESTERID);
 
