@@ -98,6 +98,7 @@ Alles Ander Explizit definiert sein\
     {longitude, latitude, radius (m)} -> [Barrier]
     {_id} -> {Barrier}
     {postcode} - [Barrier]
+    {} - [Barrier] //Barriers des aktuell angemeldeten Benutzers
     ErrorCodes: 1
 
 ### Barrier-Add:
@@ -124,6 +125,11 @@ Alles Ander Explizit definiert sein\
     .../barriers/solutions/vote PUT
     {_id (SolutionId), vote: Vote}
     ErrorCodes: 1, 11
+    
+### Barrier-delete:
+    .../barriers/delete DELETE
+    {_id}
+    ErrorCodes: 1, 9, 10
     
 ### Pictures-Get:
     .../pictures/<objectId> GET

@@ -1,5 +1,6 @@
 package de.dhbw.handycrab.api.barriers;
 
+import de.dhbw.handycrab.api.RequestResult;
 import org.bson.types.ObjectId;
 
 import java.util.List;
@@ -8,6 +9,8 @@ public interface Barriers {
     String LOOKUP = "java:app/server/BarriersBean!de.dhbw.handycrab.api.barriers.Barriers";
 
     FrontendBarrier getBarrier(ObjectId id, ObjectId requesterId);
+
+    List<FrontendBarrier> getBarrier(ObjectId requesterId);
 
     List<FrontendBarrier> getBarrier(String postcode, ObjectId requesterId);
 
@@ -22,4 +25,6 @@ public interface Barriers {
     FrontendBarrier addSolution(ObjectId id, String solution, ObjectId requesterId);
 
     FrontendBarrier addVoteToSolution(ObjectId solutionId, Vote vote, ObjectId requesterId);
+
+    RequestResult deleteBarrier(ObjectId _id, ObjectId userId);
 }

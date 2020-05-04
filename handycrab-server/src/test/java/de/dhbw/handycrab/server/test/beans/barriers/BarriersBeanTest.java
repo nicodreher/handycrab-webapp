@@ -79,9 +79,11 @@ class BarriersBeanTest {
                 generateBarrier(new ObjectId("000000000000000000000001"), new ObjectId("000000000000000000000001"), "Treppe nicht barrierefrei", 60, 40, "Treppe nicht barrierefrei", "ABC123", new ArrayList<>(), new ArrayList<>()),
                 generateBarrier(new ObjectId("000000000000000000000002"), new ObjectId("000000000000000000000002"), "Keine Behindertenparkplätze", 30, 50, "Keine Behindertenparkplätze", "XYZ123", new ArrayList<>(), new ArrayList<>()),
                 generateBarrier(new ObjectId("000000000000000000000003"), new ObjectId("000000000000000000000003"), "Vorsicht Pflasterstein", 61, 41, "Vorsicht Pflasterstein", "ABC123", new ArrayList<>(), new ArrayList<>()),
-                generateBarrier(new ObjectId("000000000000000000000004"), new ObjectId("000000000000000000000004"), "ABC", 60.00001, 40.00001, "ABC", "ABC123", new ArrayList<>(), new ArrayList<>())
+                generateBarrier(new ObjectId("000000000000000000000004"), new ObjectId("000000000000000000000004"), "ABC", 60.00001, 40.00001, "ABC", "ABC123", new ArrayList<>(), new ArrayList<>()),
+                generateBarrier(new ObjectId("000000000000000000000005"), new ObjectId("000000000000000000000000"), "Ich bin #2", 30, 40, "Beschreibung", "ABC1234", new ArrayList<>(), new ArrayList<>())
         };
     }
+
 
     /**
      * Initializes a bean before each unit test
@@ -97,6 +99,34 @@ class BarriersBeanTest {
     public void insertBarriers() {
         var docs = generateBarriers();
         container.getCollection("barriers").insertMany(Arrays.stream(docs).collect(Collectors.toList()));
+    }
+
+    /**
+     * Test the {@link BarriersBean#getBarrier(ObjectId)} with valid inputs.
+     * Returns list of barriers with userId = requesterId
+     */
+    @Test
+    void getBarrier_onUserId_ReturnsBarrier() {
+        var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
+
+        var result = bean.getBarrier(REQUESTERID);
+
+        assertEquals(2, result.size());
+        assertNotNull(result.get(0));
+        assertNotNull(result.get(1));
+        assertEquals(new ObjectId("000000000000000000000005"), result.get(1).get_id());
+        assertEquals(new ObjectId("000000000000000000000000"), result.get(0).get_id());
+    }
+
+    /**
+     * Test the {@link BarriersBean#getBarrier(ObjectId)} with null UserId.
+     * Throws IncompleteRequestException
+     */
+    @Test
+    void getBarrier_onUserIdWithNull_throwsIncompleteRequestException() {
+        var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
+
+        assertThrows(IncompleteRequestException.class, () -> bean.getBarrier(null));
     }
 
     /**
@@ -552,6 +582,17 @@ class BarriersBeanTest {
     }
 
     /**
+     * Test for the {@link BarriersBean#addVoteToSolution(ObjectId, Vote, ObjectId)} with incomplete request information.
+     * Throws IncompleteRequestException
+     */
+    @Test
+    void addVoteToSolution_incompleteRequest_throwsIncompleteRequestException() {
+        var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
+
+        assertThrows(IncompleteRequestException.class, () -> bean.addVoteToSolution(null, null, REQUESTERID));
+    }
+
+    /**
      * Test for the {@link BarriersBean#addVoteToBarrier(ObjectId, Vote, ObjectId)}
      * with valid inputs (Upvote)
      */
@@ -657,5 +698,69 @@ class BarriersBeanTest {
         assertEquals(Vote.DOWN, barrier.getVote());
         assertEquals(0, barrier.getUpVotes());
         assertEquals(1, barrier.getDownVotes());
+    }
+
+    /**
+     * Test for the {@link BarriersBean#addVoteToBarrier(ObjectId, Vote, ObjectId)} with incomplete request information.
+     * Throws IncompleteRequestException.
+     */
+    @Test
+    void addVoteToBarrier_incompleteRequest_throwsIncompleteRequestException() {
+        var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
+
+        assertThrows(IncompleteRequestException.class, () -> bean.addVoteToSolution(null, null, REQUESTERID));
+    }
+
+    /**
+     * Test for the {@link BarriersBean#deleteBarrier(ObjectId, ObjectId)} with valid Input.
+     * Returns true
+     */
+    @Test
+    void deleteBarrier_validInputs_DeletedInMongoDB() {
+        var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
+        var _id = new ObjectId("000000000000000000000000");
+        var userId = new ObjectId("000000000000000000000000");
+
+        var result = bean.deleteBarrier(_id, userId);
+
+        assertNotNull(result);
+        assertEquals(true, result.getResult());
+        assertThrows(BarrierNotFoundException.class, () -> bean.getBarrier(_id, userId));
+    }
+
+    /**
+     * Test for the {@link BarriersBean#deleteBarrier(ObjectId, ObjectId)} with invalid identifier for barrier.
+     * Throws BarrierNotFoundException
+     */
+    @Test
+    void deleteBarrier_invalidIdForBarrier_throwsBarrierNotFoundException() {
+        var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
+        var _id = new ObjectId("000000000000000000000027");
+
+        assertThrows(BarrierNotFoundException.class, () -> bean.deleteBarrier(_id, REQUESTERID));
+    }
+
+    /**
+     * Test for the {@link BarriersBean#deleteBarrier(ObjectId, ObjectId)} with invalid userId.
+     * Throws InvalidUserIdException.
+     */
+    @Test
+    void deleteBarrier_invalidUserId_throwsInvalidUserIdException() {
+        var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
+        var _id = new ObjectId("000000000000000000000000");
+        var userId = new ObjectId("000000000000000000000027");
+
+        assertThrows(InvalidUserIdException.class, () -> bean.deleteBarrier(_id, userId));
+    }
+
+    /**
+     * Test for the {@link BarriersBean#deleteBarrier(ObjectId, ObjectId)} with incomplete Request information.
+     * Throws Incomplete RequestException
+     */
+    @Test
+    void deleteBarrier_incompleteRequest_throwsIncompleteRequestException() {
+        var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
+
+        assertThrows(IncompleteRequestException.class, () -> bean.deleteBarrier(null, REQUESTERID));
     }
 }

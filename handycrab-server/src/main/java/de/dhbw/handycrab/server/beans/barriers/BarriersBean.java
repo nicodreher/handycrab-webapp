@@ -5,6 +5,7 @@ import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.geojson.Point;
 import com.mongodb.client.model.geojson.Position;
+import de.dhbw.handycrab.api.RequestResult;
 import de.dhbw.handycrab.api.barriers.*;
 import de.dhbw.handycrab.api.pictures.Pictures;
 import de.dhbw.handycrab.api.utils.Serializer;
@@ -67,6 +68,17 @@ public class BarriersBean implements Barriers {
                 throw new BarrierNotFoundException();
         }
         throw new IncompleteRequestException();
+    }
+
+    @Override
+    public List<FrontendBarrier> getBarrier(ObjectId requesterId) {
+        if (requesterId != null) {
+            return dataSource.find(new RequestBuilder()
+                    .filter(Filters.eq("userId", requesterId)))
+                    .map(bar -> new FrontendBarrier(bar, requesterId))
+                    .collect(Collectors.toList());
+        } else
+            throw new IncompleteRequestException();
     }
 
     @Override
@@ -138,24 +150,27 @@ public class BarriersBean implements Barriers {
 
     @Override
     public FrontendBarrier addVoteToBarrier(ObjectId id, Vote vote, ObjectId userId) {
-        if (dataSource.contains(id)) {
-            Barrier barrier = dataSource.get(id);
-            var upVotes = barrier.getUpVotes();
-            var downVotes = barrier.getDownVotes();
-            if (vote == Vote.UP && !upVotes.contains(userId)) {
-                downVotes.remove(userId);
-                upVotes.add(userId);
-            } else if (vote == Vote.DOWN && !downVotes.contains(userId)) {
-                upVotes.remove(userId);
-                downVotes.add(userId);
-            } else if (vote == Vote.NONE) {
-                upVotes.remove(userId);
-                downVotes.remove(userId);
-            }
-            dataSource.update(barrier);
-            return new FrontendBarrier(barrier, userId);
+        if (id != null && vote != null && userId != null) {
+            if (dataSource.contains(id)) {
+                Barrier barrier = dataSource.get(id);
+                var upVotes = barrier.getUpVotes();
+                var downVotes = barrier.getDownVotes();
+                if (vote == Vote.UP && !upVotes.contains(userId)) {
+                    downVotes.remove(userId);
+                    upVotes.add(userId);
+                } else if (vote == Vote.DOWN && !downVotes.contains(userId)) {
+                    upVotes.remove(userId);
+                    downVotes.add(userId);
+                } else if (vote == Vote.NONE) {
+                    upVotes.remove(userId);
+                    downVotes.remove(userId);
+                }
+                dataSource.update(barrier);
+                return new FrontendBarrier(barrier, userId);
+            } else
+                throw new BarrierNotFoundException();
         } else
-            throw new BarrierNotFoundException();
+            throw new IncompleteRequestException();
     }
 
     @Override
@@ -177,23 +192,41 @@ public class BarriersBean implements Barriers {
 
     @Override
     public FrontendBarrier addVoteToSolution(ObjectId solutionId, Vote vote, ObjectId userId) {
-        Barrier barrier = dataSource.findFirst(new RequestBuilder().filter(Filters.eq("solutions._id", solutionId)));
-        if (barrier != null) {
-            var solutionObj = barrier.getSolutions().stream().filter(solution -> solution.getId().equals(solutionId)).findFirst().orElseGet(null);
-            if (vote == Vote.UP && !solutionObj.getUpVotes().contains(userId)) {
-                solutionObj.getDownVotes().remove(userId);
-                solutionObj.getUpVotes().add(userId);
-            } else if (vote == Vote.DOWN && !solutionObj.getDownVotes().contains(userId)) {
-                solutionObj.getUpVotes().remove(userId);
-                solutionObj.getDownVotes().add(userId);
-            } else if (vote == Vote.NONE) {
-                solutionObj.getDownVotes().remove(userId);
-                solutionObj.getUpVotes().remove(userId);
+        if (solutionId != null && vote != null && userId != null) {
+            Barrier barrier = dataSource.findFirst(new RequestBuilder().filter(Filters.eq("solutions._id", solutionId)));
+            if (barrier != null) {
+                var solutionObj = barrier.getSolutions().stream().filter(solution -> solution.getId().equals(solutionId)).findFirst().orElseGet(null);
+                if (vote == Vote.UP && !solutionObj.getUpVotes().contains(userId)) {
+                    solutionObj.getDownVotes().remove(userId);
+                    solutionObj.getUpVotes().add(userId);
+                } else if (vote == Vote.DOWN && !solutionObj.getDownVotes().contains(userId)) {
+                    solutionObj.getUpVotes().remove(userId);
+                    solutionObj.getDownVotes().add(userId);
+                } else if (vote == Vote.NONE) {
+                    solutionObj.getDownVotes().remove(userId);
+                    solutionObj.getUpVotes().remove(userId);
+                }
+            } else {
+                throw new SolutionNotFoundException();
             }
-        } else {
-            throw new SolutionNotFoundException();
-        }
-        dataSource.update(barrier);
-        return new FrontendBarrier(barrier, userId);
+            dataSource.update(barrier);
+            return new FrontendBarrier(barrier, userId);
+        } else throw new IncompleteRequestException();
+    }
+
+    @Override
+    public RequestResult deleteBarrier(ObjectId _id, ObjectId userId) {
+        if (_id != null && userId != null) {
+            if (dataSource.contains(_id)) {
+                var barrier = dataSource.get(_id);
+                if (barrier.getUserId().equals(userId)) {
+                    dataSource.deleteOne(_id);
+                    return new RequestResult(true);
+                } else
+                    throw new InvalidUserIdException();
+            } else
+                throw new BarrierNotFoundException();
+        } else
+            throw new IncompleteRequestException();
     }
 }

@@ -1,11 +1,11 @@
 package de.dhbw.handycrab.server.rest.barriers;
 
 
+import de.dhbw.handycrab.api.RequestResult;
 import de.dhbw.handycrab.api.barriers.Barriers;
 import de.dhbw.handycrab.api.barriers.FrontendBarrier;
 import de.dhbw.handycrab.api.barriers.Vote;
 import de.dhbw.handycrab.api.users.User;
-import de.dhbw.handycrab.exceptions.IncompleteRequestException;
 import de.dhbw.handycrab.server.rest.authorization.Authorized;
 import de.dhbw.handycrab.server.rest.authorization.CurrentUser;
 import org.bson.types.ObjectId;
@@ -42,7 +42,7 @@ public class BarriersService {
         else if (obj.has("longitude") && obj.has("latitude") && obj.has("radius"))
             return barriers.getBarrier(obj.getDouble("longitude"), obj.getDouble("latitude"), obj.getInt("radius"), user.getID());
         else
-            throw new IncompleteRequestException();
+            return barriers.getBarrier(user.getID());
     }
 
     @POST
@@ -82,7 +82,7 @@ public class BarriersService {
     @Produces(MEDIA_TYPE)
     public FrontendBarrier addVote(@Context HttpServletRequest request, String json) {
         JSONObject obj = new JSONObject(json);
-        return barriers.addVoteToBarrier(new ObjectId(obj.optString("_id")), Vote.valueOf(obj.optString("vote", null)), user.getID());
+        return barriers.addVoteToBarrier(new ObjectId(obj.optString("_id", null)), Vote.valueOf(obj.optString("vote", null)), user.getID());
     }
 
     @PUT
@@ -92,6 +92,16 @@ public class BarriersService {
     @Produces(MEDIA_TYPE)
     public FrontendBarrier addVoteToSolution(@Context HttpServletRequest request, String json) {
         JSONObject obj = new JSONObject(json);
-        return barriers.addVoteToSolution(new ObjectId(obj.getString("_id")), Vote.valueOf(obj.optString("vote", null)), user.getID());
+        return barriers.addVoteToSolution(new ObjectId(obj.optString("_id", null)), Vote.valueOf(obj.optString("vote", null)), user.getID());
+    }
+
+    @DELETE
+    @Authorized
+    @Path("/delete")
+    @Consumes(MEDIA_TYPE)
+    @Produces(MEDIA_TYPE)
+    public RequestResult deleteBarrier(@Context HttpServletRequest request, String json) {
+        JSONObject obj = new JSONObject(json);
+        return barriers.deleteBarrier(new ObjectId(obj.optString("_id", null)), user.getID());
     }
 }
