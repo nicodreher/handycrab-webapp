@@ -1,6 +1,7 @@
 package de.dhbw.handycrab.server.beans.barriers;
 
 import com.mongodb.MongoClient;
+import com.mongodb.MongoException;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.geojson.Point;
@@ -33,7 +34,7 @@ public class BarriersBean implements Barriers {
     private Serializer serializer;
 
     @Resource(lookup = Pictures.LOOKUP)
-    private PicturesBean picturesBean;
+    private Pictures picturesBean;
 
     private DataSource<Barrier> dataSource;
 
@@ -56,7 +57,10 @@ public class BarriersBean implements Barriers {
     @PostConstruct
     private void construct() {
         dataSource = new DataSource<>(Barrier.class, "barriers", serializer, client);
-        dataSource.getCollection().createIndex(Indexes.geo2dsphere("point"));
+        try {
+            dataSource.getCollection().createIndex(Indexes.geo2dsphere("point"));
+        } catch (MongoException ignored) {
+        }
     }
 
     @Override
