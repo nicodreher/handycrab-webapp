@@ -23,7 +23,7 @@ public class PicturesService {
     @GET
     @Path("{id}")
     public Response getImage(@PathParam("id") String id) {
-        if (id.matches("^[0-9a-fA-F]+$")) {
+        if (id.matches("^[0-9a-fA-F]+$") && id.length() == 24) {
             Picture picture = pictures.get(new ObjectId(id));
             return Response.ok().type(picture.getContentType()).entity(Base64.getDecoder().decode(picture.getBase64())).build();
         } else throw new IncompleteRequestException();
