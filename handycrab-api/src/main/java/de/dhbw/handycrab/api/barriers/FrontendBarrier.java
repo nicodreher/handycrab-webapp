@@ -7,10 +7,18 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Class for representing a Barrier, which is used by the REST-Clients.
+ * Up- and Downvotes only represented by integers (amount of up- and downvotes).
+ * @author Lukas Lautenschlager
+ */
 public class FrontendBarrier implements Serializable {
     private ObjectId _id;
     private ObjectId userId;
     private String title;
+    /**
+     * URL to retrieve the picture from the REST-Service.
+     */
     private String picturePath;
     private double longitude;
     private double latitude;
@@ -19,6 +27,9 @@ public class FrontendBarrier implements Serializable {
     private List<FrontendSolution> solutions;
     private int upVotes;
     private int downVotes;
+    /**
+     * Represent the value for a vote of the requested user.
+     */
     private Vote vote;
 
     public FrontendBarrier() {

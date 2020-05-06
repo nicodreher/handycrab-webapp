@@ -5,10 +5,10 @@
 "de.dhbw.handycrab.exceptions.users.InvalidMailException",400,5
 "de.dhbw.handycrab.exceptions.users.InvalidLoginException",400,6
 "de.dhbw.handycrab.exceptions.users.UserNotFoundException",404,7
-"de.dhbw.handycrab.exceptions.InvalidGeoPositionException",400,8
-"de.dhbw.handycrab.exceptions.BarrierNotFoundException",404,9
-"de.dhbw.handycrab.exceptions.InvalidUserIdException",400,10
-"de.dhbw.handycrab.exceptions.SolutionNotFoundException",404,11
+"de.dhbw.handycrab.exceptions.barriers.InvalidGeoPositionException",400,8
+"de.dhbw.handycrab.exceptions.barriers.BarrierNotFoundException",404,9
+"de.dhbw.handycrab.exceptions.barriers.InvalidUserIdException",400,10
+"de.dhbw.handycrab.exceptions.barriers.SolutionNotFoundException",404,11
 "de.dhbw.handycrab.exceptions.users.InvalidUsernameException",400,12
 "de.dhbw.handycrab.exceptions.users.InvalidPasswordException",400,13
 "de.dhbw.handycrab.exceptions.pictures.PictureToBigException",400,14

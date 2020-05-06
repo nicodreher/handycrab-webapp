@@ -7,6 +7,10 @@ import de.dhbw.handycrab.api.barriers.Solution;
 import de.dhbw.handycrab.api.barriers.Vote;
 import de.dhbw.handycrab.api.pictures.Pictures;
 import de.dhbw.handycrab.exceptions.*;
+import de.dhbw.handycrab.exceptions.barriers.BarrierNotFoundException;
+import de.dhbw.handycrab.exceptions.barriers.InvalidGeoPositionException;
+import de.dhbw.handycrab.exceptions.barriers.InvalidUserIdException;
+import de.dhbw.handycrab.exceptions.barriers.SolutionNotFoundException;
 import de.dhbw.handycrab.server.beans.barriers.BarriersBean;
 import de.dhbw.handycrab.server.beans.pictures.PicturesBean;
 import de.dhbw.handycrab.server.beans.utils.SerializerBean;
@@ -276,6 +280,100 @@ class BarriersBeanTest {
         assertEquals(barrier.getString("picture"), picturesBean
                 .get(new ObjectId(resultBar.getPicturePath().replace(Pictures.BASE_URL+"/", "")))
                 .getBase64());
+    }
+
+    /**
+     * Test the {@link BarriersBean#addBarrier(String, double, double, String, String, String, String, ObjectId)}
+     * with valid Parameters (edge case longitude = 180 and latitude = 90)
+     */
+    @Test
+    void addBarrier_validEdgeCase_savedInMongoDB()
+    {
+        var picturesBean = new PicturesBean(container.getMongoClient(), new SerializerBean());
+        var bean = new BarriersBean(container.getMongoClient(), new SerializerBean(), picturesBean);
+        var title = "Neue Barriere";
+        double longitude = 180;
+        double latitude = 90;
+        var postalCode = "ABC123";
+        var description = "Beschreibung";
+        var solution = "Lösung für Barriere";
+
+        var bar = bean.addBarrier(title,longitude,latitude,null, postalCode, description, solution, REQUESTERID);
+
+        var result = bean.getBarrier(bar.get_id(), REQUESTERID);
+        assertNotNull(result);
+        assertEquals(title, result.getTitle());
+        assertEquals(longitude, result.getLongitude());
+        assertEquals(latitude, result.getLatitude());
+        assertEquals(postalCode, result.getPostcode());
+        assertEquals(description, result.getDescription());
+        assertEquals(solution, result.getSolutions().get(0).getText());
+    }
+
+    /**
+     * Test the {@link BarriersBean#addBarrier(String, double, double, String, String, String, String, ObjectId)}
+     * with valid Parameters (edge case longitude = -180 and latitude = -90)
+     */
+    @Test
+    void addBarrier_validEdgeCaseNeg_savedInMongoDB()
+    {
+        var picturesBean = new PicturesBean(container.getMongoClient(), new SerializerBean());
+        var bean = new BarriersBean(container.getMongoClient(), new SerializerBean(), picturesBean);
+        var title = "Neue Barriere";
+        double longitude = -180;
+        double latitude = -90;
+        var postalCode = "ABC123";
+        var description = "Beschreibung";
+        var solution = "Lösung für Barriere";
+
+        var bar = bean.addBarrier(title,longitude,latitude,null, postalCode, description, solution, REQUESTERID);
+
+        var result = bean.getBarrier(bar.get_id(), REQUESTERID);
+        assertNotNull(result);
+        assertEquals(title, result.getTitle());
+        assertEquals(longitude, result.getLongitude());
+        assertEquals(latitude, result.getLatitude());
+        assertEquals(postalCode, result.getPostcode());
+        assertEquals(description, result.getDescription());
+        assertEquals(solution, result.getSolutions().get(0).getText());
+    }
+
+    /**
+     * Test the {@link BarriersBean#addBarrier(String, double, double, String, String, String, String, ObjectId)}
+     * with valid Parameters (edge case longitude = 180.1 and latitude = 90.1)
+     */
+    @Test
+    void addBarrier_invalidEdgeCase_savedInMongoDB()
+    {
+        var picturesBean = new PicturesBean(container.getMongoClient(), new SerializerBean());
+        var bean = new BarriersBean(container.getMongoClient(), new SerializerBean(), picturesBean);
+        var title = "Neue Barriere";
+        double longitude = 180.1;
+        double latitude = 90.1;
+        var postalCode = "ABC123";
+        var description = "Beschreibung";
+        var solution = "Lösung für Barriere";
+
+        assertThrows(InvalidGeoPositionException.class, () -> bean.addBarrier(title,longitude,latitude,null, postalCode, description, solution, REQUESTERID));
+    }
+
+    /**
+     * Test the {@link BarriersBean#addBarrier(String, double, double, String, String, String, String, ObjectId)}
+     * with valid Parameters (edge case longitude = -180.1 and latitude = -90.1)
+     */
+    @Test
+    void addBarrier_invalidEdgeCaseNeg_savedInMongoDB()
+    {
+        var picturesBean = new PicturesBean(container.getMongoClient(), new SerializerBean());
+        var bean = new BarriersBean(container.getMongoClient(), new SerializerBean(), picturesBean);
+        var title = "Neue Barriere";
+        double longitude = -180.1;
+        double latitude = -90.1;
+        var postalCode = "ABC123";
+        var description = "Beschreibung";
+        var solution = "Lösung für Barriere";
+
+        assertThrows(InvalidGeoPositionException.class, () -> bean.addBarrier(title,longitude,latitude,null, postalCode, description, solution, REQUESTERID));
     }
 
     /**

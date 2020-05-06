@@ -19,6 +19,11 @@ import javax.ws.rs.core.Context;
 
 import static de.dhbw.handycrab.server.rest.RestApplication.MEDIA_TYPE;
 
+/**
+ * REST-Service for handling barriers using {@link de.dhbw.handycrab.server.beans.barriers.BarriersBean}
+ *
+ * @author Lukas Lautenschlager
+ */
 @Path("/barriers")
 public class BarriersService {
     @Resource(lookup = Barriers.LOOKUP)

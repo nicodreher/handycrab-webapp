@@ -1,7 +1,6 @@
 package de.dhbw.handycrab.server.beans.barriers;
 
 import com.mongodb.MongoClient;
-import com.mongodb.MongoException;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Indexes;
 import com.mongodb.client.model.geojson.Point;
@@ -11,6 +10,10 @@ import de.dhbw.handycrab.api.barriers.*;
 import de.dhbw.handycrab.api.pictures.Pictures;
 import de.dhbw.handycrab.api.utils.Serializer;
 import de.dhbw.handycrab.exceptions.*;
+import de.dhbw.handycrab.exceptions.barriers.BarrierNotFoundException;
+import de.dhbw.handycrab.exceptions.barriers.InvalidGeoPositionException;
+import de.dhbw.handycrab.exceptions.barriers.InvalidUserIdException;
+import de.dhbw.handycrab.exceptions.barriers.SolutionNotFoundException;
 import de.dhbw.handycrab.server.beans.persistence.DataSource;
 import de.dhbw.handycrab.server.beans.persistence.RequestBuilder;
 import de.dhbw.handycrab.server.beans.pictures.PicturesBean;
@@ -23,6 +26,12 @@ import javax.ejb.Stateless;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Implementation of the {@link Barriers} interface
+ *
+ * @author Lukas Lautenschlager
+ * @see Barriers
+ */
 @Stateless
 @Remote(Barriers.class)
 public class BarriersBean implements Barriers {
@@ -106,7 +115,7 @@ public class BarriersBean implements Barriers {
     @Override
     public FrontendBarrier addBarrier(String title, double longitude, double latitude, String picture, String postalCode, String description, String solution, ObjectId userId) {
         if (title != null && postalCode != null && description != null) {
-            if (longitude <= 90 && latitude <= 180) {
+            if (longitude <= 180 && longitude >= -180 && latitude <= 90 && latitude >= -90) {
                 var barrier = new BarrierBuilder().title(title).point(longitude, latitude).postalCode(postalCode).description(description).userId(userId);
                 if (solution != null && userId != null) {
                     var solObject = new Solution();
@@ -216,12 +225,12 @@ public class BarriersBean implements Barriers {
     }
 
     @Override
-    public RequestResult deleteBarrier(ObjectId _id, ObjectId userId) {
-        if (_id != null && userId != null) {
-            if (dataSource.contains(_id)) {
-                var barrier = dataSource.get(_id);
-                if (barrier.getUserId().equals(userId)) {
-                    dataSource.deleteOne(_id);
+    public RequestResult deleteBarrier(ObjectId id, ObjectId requesterId) {
+        if (id != null && requesterId != null) {
+            if (dataSource.contains(id)) {
+                var barrier = dataSource.get(id);
+                if (barrier.getUserId().equals(requesterId)) {
+                    dataSource.deleteOne(id);
                     return new RequestResult(true);
                 } else
                     throw new InvalidUserIdException();
