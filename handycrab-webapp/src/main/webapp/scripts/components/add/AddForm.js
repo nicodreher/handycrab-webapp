@@ -129,10 +129,10 @@ export class AddForm extends React.Component {
                        label='Postleitzahl' required={true}/>
             <FormField id='barrier_description' label='Beschreibung'
                        onChange={(event) => this.setState({description: event.target.value})}
-                       value={this.state.description} type={'text'}/>
+                       value={this.state.description} as='textarea'/>
             <FormField id='barrier_solution' label='Lösungsvorschlag'
                        onChange={(event) => this.setState({solution: event.target.value})} value={this.state.solution}
-                       type={'text'}/>
+                       as='textarea'/>
             <Form.Group as={Row}>
                 <Form.Label id={'barrier_image_label'} htmlFor={'barrier_image'} column sm="2">
                     Bild der Barriere
@@ -140,7 +140,7 @@ export class AddForm extends React.Component {
                 <Col sm="10">
                     <Form.File id="barrier_image" label={this.state.fileName} custom ref={this.fileInput}
                                accept='.png, .jpg, .jpeg, image/png, image/jpeg' onChange={this.handleChangedFile}
-                               isInvalid={!validFile}/>
+                               isInvalid={!validFile} data-browse='Durchsuchen'/>
                 </Col>
             </Form.Group>
 
