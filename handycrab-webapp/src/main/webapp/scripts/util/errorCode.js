@@ -1,3 +1,7 @@
+/**
+ * @param {number} code The errorCode
+ * @return {String} The error message
+ */
 export function errorCodeToMessage(code) {
     switch (code) {
         case 1:
@@ -26,6 +30,12 @@ export function errorCodeToMessage(code) {
             return 'Nutzername ungültig. Ein Benutzername besteht aus 4 bis 16 Zeichen. Erlaubt sind dabei nur Buchstaben und Ziffern. Keine Sonderzeichen wie "$"';
         case 13:
             return 'Ungültiges Passwort. Ein Passwort besteht aus mindestens 6 und höchstens 100 Zeichen!';
+        case 14:
+            return 'Das hochgeladene Bild ist zu groß'
+        case 15:
+            return 'Das Format des Bildes wird nicht unterstützt. Bitte nutzen Sie eine .jpg- oder .png-Datei'
+        case 16:
+            return 'Das Bild für diese Barriere konnte nicht gefunden werden'
         default:
             return 'Ein unerwarteter Fehler ist aufgetreten';
 
