@@ -13,6 +13,8 @@ import org.bson.types.ObjectId;
 public interface Pictures {
     String LOOKUP = "java:app/server/PicturesBean!de.dhbw.handycrab.api.pictures.Pictures";
 
+    String BASE_URL = System.getenv("pictures_baseurl");
+
     /**
      * Retrieve a picture from the database
      * @param id The {@link ObjectId} of the picture

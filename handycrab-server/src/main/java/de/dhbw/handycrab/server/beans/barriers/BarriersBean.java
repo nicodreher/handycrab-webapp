@@ -57,10 +57,7 @@ public class BarriersBean implements Barriers {
     @PostConstruct
     private void construct() {
         dataSource = new DataSource<>(Barrier.class, "barriers", serializer, client);
-        try {
-            dataSource.getCollection().createIndex(Indexes.geo2dsphere("point"));
-        } catch (MongoException ignored) {
-        }
+        dataSource.getCollection().createIndex(Indexes.geo2dsphere("point"));
     }
 
     @Override

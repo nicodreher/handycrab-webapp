@@ -5,6 +5,7 @@ import com.mongodb.client.model.geojson.Position;
 import de.dhbw.handycrab.api.barriers.FrontendBarrier;
 import de.dhbw.handycrab.api.barriers.Solution;
 import de.dhbw.handycrab.api.barriers.Vote;
+import de.dhbw.handycrab.api.pictures.Pictures;
 import de.dhbw.handycrab.exceptions.*;
 import de.dhbw.handycrab.server.beans.barriers.BarriersBean;
 import de.dhbw.handycrab.server.beans.pictures.PicturesBean;
@@ -272,7 +273,9 @@ class BarriersBeanTest {
         assertEquals(40d, resultBar.getLongitude());
         assertEquals(30d, resultBar.getLatitude());
         assertEquals("70000", resultBar.getPostcode());
-        assertEquals(barrier.getString("picture"), picturesBean.get(resultBar.getPictureId()).getBase64());
+        assertEquals(barrier.getString("picture"), picturesBean
+                .get(new ObjectId(resultBar.getPicturePath().replace(Pictures.BASE_URL+"/", "")))
+                .getBase64());
     }
 
     /**
@@ -365,7 +368,9 @@ class BarriersBeanTest {
         FrontendBarrier result = bean.getBarrier(_id, REQUESTERID);
         assertNotNull(result);
         assertEquals(title, result.getTitle());
-        assertEquals(pic, picturesBean.get(result.getPictureId()).getBase64());
+        assertEquals(pic, picturesBean
+                .get(new ObjectId(result.getPicturePath().replace(Pictures.BASE_URL + "/", "")))
+                .getBase64());
         assertEquals(description, result.getDescription());
     }
 
