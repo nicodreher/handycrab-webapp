@@ -30,6 +30,8 @@ spec:
                   key: connection
             - name: mongo_database
               value: "handycrab"
+            - name: pictures_baseurl
+              value: "https://handycrab.nico-dreher.de/rest/pictures"
       imagePullSecrets:
         - name: registrypullsecret
 ---

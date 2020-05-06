@@ -1,5 +1,6 @@
 package de.dhbw.handycrab.api.barriers;
 
+import de.dhbw.handycrab.api.pictures.Pictures;
 import org.bson.types.ObjectId;
 
 import java.io.Serializable;
@@ -10,7 +11,7 @@ public class FrontendBarrier implements Serializable {
     private ObjectId _id;
     private ObjectId userId;
     private String title;
-    private ObjectId pictureId;
+    private String picturePath;
     private double longitude;
     private double latitude;
     private String description;
@@ -27,7 +28,10 @@ public class FrontendBarrier implements Serializable {
         this._id = barrier.get_id();
         this.userId = barrier.getUserId();
         this.title = barrier.getTitle();
-        this.pictureId = barrier.getPicture();
+        if(barrier.getPicture() != null)
+            this.picturePath = Pictures.BASE_URL + "/" + barrier.getPicture().toString();
+        else
+            this.picturePath = null;
         this.longitude = barrier.getLongitude();
         this.latitude = barrier.getLatitude();
         this.description = barrier.getDescription();
@@ -123,11 +127,11 @@ public class FrontendBarrier implements Serializable {
         this.vote = vote;
     }
 
-    public ObjectId getPictureId() {
-        return pictureId;
+    public String getPicturePath() {
+        return picturePath;
     }
 
-    public void setPictureId(ObjectId pictureId) {
-        this.pictureId = pictureId;
+    public void setPicturePath(String picturePath) {
+        this.picturePath = picturePath;
     }
 }
