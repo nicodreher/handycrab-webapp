@@ -1,6 +1,5 @@
 import React from "react";
-import Button from "react-bootstrap/Button";
-import {Form} from "react-bootstrap";
+import {Form, Button} from "react-bootstrap";
 import {errorCodeToMessage} from "../../util/errorCode";
 import {FormField} from "../general/FormField";
 import {OptionalAlert} from "../app/OptionalAlert";
@@ -10,7 +9,7 @@ import {logIn} from "../../util/Auth";
 export class LoginForm extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {login: '', password: '', error: ''};
+        this.state = {login: '', password: '', error: '', stayLoggedIn: false};
 
         this.handleChangedLogin = this.handleChangedLogin.bind(this);
         this.handleChangedPassword = this.handleChangedPassword.bind(this);
@@ -24,6 +23,10 @@ export class LoginForm extends React.Component {
         this.setState({error: ''});
     }
 
+    handleChangedStayLoggedIn = (event) => {
+        this.setState({stayLoggedIn: !this.state.stayLoggedIn});
+    }
+
     handleChangedLogin(event) {
         this.setState({login: event.target.value});
     }
@@ -33,7 +36,6 @@ export class LoginForm extends React.Component {
     }
 
     handleSubmit(event) {
-        //alert('Submitted [login: ' + this.state.login + ', password: ' + this.state.password + ']');
         event.preventDefault();
         let hasErrorCode;
         fetch(loginUrl, {
@@ -46,7 +48,8 @@ export class LoginForm extends React.Component {
             body: JSON.stringify(
                 {
                     login: this.state.login,
-                    password: this.state.password
+                    password: this.state.password,
+                    createToken: this.state.stayLoggedIn
                 })
         }).then(response => {
             hasErrorCode = !response.ok;
@@ -59,7 +62,7 @@ export class LoginForm extends React.Component {
                 console.log(data);
                 logIn();
                 const destination = sessionStorage.getItem("destination");
-                this.props.history.push(destination  ? destination : "/search");
+                this.props.history.push(destination ? destination : "/search");
             }
         }).catch(error => {
             console.error(error);
@@ -77,6 +80,10 @@ export class LoginForm extends React.Component {
                                label="Benutzername oder E-Mail"/>
                     <FormField id="password" type="password" value={this.state.password}
                                onChange={this.handleChangedPassword} label="Passwort"/>
+                    <Form.Group controlId="stay logged in">
+                        <Form.Check type={"checkbox"} label={"Angemeldet bleiben"} checked={this.state.stayLoggedIn}
+                                    onChange={this.handleChangedStayLoggedIn}/>
+                    </Form.Group>
                     <Button type="submit">
                         Anmelden
                     </Button>
