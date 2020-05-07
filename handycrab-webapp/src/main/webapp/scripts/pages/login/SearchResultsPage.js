@@ -14,13 +14,18 @@ export class SearchResultsPage extends React.Component{
 
         var urlParams = this.resolveURLParams();
 
-        var restResults = this.generateTestData(urlParams.longitude, urlParams.latitude, urlParams.radius, urlParams.postCode);
+        var restResults = this.generateTestData(20, urlParams.longitude, urlParams.latitude, urlParams.radius, urlParams.postCode);
         restResults = this.sortDataByCriterion(restResults, urlParams.sortCriterion,  urlParams.sortOrder);
         restResults = this.addDistance(restResults, urlParams.longitude, urlParams.latitude);
 
         this.state = {results: restResults, loading: true, longitude: urlParams.longitude, latitude: urlParams.latitude,
                       radius: urlParams.radius, criterion: urlParams.sortCriterion, order: urlParams.sortOrder,
                       postCode: urlParams.postCode, filterOpen: false, error: null};
+    }
+
+    componentDidMount()
+    {
+        // this.getData(this.state.longitude, this.state.latitude, this.state.radius, this.state.postCode);
     }
 
     getSortCriteria(postCode)
@@ -158,6 +163,8 @@ export class SearchResultsPage extends React.Component{
             var randomLongitudeDistance = Math.random() * (radius - 1);
             var resultingLatitudeDistance = Math.random() * (radius - randomLongitudeDistance - 1);
             var voteDecision = votePossibilities[Math.floor(Math.random() * votePossibilities.length)];
+            var image = Math.random() > 0.5 ? imageUrls[Math.floor(Math.random() * imageUrls.length)] : "";
+            var text = image == null || Math.random() > 0.5 ? loremIpsum : "";
 
             testData.push({
                 _id: i,
@@ -165,12 +172,12 @@ export class SearchResultsPage extends React.Component{
                 title: "Barriere "+ i,
                 longitude: randomLongitudeDistance + longitude,
                 latitude: resultingLatitudeDistance + latitude,
-                picture: imageUrls[Math.floor(Math.random() * imageUrls.length)],
+                picture: image,
                 description: loremIpsum,
                 postcode: "00000",
                 solution: [{
                             _id: i,
-                            text: loremIpsum,
+                            text: text,
                             userId: 0,
                             upvotes: Math.floor(Math.random() * 10),
                             downvotes: Math.floor(Math.random() * 10),
@@ -214,6 +221,10 @@ export class SearchResultsPage extends React.Component{
         this.setURLParams(this.state.longitude, this.state.latitude, this.state.radius, this.state.postCode,
                           this.state.criterion, sortOrder);
         localStorage.setItem("lastSortOrder", sortOrder);
+    }
+
+    clearError = () => {
+        this.setState({error: null});
     }
 
     render()
