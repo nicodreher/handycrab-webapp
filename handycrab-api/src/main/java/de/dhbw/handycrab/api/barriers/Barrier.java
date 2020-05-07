@@ -131,6 +131,7 @@ public class Barrier implements Serializable {
         _id = (ObjectId) objectInputStream.readObject();
         userId = (ObjectId) objectInputStream.readObject();
         title = objectInputStream.readUTF();
+        picture = (ObjectId) objectInputStream.readObject();
         longitude = objectInputStream.readDouble();
         latitude = objectInputStream.readDouble();
         point = new Point(new Position(longitude, latitude));
@@ -152,6 +153,7 @@ public class Barrier implements Serializable {
         stream.writeObject(_id);
         stream.writeObject(userId);
         stream.writeUTF(title);
+        stream.writeObject(picture);
         stream.writeDouble(longitude);
         stream.writeDouble(latitude);
         stream.writeUTF(description);
