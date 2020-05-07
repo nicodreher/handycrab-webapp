@@ -70,10 +70,10 @@ public class BarriersBean implements Barriers {
     }
 
     @Override
-    public FrontendBarrier getBarrier(ObjectId id, ObjectId userId) {
+    public Barrier getBarrier(ObjectId id) {
         if (id != null) {
             if (dataSource.contains(id)) {
-                return new FrontendBarrier(dataSource.get(id), userId);
+                return dataSource.get(id);
             } else
                 throw new BarrierNotFoundException();
         }
@@ -81,22 +81,20 @@ public class BarriersBean implements Barriers {
     }
 
     @Override
-    public List<FrontendBarrier> getBarrier(ObjectId requesterId) {
+    public List<Barrier> getBarrierOnUserId(ObjectId requesterId) {
         if (requesterId != null) {
             return dataSource.find(new RequestBuilder()
                     .filter(Filters.eq("userId", requesterId)))
-                    .map(bar -> new FrontendBarrier(bar, requesterId))
                     .collect(Collectors.toList());
         } else
             throw new IncompleteRequestException();
     }
 
     @Override
-    public List<FrontendBarrier> getBarrier(String postcode, ObjectId userId) {
+    public List<Barrier> getBarrier(String postcode) {
         if (postcode != null) {
             return dataSource.find(new RequestBuilder()
                     .filter(Filters.eq("postcode", postcode)))
-                    .map(bar -> new FrontendBarrier(bar, userId))
                     .collect(Collectors.toList());
         } else {
             throw new IncompleteRequestException();
@@ -104,16 +102,16 @@ public class BarriersBean implements Barriers {
     }
 
     @Override
-    public List<FrontendBarrier> getBarrier(double longitude, double latitude, int radius, ObjectId userId) {
+    public List<Barrier> getBarrier(double longitude, double latitude, int radius) {
         if (longitude <= 180 && longitude >= -180 && latitude <= 90 && latitude >= -90) {
             Point point = new Point(new Position(longitude, latitude));
             return dataSource.find(new RequestBuilder().filter(Filters.nearSphere("point", point, (double) radius, 0d)))
-                    .map(e -> new FrontendBarrier(e, userId)).collect(Collectors.toList());
+                    .collect(Collectors.toList());
         } else throw new InvalidGeoPositionException();
     }
 
     @Override
-    public FrontendBarrier addBarrier(String title, double longitude, double latitude, String picture, String postalCode, String description, String solution, ObjectId userId) {
+    public Barrier addBarrier(String title, double longitude, double latitude, String picture, String postalCode, String description, String solution, ObjectId userId) {
         if (title != null && postalCode != null && description != null) {
             if (longitude <= 180 && longitude >= -180 && latitude <= 90 && latitude >= -90) {
                 var barrier = new BarrierBuilder().title(title).point(longitude, latitude).postalCode(postalCode).description(description).userId(userId);
@@ -129,7 +127,7 @@ public class BarriersBean implements Barriers {
                 }
                 var bar = barrier.build();
                 dataSource.insert(bar);
-                return new FrontendBarrier(bar, userId);
+                return bar;
             } else
                 throw new InvalidGeoPositionException();
         } else {
@@ -138,7 +136,7 @@ public class BarriersBean implements Barriers {
     }
 
     @Override
-    public FrontendBarrier modifyBarrier(ObjectId id, String title, String picture, String description, ObjectId userId) {
+    public Barrier modifyBarrier(ObjectId id, String title, String picture, String description, ObjectId userId) {
         if (id != null) {
             Barrier barrier = dataSource.get(id);
             if (!barrier.getUserId().equals(userId))
@@ -152,14 +150,14 @@ public class BarriersBean implements Barriers {
                 barrier.setPicture(pic.getID());
             }
             dataSource.update(barrier);
-            return new FrontendBarrier(barrier, userId);
+            return barrier;
         } else {
             throw new IncompleteRequestException();
         }
     }
 
     @Override
-    public FrontendBarrier addVoteToBarrier(ObjectId id, Vote vote, ObjectId userId) {
+    public Barrier addVoteToBarrier(ObjectId id, Vote vote, ObjectId userId) {
         if (id != null && vote != null && userId != null) {
             if (dataSource.contains(id)) {
                 Barrier barrier = dataSource.get(id);
@@ -176,7 +174,7 @@ public class BarriersBean implements Barriers {
                     downVotes.remove(userId);
                 }
                 dataSource.update(barrier);
-                return new FrontendBarrier(barrier, userId);
+                return barrier;
             } else
                 throw new BarrierNotFoundException();
         } else
@@ -184,7 +182,7 @@ public class BarriersBean implements Barriers {
     }
 
     @Override
-    public FrontendBarrier addSolution(ObjectId id, String solution, ObjectId userId) {
+    public Barrier addSolution(ObjectId id, String solution, ObjectId userId) {
         if (id != null && solution != null && userId != null) {
             if (dataSource.contains(id)) {
                 var barrier = dataSource.get(id);
@@ -193,7 +191,7 @@ public class BarriersBean implements Barriers {
                 solutionToAdd.setUserId(userId);
                 barrier.getSolutions().add(solutionToAdd);
                 dataSource.update(barrier);
-                return new FrontendBarrier(barrier, userId);
+                return barrier;
             } else
                 throw new BarrierNotFoundException();
         } else
@@ -201,7 +199,7 @@ public class BarriersBean implements Barriers {
     }
 
     @Override
-    public FrontendBarrier addVoteToSolution(ObjectId solutionId, Vote vote, ObjectId userId) {
+    public Barrier addVoteToSolution(ObjectId solutionId, Vote vote, ObjectId userId) {
         if (solutionId != null && vote != null && userId != null) {
             Barrier barrier = dataSource.findFirst(new RequestBuilder().filter(Filters.eq("solutions._id", solutionId)));
             if (barrier != null) {
@@ -220,18 +218,18 @@ public class BarriersBean implements Barriers {
                 throw new SolutionNotFoundException();
             }
             dataSource.update(barrier);
-            return new FrontendBarrier(barrier, userId);
+            return barrier;
         } else throw new IncompleteRequestException();
     }
 
     @Override
-    public RequestResult deleteBarrier(ObjectId id, ObjectId requesterId) {
+    public boolean deleteBarrier(ObjectId id, ObjectId requesterId) {
         if (id != null && requesterId != null) {
             if (dataSource.contains(id)) {
                 var barrier = dataSource.get(id);
                 if (barrier.getUserId().equals(requesterId)) {
                     dataSource.deleteOne(id);
-                    return new RequestResult(true);
+                    return true;
                 } else
                     throw new InvalidUserIdException();
             } else

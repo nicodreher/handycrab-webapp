@@ -2,6 +2,7 @@ package de.dhbw.handycrab.server.test.beans.barriers;
 
 import com.mongodb.client.model.geojson.Point;
 import com.mongodb.client.model.geojson.Position;
+import de.dhbw.handycrab.api.barriers.Barrier;
 import de.dhbw.handycrab.api.barriers.FrontendBarrier;
 import de.dhbw.handycrab.api.barriers.Solution;
 import de.dhbw.handycrab.api.barriers.Vote;
@@ -114,7 +115,7 @@ class BarriersBeanTest {
     void getBarrier_onUserId_ReturnsBarrier() {
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
 
-        var result = bean.getBarrier(REQUESTERID);
+        var result = bean.getBarrierOnUserId(REQUESTERID);
 
         assertEquals(2, result.size());
         assertNotNull(result.get(0));
@@ -131,11 +132,11 @@ class BarriersBeanTest {
     void getBarrier_onUserIdWithNull_throwsIncompleteRequestException() {
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
 
-        assertThrows(IncompleteRequestException.class, () -> bean.getBarrier(null));
+        assertThrows(IncompleteRequestException.class, () -> bean.getBarrierOnUserId(null));
     }
 
     /**
-     * Test the {@link BarriersBean#getBarrier(String, ObjectId) with valid inputs},
+     * Test the {@link BarriersBean#getBarrier(String) with valid inputs},
      * dependent on a postal code and a userId
      */
     @Test
@@ -143,7 +144,7 @@ class BarriersBeanTest {
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
 
 
-        List<FrontendBarrier> bar = bean.getBarrier("XYZ123", REQUESTERID);
+        List<Barrier> bar = bean.getBarrier("XYZ123");
 
         assertEquals(2, bar.size());
         assertNotNull(bar.get(0));
@@ -153,18 +154,18 @@ class BarriersBeanTest {
     }
 
     /**
-     * Test for the {@link BarriersBean#getBarrier(String, ObjectId)} with incomplete request information.
+     * Test for the {@link BarriersBean#getBarrier(String)} with incomplete request information.
      */
     @Test
     void getBarrier_onPostCodeWithInvalidRequestInformation_throwsIncompleteRequestException() {
         String postcode = null;
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
 
-        assertThrows(IncompleteRequestException.class, () -> bean.getBarrier(postcode, REQUESTERID));
+        assertThrows(IncompleteRequestException.class, () -> bean.getBarrier(postcode));
     }
 
     /**
-     * Test for the {@link BarriersBean#getBarrier(double, double, int, ObjectId)} with valid inputs.
+     * Test for the {@link BarriersBean#getBarrier(double, double, int)} with valid inputs.
      * Dependent on geological position and radius.
      */
     @Test
@@ -174,7 +175,7 @@ class BarriersBeanTest {
         double latitude = 40;
         int radius = 10;
 
-        var result = bean.getBarrier(longitude, latitude, radius, REQUESTERID);
+        var result = bean.getBarrier(longitude, latitude, radius);
 
         assertNotNull(result);
         assertEquals(3, result.size());
@@ -185,7 +186,7 @@ class BarriersBeanTest {
     }
 
     /**
-     * Test for the {@link BarriersBean#getBarrier(double, double, int, ObjectId)} with invalid longitude
+     * Test for the {@link BarriersBean#getBarrier(double, double, int)} with invalid longitude
      */
     @Test
     void getBarrier_onPositionWithInvalidGeoPosition_throwsInvalidGeoPositionException() {
@@ -194,11 +195,11 @@ class BarriersBeanTest {
         double latitude = 40;
         int radius = 10;
 
-        assertThrows(InvalidGeoPositionException.class, () -> bean.getBarrier(longitude, latitude, radius, REQUESTERID));
+        assertThrows(InvalidGeoPositionException.class, () -> bean.getBarrier(longitude, latitude, radius));
     }
 
     /**
-     * Test for the {@link BarriersBean#getBarrier(double, double, int, ObjectId)} with invalid latitude
+     * Test for the {@link BarriersBean#getBarrier(double, double, int)} with invalid latitude
      */
     @Test
     void getBarrier_OnPositionInvalidLatitude_throwsInvalidGeoPositionException() {
@@ -207,11 +208,11 @@ class BarriersBeanTest {
         double latitude = 120;
         int radius = 10;
 
-        assertThrows(InvalidGeoPositionException.class, () -> bean.getBarrier(longitude, latitude, radius, REQUESTERID));
+        assertThrows(InvalidGeoPositionException.class, () -> bean.getBarrier(longitude, latitude, radius));
     }
 
     /**
-     * Test the {@link BarriersBean#getBarrier(ObjectId, ObjectId) with valid inputs},
+     * Test the {@link BarriersBean#getBarrier(ObjectId) with valid inputs},
      * dependent on an identifier and a userId
      */
     @Test
@@ -219,25 +220,25 @@ class BarriersBeanTest {
         var _id = new ObjectId("000000000000000000000000");
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
 
-        FrontendBarrier bar = bean.getBarrier(_id, REQUESTERID);
+        var bar = bean.getBarrier(_id);
 
         assertNotNull(bar);
         assertEquals(_id, bar.get_id());
     }
 
     /**
-     * Test for the {@link BarriersBean#getBarrier(ObjectId, ObjectId)} with incomplete request info.
+     * Test for the {@link BarriersBean#getBarrier(ObjectId)} with incomplete request info.
      */
     @Test
     void getBarrier_onId_throwsIncompleteRequestException() {
         ObjectId _id = null;
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
 
-        assertThrows(IncompleteRequestException.class, () -> bean.getBarrier(_id, REQUESTERID));
+        assertThrows(IncompleteRequestException.class, () -> bean.getBarrier(_id));
     }
 
     /**
-     * Test the {@link BarriersBean#getBarrier(String, ObjectId) with invalid inputs},
+     * Test the {@link BarriersBean#getBarrier(String) with invalid inputs},
      * with an unknown Identifier.
      */
     @Test
@@ -245,7 +246,7 @@ class BarriersBeanTest {
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
         var _id = new ObjectId("000000000000000000000012");
 
-        assertThrows(BarrierNotFoundException.class, () -> bean.getBarrier(_id, REQUESTERID));
+        assertThrows(BarrierNotFoundException.class, () -> bean.getBarrier(_id));
     }
 
     /**
@@ -269,7 +270,7 @@ class BarriersBeanTest {
                 barrier.optString("solution", null),
                 userId);
 
-        List<FrontendBarrier> result = bean.getBarrier("70000", REQUESTERID);
+        List<Barrier> result = bean.getBarrier("70000");
         var resultBar = result.get(0);
         assertNotNull(result);
         assertEquals(userId, resultBar.getUserId());
@@ -278,7 +279,7 @@ class BarriersBeanTest {
         assertEquals(30d, resultBar.getLatitude());
         assertEquals("70000", resultBar.getPostcode());
         assertEquals(barrier.getString("picture"), picturesBean
-                .get(new ObjectId(resultBar.getPicturePath().replace(Pictures.BASE_URL+"/", "")))
+                .get(resultBar.getPicture())
                 .getBase64());
     }
 
@@ -300,7 +301,7 @@ class BarriersBeanTest {
 
         var bar = bean.addBarrier(title,longitude,latitude,null, postalCode, description, solution, REQUESTERID);
 
-        var result = bean.getBarrier(bar.get_id(), REQUESTERID);
+        var result = bean.getBarrier(bar.get_id());
         assertNotNull(result);
         assertEquals(title, result.getTitle());
         assertEquals(longitude, result.getLongitude());
@@ -328,7 +329,7 @@ class BarriersBeanTest {
 
         var bar = bean.addBarrier(title,longitude,latitude,null, postalCode, description, solution, REQUESTERID);
 
-        var result = bean.getBarrier(bar.get_id(), REQUESTERID);
+        var result = bean.getBarrier(bar.get_id());
         assertNotNull(result);
         assertEquals(title, result.getTitle());
         assertEquals(longitude, result.getLongitude());
@@ -463,11 +464,11 @@ class BarriersBeanTest {
 
         bean.modifyBarrier(_id, title, pic, description, REQUESTERID);
 
-        FrontendBarrier result = bean.getBarrier(_id, REQUESTERID);
+        var result = bean.getBarrier(_id);
         assertNotNull(result);
         assertEquals(title, result.getTitle());
         assertEquals(pic, picturesBean
-                .get(new ObjectId(result.getPicturePath().replace(Pictures.BASE_URL + "/", "")))
+                .get(result.getPicture())
                 .getBase64());
         assertEquals(description, result.getDescription());
     }
@@ -512,10 +513,10 @@ class BarriersBeanTest {
 
         bean.addVoteToBarrier(_id, vote, userId);
 
-        var barrier = bean.getBarrier(_id, userId);
+        var barrier = bean.getBarrier(_id);
         assertNotNull(barrier);
         assertEquals(_id, barrier.get_id());
-        assertEquals(1, barrier.getUpVotes());
+        assertEquals(1, barrier.getUpVotes().size());
     }
 
     /**
@@ -530,7 +531,7 @@ class BarriersBeanTest {
 
         bean.addSolution(_id, solution, userId);
 
-        FrontendBarrier result = bean.getBarrier(_id, REQUESTERID);
+        var result = bean.getBarrier(_id);
         assertNotNull(result);
         assertEquals(solution, result.getSolutions().get(0).getText());
     }
@@ -574,13 +575,12 @@ class BarriersBeanTest {
         var userId = new ObjectId("000000000000000000000000");
 
         bean.addSolution(_id, "Neue Lösung", userId);
-        var solutionId = bean.getBarrier(_id, userId).getSolutions().get(0).get_id();
+        var solutionId = bean.getBarrier(_id).getSolutions().get(0).getId();
         bean.addVoteToSolution(solutionId, Vote.UP, userId);
 
-        var solution = bean.getBarrier(_id, userId).getSolutions().get(0);
-        assertEquals(1, solution.getUpVotes());
-        assertEquals(0, solution.getDownVotes());
-        assertEquals(Vote.UP, solution.getVote());
+        var solution = bean.getBarrier(_id).getSolutions().get(0);
+        assertEquals(1, solution.getUpVotes().size());
+        assertEquals(0, solution.getDownVotes().size());
     }
 
     /**
@@ -593,14 +593,13 @@ class BarriersBeanTest {
         var _id = new ObjectId("000000000000000000000000");
         var userId = new ObjectId("000000000000000000000000");
         bean.addSolution(_id, "Neue Lösung", userId);
-        var solutionId = bean.getBarrier(_id, userId).getSolutions().get(0).get_id();
+        var solutionId = bean.getBarrier(_id).getSolutions().get(0).getId();
 
         bean.addVoteToSolution(solutionId, Vote.DOWN, userId);
 
-        var solution = bean.getBarrier(_id, userId).getSolutions().get(0);
-        assertEquals(0, solution.getUpVotes());
-        assertEquals(1, solution.getDownVotes());
-        assertEquals(Vote.DOWN, solution.getVote());
+        var solution = bean.getBarrier(_id).getSolutions().get(0);
+        assertEquals(0, solution.getUpVotes().size());
+        assertEquals(1, solution.getDownVotes().size());
     }
 
     /**
@@ -613,16 +612,15 @@ class BarriersBeanTest {
         var _id = new ObjectId("000000000000000000000000");
         var userId = new ObjectId("000000000000000000000000");
         bean.addSolution(_id, "Neue Lösung", userId);
-        var solutionId = bean.getBarrier(_id, userId).getSolutions().get(0).get_id();
+        var solutionId = bean.getBarrier(_id).getSolutions().get(0).getId();
         bean.addVoteToSolution(solutionId, Vote.DOWN, userId);
 
         bean.addVoteToSolution(solutionId, Vote.NONE, userId);
 
-        var solution = bean.getBarrier(_id, userId).getSolutions().get(0);
+        var solution = bean.getBarrier(_id).getSolutions().get(0);
         assertNotNull(solution);
-        assertEquals(0, solution.getDownVotes());
-        assertEquals(0, solution.getUpVotes());
-        assertEquals(Vote.NONE, solution.getVote());
+        assertEquals(0, solution.getDownVotes().size());
+        assertEquals(0, solution.getUpVotes().size());
     }
 
     /**
@@ -637,17 +635,19 @@ class BarriersBeanTest {
         var userId2 = new ObjectId("000000000000000000000002");
         var userId3 = new ObjectId("000000000000000000000003");
         bean.addSolution(_id, "new Solution", userId);
-        var solutionId = bean.getBarrier(_id, userId).getSolutions().get(0).get_id();
+        var solutionId = bean.getBarrier(_id).getSolutions().get(0).getId();
 
         bean.addVoteToSolution(solutionId, Vote.UP, userId);
         bean.addVoteToSolution(solutionId, Vote.DOWN, userId2);
         bean.addVoteToSolution(solutionId, Vote.DOWN, userId3);
 
-        var solution = bean.getBarrier(_id, userId).getSolutions().get(0);
+        var solution = bean.getBarrier(_id).getSolutions().get(0);
         assertNotNull(solution);
-        assertEquals(1, solution.getUpVotes());
-        assertEquals(2, solution.getDownVotes());
-        assertEquals(Vote.UP, solution.getVote());
+        assertEquals(1, solution.getUpVotes().size());
+        assertEquals(userId, solution.getUpVotes().get(0));
+        assertEquals(2, solution.getDownVotes().size());
+        assertTrue(solution.getDownVotes().contains(userId2));
+        assertTrue(solution.getDownVotes().contains(userId3));
     }
 
     /**
@@ -660,16 +660,16 @@ class BarriersBeanTest {
         var _id = new ObjectId("000000000000000000000000");
         var userId = new ObjectId("000000000000000000000000");
         bean.addSolution(_id, "New Solution", userId);
-        var solutionId = bean.getBarrier(_id, userId).getSolutions().get(0).get_id();
+        var solutionId = bean.getBarrier(_id).getSolutions().get(0).getId();
         bean.addVoteToSolution(solutionId, Vote.UP, userId);
 
         bean.addVoteToSolution(solutionId, Vote.DOWN, userId);
 
-        var solution = bean.getBarrier(_id, userId).getSolutions().get(0);
+        var solution = bean.getBarrier(_id).getSolutions().get(0);
         assertNotNull(solution);
-        assertEquals(Vote.DOWN, solution.getVote());
-        assertEquals(1, solution.getDownVotes());
-        assertEquals(0, solution.getUpVotes());
+        assertEquals(1, solution.getDownVotes().size());
+        assertTrue(solution.getDownVotes().contains(userId));
+        assertEquals(0, solution.getUpVotes().size());
     }
 
     /**
@@ -707,10 +707,10 @@ class BarriersBeanTest {
 
         bean.addVoteToBarrier(_id, Vote.UP, userId);
 
-        var barrier = bean.getBarrier(_id, userId);
-        assertEquals(Vote.UP, barrier.getVote());
-        assertEquals(1, barrier.getUpVotes());
-        assertEquals(0, barrier.getDownVotes());
+        var barrier = bean.getBarrier(_id);
+        assertEquals(1, barrier.getUpVotes().size());
+        assertTrue(barrier.getUpVotes().contains(userId));
+        assertEquals(0, barrier.getDownVotes().size());
     }
 
     /**
@@ -724,10 +724,10 @@ class BarriersBeanTest {
 
         bean.addVoteToBarrier(_id, Vote.DOWN, userId);
 
-        var barrier = bean.getBarrier(_id, userId);
-        assertEquals(Vote.DOWN, barrier.getVote());
-        assertEquals(1, barrier.getDownVotes());
-        assertEquals(0, barrier.getUpVotes());
+        var barrier = bean.getBarrier(_id);
+        assertEquals(1, barrier.getDownVotes().size());
+        assertTrue(barrier.getDownVotes().contains(userId));
+        assertEquals(0, barrier.getUpVotes().size());
     }
 
     /**
@@ -743,10 +743,9 @@ class BarriersBeanTest {
 
         bean.addVoteToBarrier(_id, Vote.NONE, userId);
 
-        var barrier = bean.getBarrier(_id, userId);
-        assertEquals(Vote.NONE, barrier.getVote());
-        assertEquals(0, barrier.getUpVotes());
-        assertEquals(0, barrier.getDownVotes());
+        var barrier = bean.getBarrier(_id);
+        assertEquals(0, barrier.getUpVotes().size());
+        assertEquals(0, barrier.getDownVotes().size());
     }
 
     /**
@@ -766,10 +765,12 @@ class BarriersBeanTest {
         bean.addVoteToBarrier(_id, Vote.NONE, userId3);
         bean.addVoteToBarrier(_id, Vote.UP, userId4);
 
-        var barrier = bean.getBarrier(_id, userId);
-        assertEquals(Vote.UP, barrier.getVote());
-        assertEquals(2, barrier.getUpVotes());
-        assertEquals(1, barrier.getDownVotes());
+        var barrier = bean.getBarrier(_id);
+        assertEquals(2, barrier.getUpVotes().size());
+        assertTrue(barrier.getUpVotes().contains(userId));
+        assertTrue(barrier.getUpVotes().contains(userId4));
+        assertEquals(1, barrier.getDownVotes().size());
+        assertTrue(barrier.getDownVotes().contains(userId2));
     }
 
     /**
@@ -797,10 +798,10 @@ class BarriersBeanTest {
 
         bean.addVoteToBarrier(_id, Vote.DOWN, userId);
 
-        var barrier = bean.getBarrier(_id, userId);
-        assertEquals(Vote.DOWN, barrier.getVote());
-        assertEquals(0, barrier.getUpVotes());
-        assertEquals(1, barrier.getDownVotes());
+        var barrier = bean.getBarrier(_id);
+        assertEquals(0, barrier.getUpVotes().size());
+        assertEquals(1, barrier.getDownVotes().size());
+        assertTrue(barrier.getDownVotes().contains(userId));
     }
 
     /**
@@ -827,8 +828,8 @@ class BarriersBeanTest {
         var result = bean.deleteBarrier(_id, userId);
 
         assertNotNull(result);
-        assertEquals(true, result.getResult());
-        assertThrows(BarrierNotFoundException.class, () -> bean.getBarrier(_id, userId));
+        assertTrue(result);
+        assertThrows(BarrierNotFoundException.class, () -> bean.getBarrier(_id));
     }
 
     /**

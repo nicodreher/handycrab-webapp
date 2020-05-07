@@ -15,35 +15,32 @@ public interface Barriers {
     /**
      * Get a barrier based on the ObjectId
      * @param id ObjectId of the barrier
-     * @param requesterId ObjectId of the requester
      * @return The Barrier
      */
-    FrontendBarrier getBarrier(ObjectId id, ObjectId requesterId);
+    Barrier getBarrier(ObjectId id);
 
     /**
      * Get a list of barriers based on the userId of the requester
      * @param requesterId ObjectId of the requester
      * @return List of barriers, where the requesterId equals the userId of the creator of a barrier.
      */
-    List<FrontendBarrier> getBarrier(ObjectId requesterId);
+    List<Barrier> getBarrierOnUserId(ObjectId requesterId);
 
     /**
      * Get a list of barriers based on a postal code
      * @param postcode
-     * @param requesterId ObjectId of the requester
      * @return List of barriers with the given postal code.
      */
-    List<FrontendBarrier> getBarrier(String postcode, ObjectId requesterId);
+    List<Barrier> getBarrier(String postcode);
 
     /**
      * Get a list of barriers based on a position (longitude, latitude) and radius
      * @param longitude
      * @param latitude
      * @param radius
-     * @param requesterId ObjectId of the requester
      * @return List of barriers within the radius of the given position
      */
-    List<FrontendBarrier> getBarrier(double longitude, double latitude, int radius, ObjectId requesterId);
+    List<Barrier> getBarrier(double longitude, double latitude, int radius);
 
     /**
      * Adds a barrier
@@ -57,7 +54,7 @@ public interface Barriers {
      * @param requesterId
      * @return The added barrier
      */
-    FrontendBarrier addBarrier(String title, double longitude, double latitude, String picture, String postalCode, String description, String solution, ObjectId requesterId);
+    Barrier addBarrier(String title, double longitude, double latitude, String picture, String postalCode, String description, String solution, ObjectId requesterId);
 
     /**
      * Modify a barrier
@@ -68,7 +65,7 @@ public interface Barriers {
      * @param requesterId ObjectId of the requester
      * @return The modified barrier
      */
-    FrontendBarrier modifyBarrier(ObjectId id, String title, String picture, String description, ObjectId requesterId);
+    Barrier modifyBarrier(ObjectId id, String title, String picture, String description, ObjectId requesterId);
 
     /**
      * Adds a vote to a barrier
@@ -77,7 +74,7 @@ public interface Barriers {
      * @param requesterId ObjectId of the requester
      * @return The barrier, which had been voted
      */
-    FrontendBarrier addVoteToBarrier(ObjectId id, Vote vote, ObjectId requesterId);
+    Barrier addVoteToBarrier(ObjectId id, Vote vote, ObjectId requesterId);
 
     /**
      * Adds a solution to a barrier
@@ -86,7 +83,7 @@ public interface Barriers {
      * @param requesterId ObjectId of the requester
      * @return The barrier of the added solution
      */
-    FrontendBarrier addSolution(ObjectId id, String solution, ObjectId requesterId);
+    Barrier addSolution(ObjectId id, String solution, ObjectId requesterId);
 
     /**
      * Adds a vote to a solution
@@ -95,7 +92,7 @@ public interface Barriers {
      * @param requesterId ObjectId of the requester
      * @return The barrier of the solution
      */
-    FrontendBarrier addVoteToSolution(ObjectId solutionId, Vote vote, ObjectId requesterId);
+    Barrier addVoteToSolution(ObjectId solutionId, Vote vote, ObjectId requesterId);
 
     /**
      * Deletes a barrier
@@ -103,5 +100,5 @@ public interface Barriers {
      * @param requesterId ObjectId of the requester
      * @return true, if barrier was deleted
      */
-    RequestResult deleteBarrier(ObjectId id, ObjectId requesterId);
+    boolean deleteBarrier(ObjectId id, ObjectId requesterId);
 }
