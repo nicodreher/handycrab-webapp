@@ -17,8 +17,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 
+import java.util.stream.Collectors;
+
 import static de.dhbw.handycrab.server.rest.RestApplication.MEDIA_TYPE;
 
+/**
+ * REST-Service for handling barriers using {@link de.dhbw.handycrab.server.beans.barriers.BarriersBean}
+ *
+ * @author Lukas Lautenschlager
+ */
 @Path("/barriers")
 public class BarriersService {
     @Resource(lookup = Barriers.LOOKUP)
@@ -35,14 +42,17 @@ public class BarriersService {
     @Produces(MEDIA_TYPE)
     public Object get(@Context HttpServletRequest request, String json) {
         var obj = new JSONObject(json);
+        var userId = user.getID();
         if (obj.has("_id"))
-            return barriers.getBarrier(new ObjectId(obj.getString("_id")), user.getID());
+            return new FrontendBarrier(barriers.getBarrier(new ObjectId(obj.getString("_id"))), userId);
         else if (obj.has("postcode"))
-            return barriers.getBarrier(obj.getString("postcode"), user.getID());
+            return barriers.getBarrier(obj.getString("postcode"))
+                    .stream().map(e -> new FrontendBarrier(e, userId)).collect(Collectors.toList());
         else if (obj.has("longitude") && obj.has("latitude") && obj.has("radius"))
-            return barriers.getBarrier(obj.getDouble("longitude"), obj.getDouble("latitude"), obj.getInt("radius"), user.getID());
+            return barriers.getBarrier(obj.getDouble("longitude"), obj.getDouble("latitude"), obj.getInt("radius"))
+                    .stream().map(e -> new FrontendBarrier(e, userId)).collect(Collectors.toList());
         else
-            return barriers.getBarrier(user.getID());
+            return barriers.getBarrierOnUserId(userId);
     }
 
     @POST
@@ -52,7 +62,7 @@ public class BarriersService {
     @Produces(MEDIA_TYPE)
     public FrontendBarrier addBarrier(@Context HttpServletRequest request, String json) {
         JSONObject obj = new JSONObject(json);
-        return barriers.addBarrier(obj.optString("title", null), obj.optDouble("longitude", 200), obj.optDouble("latitude", 100), obj.optString("picture", null), obj.optString("postcode", null), obj.optString("description", null), obj.optString("solution", null), user.getID());
+        return new FrontendBarrier(barriers.addBarrier(obj.optString("title", null), obj.optDouble("longitude", 200), obj.optDouble("latitude", 100), obj.optString("picture", null), obj.optString("postcode", null), obj.optString("description", null), obj.optString("solution", null), user.getID()), user.getID());
     }
 
     @PUT
@@ -62,7 +72,7 @@ public class BarriersService {
     @Produces(MEDIA_TYPE)
     public FrontendBarrier modifyBarrier(@Context HttpServletRequest request, String json) {
         JSONObject obj = new JSONObject(json);
-        return barriers.modifyBarrier(new ObjectId(obj.optString("_id", null)), obj.optString("title", null), obj.optString("picture", null), obj.optString("description", null), user.getID());
+        return new FrontendBarrier(barriers.modifyBarrier(new ObjectId(obj.optString("_id", null)), obj.optString("title", null), obj.optString("picture", null), obj.optString("description", null), user.getID()), user.getID());
     }
 
     @POST
@@ -72,7 +82,7 @@ public class BarriersService {
     @Produces(MEDIA_TYPE)
     public FrontendBarrier addSolution(@Context HttpServletRequest request, String json) {
         JSONObject obj = new JSONObject(json);
-        return barriers.addSolution(new ObjectId(obj.getString("_id")), obj.optString("solution", null), user.getID());
+        return new FrontendBarrier(barriers.addSolution(new ObjectId(obj.getString("_id")), obj.optString("solution", null), user.getID()), user.getID());
     }
 
     @PUT
@@ -82,7 +92,7 @@ public class BarriersService {
     @Produces(MEDIA_TYPE)
     public FrontendBarrier addVote(@Context HttpServletRequest request, String json) {
         JSONObject obj = new JSONObject(json);
-        return barriers.addVoteToBarrier(new ObjectId(obj.optString("_id", null)), Vote.valueOf(obj.optString("vote", null)), user.getID());
+        return new FrontendBarrier(barriers.addVoteToBarrier(new ObjectId(obj.optString("_id", null)), Vote.valueOf(obj.optString("vote", null)), user.getID()), user.getID());
     }
 
     @PUT
@@ -92,7 +102,7 @@ public class BarriersService {
     @Produces(MEDIA_TYPE)
     public FrontendBarrier addVoteToSolution(@Context HttpServletRequest request, String json) {
         JSONObject obj = new JSONObject(json);
-        return barriers.addVoteToSolution(new ObjectId(obj.optString("_id", null)), Vote.valueOf(obj.optString("vote", null)), user.getID());
+        return new FrontendBarrier(barriers.addVoteToSolution(new ObjectId(obj.optString("_id", null)), Vote.valueOf(obj.optString("vote", null)), user.getID()), user.getID());
     }
 
     @DELETE
@@ -102,6 +112,6 @@ public class BarriersService {
     @Produces(MEDIA_TYPE)
     public RequestResult deleteBarrier(@Context HttpServletRequest request, String json) {
         JSONObject obj = new JSONObject(json);
-        return barriers.deleteBarrier(new ObjectId(obj.optString("_id", null)), user.getID());
+        return new RequestResult(barriers.deleteBarrier(new ObjectId(obj.optString("_id", null)), user.getID()));
     }
 }

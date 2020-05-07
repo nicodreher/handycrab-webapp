@@ -6,6 +6,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Data structure of a solution.
+ * @author Lukas Lautenschlager
+ */
 public class Solution implements Serializable {
     private ObjectId _id = new ObjectId();
     private String text;

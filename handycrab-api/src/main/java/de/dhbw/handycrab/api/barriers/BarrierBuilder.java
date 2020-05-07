@@ -2,6 +2,10 @@ package de.dhbw.handycrab.api.barriers;
 
 import org.bson.types.ObjectId;
 
+/**
+ * Builder pattern for the {@link Barrier} class.
+ * @author Lukas Lautenschlager
+ */
 public class BarrierBuilder {
     Barrier barrier = new Barrier();
 

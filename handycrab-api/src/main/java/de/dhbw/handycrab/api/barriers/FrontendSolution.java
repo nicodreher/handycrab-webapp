@@ -4,12 +4,20 @@ import org.bson.types.ObjectId;
 
 import java.io.Serializable;
 
+/**
+ * Data structure of a solution for the REST-Clients.
+ * Up- and Downvotes representing the amount.
+ * @author Lukas Lautenschlager
+ */
 public class FrontendSolution implements Serializable {
     private ObjectId _id;
     private ObjectId userId;
     private String text;
     private int upVotes;
     private int downVotes;
+    /**
+     * Represent the value for a vote of the requested user.
+     */
     private Vote vote;
 
     public FrontendSolution() {

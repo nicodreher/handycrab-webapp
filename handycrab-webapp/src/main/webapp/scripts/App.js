@@ -20,6 +20,7 @@ import {
 } from "react-router-dom"
 import {isLoggedIn, logout} from "./util/Auth";
 import {ProtectedRoute} from "./components/app/ProtectedRoute";
+import {BarrierAddPage} from "./pages/login/BarrierAddPage";
 
 class App extends React.Component {
 
@@ -37,19 +38,23 @@ class App extends React.Component {
     }
 
     render() {
+        const  loggedIn = isLoggedIn();
         return (
             <div id="app-flex-div">
                 <TitleBar menuAction={this.toggleMenu}/>
                 <div id="content-div">
                     <div id="main-menu" style={{visibility: this.state.menuOpen ? "visible" : "hidden"}}>
                         <MainMenuItem icon="images/icons/menu/home_icon.png" altText="home" title="Home" url="/" />
-                        {!isLoggedIn() &&
+                        {!loggedIn &&
                         <MainMenuItem icon="images/icons/menu/login_icon.png" altText="login" title="Anmeldung" url="/login" />}
-                        <MainMenuItem icon="images/icons/menu/register_icon.png" altText="register" title="Registrierung" url="/register" />
-                        {isLoggedIn() &&
+                        {!loggedIn &&
+                        <MainMenuItem icon="images/icons/menu/register_icon.png" altText="register" title="Registrierung" url="/register" />}
+                        {loggedIn &&
                         <MainMenuItem icon="images/icons/menu/search_icon.png" altText="search" title="Suche" url="/search" />}
+                        {loggedIn &&
+                        <MainMenuItem icon="images/icons/menu/add_icon.svg" altText="add" title="Barriere hinzufügen" url="/add" />}
                         <MainMenuItem icon="images/icons/menu/info_icon.png" altText="about" title="Über die Anwendung" url="/about" />
-                        {isLoggedIn() &&
+                        {loggedIn &&
                         <MainMenuItem icon="images/icons/menu/logout_icon.svg" altText="logout" title="Abmelden" onClick={logout} />}
                     </div>
                     <Router>
@@ -60,6 +65,7 @@ class App extends React.Component {
                             <Route exact path="/about" component={AboutPage}/>
                             <ProtectedRoute exact path="/search" component={SearchPage}/>
                             <ProtectedRoute exact path="/results" component={SearchResultsPage}/>
+                            <ProtectedRoute exact path="/add" component={BarrierAddPage}/>
                             <Route component={ErrorPage}/>
                         </Switch>
                     </Router>

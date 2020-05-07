@@ -8,7 +8,7 @@ export function FormField(props) {
             {props.label}
         </Form.Label>
         <Col sm="10">
-            <Form.Control {...props} isInvalid={invalid} aria-describedby={props.id + '_label'}/>
+            <Form.Control isInvalid={invalid} {...props} aria-describedby={props.id + '_label'}/>
         </Col>
     </Form.Group>
 }

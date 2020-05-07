@@ -50,7 +50,7 @@ public class UsersService {
         request.getSession().setAttribute("userId", loggedInUser.getUser().getID());
         Response.ResponseBuilder builder = Response.ok().entity(new FrontendUser(loggedInUser.getUser()));
         if(loggedInUser.getToken() != null) {
-            NewCookie cookie = new NewCookie("TOKEN", loggedInUser.getUser().getID().toHexString() + ":" + loggedInUser.getToken(), null, null, NewCookie.DEFAULT_VERSION, null, 60 * 60 * 24 * 30, null, false, false);
+            NewCookie cookie = new NewCookie("TOKEN", loggedInUser.getUser().getID().toHexString() + ":" + loggedInUser.getToken(), "/", null, NewCookie.DEFAULT_VERSION, null, 60 * 60 * 24 * 30, null, false, false);
             builder.cookie(cookie);
         }
         return builder.build();
