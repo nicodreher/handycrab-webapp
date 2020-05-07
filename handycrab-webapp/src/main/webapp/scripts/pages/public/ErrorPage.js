@@ -4,9 +4,10 @@ import "../../../styles/pages/public/error-page.css"
 export class ErrorPage extends React.Component{
     render(){
         return(
-            <div>
-                <img id="error-cat" src="images/error/error_cat.jpg" alt="Fehler-Katze"/>
-                <p id="error-text">Ups 😔, da ist wohl etwas schiefgelaufen... <a href="/">Hier gehts heim</a></p>
+            <div className="error-div">
+                <h1 className="four-o-four-text">404</h1>
+                <p className="description">Ups...hier ist wohl etwas schiefgelaufen...</p>
+                <a href="/" className="back-home">« Zurück zur Homepage</a>
             </div>
         );
     }

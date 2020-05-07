@@ -45,14 +45,17 @@ export class BarrierPreview extends React.Component{
             </div>
 
             <div>
-                <span className="metric-distance">
-                    <img src="images/icons/uicomponents/pin.png" />
-                    <p>{this.props.distance}m Abstand</p>
-                </span>
                 <img className="vote-image" src={this.decideOnUpvoteImg()} onClick={this.onUpvoteClick}/>
                 <p className="vote-paragraph">{this.state.upvotes}</p>
                 <img className="vote-image" src={this.decideOnDownvoteImg()} onClick={this.onDownvoteClick}/>
                 <p className="vote-paragraph">{this.state.downvotes}</p>
+
+                {!isNaN(this.props.distance) &&
+                    <span className="metric-distance">
+                        <img src="images/icons/uicomponents/pin.png" />
+                        <p>{this.props.distance}m Abstand</p>
+                    </span>
+                }
             </div>
         </div>
         );

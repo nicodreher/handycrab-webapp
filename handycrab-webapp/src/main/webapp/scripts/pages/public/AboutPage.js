@@ -5,7 +5,6 @@ export class AboutPage extends React.Component{
     render(){
         return(
             <div>
-                <a href="/">&#60; Homepage</a>
                 <div id="about" className="about-div">
                     <h1>Über diese Anwendung</h1>
                     <iframe className="about-iframe" src="legal/about.html" sandbox="" />

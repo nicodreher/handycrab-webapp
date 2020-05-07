@@ -43,7 +43,8 @@ class App extends React.Component {
                 <div id="content-div">
                     <div id="main-menu" style={{visibility: this.state.menuOpen ? "visible" : "hidden"}}>
                         <MainMenuItem icon="images/icons/menu/home_icon.png" altText="home" title="Home" url="/" />
-                        <MainMenuItem icon="images/icons/menu/login_icon.png" altText="login" title="Anmeldung" url="/login" />
+                        {!isLoggedIn() &&
+                        <MainMenuItem icon="images/icons/menu/login_icon.png" altText="login" title="Anmeldung" url="/login" />}
                         <MainMenuItem icon="images/icons/menu/register_icon.png" altText="register" title="Registrierung" url="/register" />
                         {isLoggedIn() &&
                         <MainMenuItem icon="images/icons/menu/search_icon.png" altText="search" title="Suche" url="/search" />}
