@@ -63,7 +63,8 @@ Alles Ander Explizit definiert sein\
 14 | 400 | Picture To Big
 15 | 400 | Invalid Picture Format
 16 | 404 | Picture Not Found
-
+17 | 400 | Invalid JSON
+18 | 400 | Invalid ObjectId
 ## REST-Schnittstellen
 ### Registrierung:
     .../users/register POST
@@ -88,18 +89,25 @@ Alles Ander Explizit definiert sein\
     ErrorCodes: -
 ### Get-username
     .../users/name GET
+    QueryPrams:
+        id: ObjectId (Optional)
     Login: false
     {_id} -> {result: string}
-    ErrorCodes: 7
+    ErrorCodes: 7, 18
 
 ### Barriers-Get:
     .../barriers/get GET
     Login: true
+    QueryPrams:
+        longitude: Double, latitude: Double, radius: Integer (m) (optional)
+        id: ObjectId (optional)
+        postcode: String (optional)
+        
     {longitude, latitude, radius (m)} -> [Barrier]
     {_id} -> {Barrier}
     {postcode} - [Barrier]
     {} - [Barrier] //Barriers des aktuell angemeldeten Benutzers
-    ErrorCodes: 1
+    ErrorCodes: 1, 18
 
 ### Barrier-Add:
     .../barriers/add POST
@@ -110,28 +118,28 @@ Alles Ander Explizit definiert sein\
 ### Barrier-Modify:
     .../barriers/modify PUT
     {_id (BarrierId), title?, picture? (Base64)?, description?} -> {Barrier}
-    ErrorCodes: 1, 14, 15
+    ErrorCodes: 1, 14, 15, 18
 ### Barrier-Vote: 
     .../barriers/vote PUT
     {_id (BarrierId), vote: Vote}
-    ErrorCodes: 9
+    ErrorCodes: 9, 18
 
 ### Barrier-Solution:
     .../barriers/solution POST
     {_id (BarrierId), solution: Solution} -> {Barrier}
-    ErrorCodes: 1, 9, 10
+    ErrorCodes: 1, 9, 10, 18
 
 ### Barrier-Solution-Vote: 
     .../barriers/solutions/vote PUT
     {_id (SolutionId), vote: Vote}
-    ErrorCodes: 1, 11
+    ErrorCodes: 1, 11, 18
     
 ### Barrier-delete:
     .../barriers/delete DELETE
     {_id}
-    ErrorCodes: 1, 9, 10
+    ErrorCodes: 1, 9, 10, 18
     
 ### Pictures-Get:
     .../pictures/<objectId> GET
     () -> Binary Picture as image/jpeg or image/png
-    ErrorCodes: 16
+    ErrorCodes: 16, 18

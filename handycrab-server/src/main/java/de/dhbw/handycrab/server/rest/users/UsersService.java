@@ -4,13 +4,14 @@ import de.dhbw.handycrab.api.users.FrontendUser;
 import de.dhbw.handycrab.api.users.LoggedInUser;
 import de.dhbw.handycrab.api.users.User;
 import de.dhbw.handycrab.api.users.Users;
+import de.dhbw.handycrab.exceptions.IncompleteRequestException;
 import de.dhbw.handycrab.exceptions.users.InvalidLoginException;
 import de.dhbw.handycrab.server.rest.authorization.Authorized;
 import de.dhbw.handycrab.server.rest.authorization.CurrentUser;
 import org.bson.types.ObjectId;
 import org.json.JSONObject;
 
-import static de.dhbw.handycrab.server.rest.RestApplication.MEDIA_TYPE;
+import static de.dhbw.handycrab.server.rest.RestApplication.*;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;
@@ -103,8 +104,11 @@ public class UsersService {
     @Path("/name")
     @Consumes(MEDIA_TYPE)
     @Produces(MEDIA_TYPE)
-    public RequestResult getName(String json) {
+    public RequestResult getName(String json, @QueryParam("id") String id) {
+        if(json == null || json.isEmpty()) {
+            json = "{}";
+        }
         JSONObject entity = new JSONObject(json);
-        return new RequestResult(users.getUsername(new ObjectId(entity.optString("_id", null))));
+        return new RequestResult(users.getUsername(new ObjectId(validateObjectId(entity.optString("_id", id)))));
     }
 }
