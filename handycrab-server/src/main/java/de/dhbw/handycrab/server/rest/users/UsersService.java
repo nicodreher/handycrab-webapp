@@ -104,11 +104,16 @@ public class UsersService {
     @Path("/name")
     @Consumes(MEDIA_TYPE)
     @Produces(MEDIA_TYPE)
-    public RequestResult getName(String json, @QueryParam("id") String id) {
-        if(json == null || json.isEmpty()) {
-            json = "{}";
-        }
-        JSONObject entity = new JSONObject(json);
-        return new RequestResult(users.getUsername(new ObjectId(validateObjectId(entity.optString("_id", id)))));
+    public RequestResult getNameWithJSON(String json) {
+        var entity = new JSONObject(json);
+        return new RequestResult(users.getUsername(new ObjectId(validateObjectId(entity.optString("_id", null)))));
+    }
+
+    @GET
+    @Path("/name")
+    @Produces(MEDIA_TYPE)
+    public RequestResult getNameWithQueryParam(@QueryParam("id") String id)
+    {
+        return new RequestResult(users.getUsername(new ObjectId(validateObjectId(id))));
     }
 }
