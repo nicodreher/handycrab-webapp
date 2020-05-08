@@ -81,9 +81,9 @@ export class SearchForm extends React.Component {
             search = "lo=" + this.state.longitude + "&la=" + this.state.latitude + "&ra=" + this.state.radius;
         } else {
             if (this.state.postal.size === 4) {
-                search = "plz=0" + this.state.postal;
+                search = "pc=0" + this.state.postal;
             } else {
-                search = "plz=" + this.state.postal;
+                search = "pc=" + this.state.postal;
             }
         }
         window.location.replace(window.location.origin + "/results?" + search);
