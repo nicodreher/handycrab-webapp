@@ -121,7 +121,7 @@ Alles Ander Explizit definiert sein\
     ErrorCodes: 1, 14, 15, 18
 ### Barrier-Vote: 
     .../barriers/vote PUT
-    {_id (BarrierId), vote: Vote}
+    {_id (BarrierId), vote: Vote} -> {Barrier}
     ErrorCodes: 9, 18
 
 ### Barrier-Solution:
@@ -131,12 +131,12 @@ Alles Ander Explizit definiert sein\
 
 ### Barrier-Solution-Vote: 
     .../barriers/solutions/vote PUT
-    {_id (SolutionId), vote: Vote}
+    {_id (SolutionId), vote: Vote} -> {Barrier}
     ErrorCodes: 1, 11, 18
     
 ### Barrier-delete:
     .../barriers/delete DELETE
-    {_id}
+    {_id} -> true
     ErrorCodes: 1, 9, 10, 18
     
 ### Pictures-Get:
