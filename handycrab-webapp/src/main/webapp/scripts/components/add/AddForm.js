@@ -1,10 +1,11 @@
 import React from "react";
-import {Col, Form, Row} from "react-bootstrap";
+import {Col, Form, Row, Spinner} from "react-bootstrap";
 import {FormField} from "../general/FormField";
 import Button from "react-bootstrap/Button";
 import {OptionalAlert} from "../app/OptionalAlert";
 import {addBarrierUrl} from "../../util/RestEndpoints";
 import {errorCodeToMessage} from "../../util/errorCode";
+import Alert from "react-bootstrap/Alert";
 
 export class AddForm extends React.Component {
     constructor(props) {
@@ -16,8 +17,9 @@ export class AddForm extends React.Component {
             description: '',
             postal: '01001',
             solution: '',
-            fileName: '',
-            error: ''
+            fileName: 'Keine Datei ausgewählt',
+            error: '',
+            processing: 0
         };
         this.fileInput = React.createRef();
     }
@@ -27,6 +29,9 @@ export class AddForm extends React.Component {
      * @param {Blob} file The blob to convert
      */
     toBase64 = (file) => new Promise((resolve, reject) => {
+        if (file === null || file === undefined) {
+            return resolve(undefined);
+        }
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = () => resolve(reader.result.replace(/^data:.*\/.*;base64,/, ''));
@@ -37,6 +42,8 @@ export class AddForm extends React.Component {
         event.preventDefault();
 
         if (this.validateInputs()) {
+            this.setState({processing: 1})
+            console.log(this.fileInput.current.files[0]);
             this.toBase64(this.fileInput.current.files[0]).then((text) => {
                 let postcode = this.state.postal;
                 postcode = postcode.length === 4 ? '0' + postcode : postcode;
@@ -64,21 +71,30 @@ export class AddForm extends React.Component {
                 if (data.errorCode) {
                     this.setState({error: errorCodeToMessage(data.errorCode)});
                 } else {
+                    this.setState({processing: 2});
+                    console.log(data);
                     //TODO success case, prolly redirect to detailansicht
+
                 }
 
-            })
+            }).catch((error) => {
+                console.error(error);
+                this.setState({processing: 0, error: 'Barriere konnte nicht hinzugefügt werden'});
+            });
         }
     }
 
     /**
-     *
+     * Validates the fields in the form that can be validated.
+     * Ultimately this results in testing the file for size and MIME type and ensuring that the title string
+     * does not only contain whitespace.
      * @return {boolean}
      */
     validateInputs = () => {
 
-        if (!this.validateFile(this.fileInput.current?.files[0])) {
-            this.setState({error: 'Die hochgeladene Datei ist kein .jpg oder .png'});
+        const result = this.validateFile(this.fileInput.current?.files[0]);
+        if (result.hasError) {
+            this.setState({error: result.msg});
             return false;
         }
         if (/^\s*$/.test(this.state.title)) {
@@ -95,25 +111,32 @@ export class AddForm extends React.Component {
      * The only valid MIME types are image/jpeg and image/png.
      *
      * @param file {File} The file to check
-     * @return {boolean} True if the file does not exist or has the appropriate MIME type
+     * @return {{hasError: boolean, msg:string}} hasError is true if the validation failed. msg provides the reason for the failure
      */
     validateFile = (file) => {
         if (file === undefined || file === null) {
-            return true;
+            return {hasError: false, msg: ''};
         }
         if (file.size > 8388608) {
-            this.setState({error: "Die hochgeladene Datei ist zu groß"});
-            return false;
+            return {hasError: true, msg: 'Die hochgeladene Datei ist größer als 8 MB'};
         }
-        return (file.type === "image/png") || (file.type === "image/jpeg");
+        if ((file.type === "image/png") || (file.type === "image/jpeg")) {
+            return {hasError: false, msg: ''};
+        } else {
+            return {hasError: true, msg: 'Die hochgeladene Datei ist kein .jpg oder .png'};
+        }
     }
 
     render() {
+        const promisesRunning = this.state.processing === 1;
         const invalidTitle = /^\s*$/.test(this.state.title);
         const validFile = this.validateFile(this.fileInput.current?.files[0]);
         return <Form id='addForm' onSubmit={this.handleSubmit}>
             <OptionalAlert error={this.state.error} display={this.state.error}
                            onClose={() => this.setState({error: ''})}/>
+            {(this.state.processing === 2) &&
+            <Alert dismissible={true} onClose={() => this.setState({processing: 0})} variant={'success'}>Barriere
+                erfolgreich hinzugefügt</Alert>}
             <div>&nbsp;</div>
             <FormField id='barrier_title' label='Titel' required={true}
                        onChange={(event) => this.setState({title: event.target.value})} value={this.state.title}
@@ -144,8 +167,9 @@ export class AddForm extends React.Component {
                 </Col>
             </Form.Group>
 
-            <Button type={"submit"}>
-                Barriere hinzufügen
+            <Button type={"submit"} disabled={promisesRunning}>
+                Barriere hinzufügen &nbsp;
+                {promisesRunning && <Spinner as="span" animation="grow" size="sm" role="status" aria-hidden="true"/>}
             </Button>
         </Form>
     }
