@@ -60,3 +60,17 @@ select option{
   height: calc(100vh - 32px - 45px);
   overflow-y: auto;
 }
+
+.leaflet-container {
+    height: 100%;
+    width: 100%;
+    z-index: 0;
+}
+
+.leafletmap-div-container{
+    height: calc(100%);
+}
+
+.me-pin-icon{
+    background-color: rgba(255, 255, 255, 0);
+}

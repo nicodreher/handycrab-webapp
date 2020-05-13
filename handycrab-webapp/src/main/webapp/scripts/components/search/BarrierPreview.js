@@ -64,7 +64,7 @@ export class BarrierPreview extends React.Component{
             <p className="barrier-title">{this.props.title}</p>
 
             <div className="barrier-content">
-                <img className="barrier-img" src={this.props.icon !== "" ? this.props.icon : replacementIcon}/>
+                <img className="barrier-img" src={this.props.icon !== undefined ? this.props.icon : replacementIcon}/>
                 <p className="barrier-short-descr">{this.props.description}</p>
             </div>
 
@@ -74,7 +74,7 @@ export class BarrierPreview extends React.Component{
                 <img className="vote-image" src={this.decideOnDownvoteImg()} onClick={() => this.onVoteClick("DOWN")}/>
                 <p className="vote-paragraph">{this.state.downvotes}</p>
 
-                {!isNaN(this.props.distance) &&
+                {!this.props.distance == null || !this.props.distance == undefined &&
                     <span className="metric-distance">
                         <img src="images/icons/uicomponents/pin.png" />
                         <p>{this.props.distance}m Abstand</p>

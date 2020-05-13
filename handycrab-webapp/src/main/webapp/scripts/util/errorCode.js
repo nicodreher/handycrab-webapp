@@ -36,6 +36,10 @@ export function errorCodeToMessage(code) {
             return 'Das Format des Bildes wird nicht unterstützt. Bitte nutzen Sie eine .jpg- oder .png-Datei'
         case 16:
             return 'Das Bild für diese Barriere konnte nicht gefunden werden'
+        case 17:
+            return 'Invalide Anfrageparameter'
+        case 18:
+            return 'Invalide Barriere'
         default:
             return 'Ein unerwarteter Fehler ist aufgetreten';
 

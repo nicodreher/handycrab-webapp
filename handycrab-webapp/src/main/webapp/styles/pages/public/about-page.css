@@ -13,7 +13,7 @@
 
 .about-iframe{
     border: 0;
-    height: calc(33% - 58px - 15px);
+    height: calc(100% - 85px);
     left: 0;
     top: 0;
     width: 100%;
