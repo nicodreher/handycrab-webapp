@@ -3,6 +3,8 @@ import {BarrierPreview} from "../../components/search/BarrierPreview";
 import {errorCodeToMessage} from "../../util/errorCode";
 import {OptionalAlert} from "../../components/app/OptionalAlert";
 import {SelectBox} from "../../components/general/SelectBox";
+import {MapComponent} from "../../components/map/MapComponent";
+import {Switch} from "../../components/general/Switch"
 import "../../../styles/pages/login/search-results-page.css"
 import {getBarrierUrl} from "../../util/RestEndpoints";
 
@@ -14,24 +16,25 @@ export class SearchResultsPage extends React.Component{
 
         var urlParams = this.resolveURLParams();
 
-        var restResults = this.generateTestData(20, urlParams.longitude, urlParams.latitude, urlParams.radius, urlParams.postCode);
-        restResults = this.sortDataByCriterion(restResults, urlParams.sortCriterion,  urlParams.sortOrder);
-        restResults = this.addDistance(restResults, urlParams.longitude, urlParams.latitude);
-
-        this.state = {results: restResults, loading: true, longitude: urlParams.longitude, latitude: urlParams.latitude,
+        this.state = {results: [], loading: true, longitude: urlParams.longitude, latitude: urlParams.latitude,
                       radius: urlParams.radius, criterion: urlParams.sortCriterion, order: urlParams.sortOrder,
-                      postCode: urlParams.postCode, filterOpen: false, error: null};
+                      postCode: urlParams.postCode, filterOpen: false, error: null, map: urlParams.showMap};
     }
 
     componentDidMount()
     {
-        // this.getData(this.state.longitude, this.state.latitude, this.state.radius, this.state.postCode);
+        this.getData(this.state.longitude, this.state.latitude, this.state.radius, this.state.postCode)
+            .then(data => {
+                this.setState({results: this.addDistance(this.sortDataByCriterion(data, this.state.criterion,
+                                                                                  this.state.order),
+                                                         this.state.longitude, this.state.latitude)});
+            });
     }
 
     getSortCriteria(postCode)
     {
         var sortCriteria = [{label: "Titel", value:"title"},
-                            {label: "Upvotes", value:"upvotes"},
+                            {label: "Upvotes", value:"upVotes"},
                             {label: "Postleitzahl", value:"postcode"}];
 
         if (postCode == null) sortCriteria.push({label: "Distanz", value:"distance"});
@@ -57,6 +60,7 @@ export class SearchResultsPage extends React.Component{
         var postCode = urlParams.get("pc");
         var sortCriterion = urlParams.get("sc");
         var sortOrder = urlParams.get("so");
+        var showMapString = urlParams.get("ma");
 
         var sortCriterionIsValid = false;
         this.getSortCriteria(postCode).forEach(criterion =>
@@ -69,6 +73,12 @@ export class SearchResultsPage extends React.Component{
             : sortCriterion;
 
         localStorage.setItem("lastSortCriterion", sortCriterion);
+
+        showMapString = ["true", "false"].includes(showMapString) ? showMapString :
+            localStorage.getItem("lastShowMap") == null ? "false" : localStorage.getItem("lastShowMap");
+
+        localStorage.setItem("lastShowMap", showMapString);
+        var showMap = showMapString === "true";
 
         var sortOrderIsValid = false;
         this.getSortOrders().forEach(allowedSortOrder =>
@@ -89,13 +99,13 @@ export class SearchResultsPage extends React.Component{
         latitude = parseFloat(latitude);
         radius = parseInt(radius);
 
-        this.setURLParams(longitude, latitude, radius, postCode, sortCriterion, sortOrder)
+        this.setURLParams(longitude, latitude, radius, postCode, sortCriterion, sortOrder, showMapString)
 
         return {longitude: longitude, latitude: latitude, radius: radius, sortCriterion: sortCriterion,
-                sortOrder: sortOrder, postCode: postCode}
+                sortOrder: sortOrder, postCode: postCode, showMap: showMap}
     }
 
-    setURLParams(longitude, latitude, radius, postCode, sortCriterion, sortOrder)
+    setURLParams(longitude, latitude, radius, postCode, sortCriterion, sortOrder, showMapString)
     {
         var urlParams = new URLSearchParams(window.location.search);
 
@@ -116,6 +126,7 @@ export class SearchResultsPage extends React.Component{
 
         urlParams.set("sc", sortCriterion);
         urlParams.set("so", sortOrder);
+        urlParams.set("ma", showMapString)
 
         history.replaceState(history.state, document.title, "results?"+urlParams.toString());
     }
@@ -145,51 +156,32 @@ export class SearchResultsPage extends React.Component{
         return order == "desc" ? sortedData.reverse() : sortedData;
     }
 
-    generateTestData(amount, longitude, latitude, radius)
-    {
-        var testData = []
+    getData = (longitude, latitude, radius, postCode) => {
+        var requestString;
+        let hasErrorCode;
+        let resultData
 
-        const imageUrls = [
-            "https://cdn.pixabay.com/photo/2016/11/08/04/49/jungle-1807476_1280.jpg",
-            "https://cdn.pixabay.com/photo/2013/11/28/10/36/painting-220060_1280.jpg",
-            "https://cdn.pixabay.com/photo/2013/11/27/14/38/prison-fence-219264_1280.jpg"
-        ]
-        const loremIpsum = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.";
-        const votePossibilities = ["NONE", "NONE", "NONE", "NONE", "UP", "DOWN"]
-
-        var i;
-        for (i = 0; i < amount; i++)
+        if (!isNaN(longitude))
         {
-            var randomLongitudeDistance = Math.random() * (radius - 1);
-            var resultingLatitudeDistance = Math.random() * (radius - randomLongitudeDistance - 1);
-            var voteDecision = votePossibilities[Math.floor(Math.random() * votePossibilities.length)];
-            var image = Math.random() > 0.5 ? imageUrls[Math.floor(Math.random() * imageUrls.length)] : "";
-            var text = image == null || Math.random() > 0.5 ? loremIpsum : "";
-
-            testData.push({
-                _id: i,
-                userId: 0,
-                title: "Barriere "+ i,
-                longitude: randomLongitudeDistance + longitude,
-                latitude: resultingLatitudeDistance + latitude,
-                picture: image,
-                description: loremIpsum,
-                postcode: "00000",
-                solution: [{
-                            _id: i,
-                            text: text,
-                            userId: 0,
-                            upvotes: Math.floor(Math.random() * 10),
-                            downvotes: Math.floor(Math.random() * 10),
-                            vote: votePossibilities[Math.floor(Math.random() * votePossibilities.length)]
-                          }],
-                upvotes: Math.floor(Math.random() * 10) + (voteDecision == "UP" ? 1 : 0),
-                downvotes: Math.floor(Math.random() * 10) + (voteDecision == "DOWN" ? 1 : 0),
-                vote: voteDecision
-            });
+            requestString = "?longitude="+longitude+"&latitude="+latitude+"&radius="+radius;
+        }
+        else
+        {
+            requestString = "?postcode="+postCode;
         }
 
-        return testData;
+        return fetch(getBarrierUrl.concat(requestString), {
+                method: 'GET',
+                cache: 'no-cache',
+                credentials: 'include'
+            }).then(response => {
+                hasErrorCode = !response.ok;
+                return response.json();
+            }).then(data => data)
+            .catch(error => {
+                console.error(error);
+                this.setState({error: 'Ein unerwarteter Fehler ist aufgetreten'})
+            });
     }
 
     addDistance(data, longitude, latitude)
@@ -197,8 +189,7 @@ export class SearchResultsPage extends React.Component{
         var dataWithDistance = [];
 
         data.forEach(dataset => {
-           dataset.distance = Math.round(Math.sqrt(Math.pow((dataset.longitude - longitude), 2)
-                                         + Math.pow((dataset.latitude - latitude), 2)));
+           dataset.distance = null;
            dataWithDistance.push(dataset);
         });
 
@@ -210,7 +201,7 @@ export class SearchResultsPage extends React.Component{
        this.setState({criterion: sortCriterion,
                       results: this.sortDataByCriterion(this.state.results, sortCriterion, this.state.order)});
        this.setURLParams(this.state.longitude, this.state.latitude, this.state.radius, this.state.postCode,
-                         sortCriterion, this.state.order);
+                         sortCriterion, this.state.order, this.state.map);
        localStorage.setItem("lastSortCriterion", sortCriterion);
     }
 
@@ -219,8 +210,17 @@ export class SearchResultsPage extends React.Component{
         this.setState({order: sortOrder,
                        results: this.sortDataByCriterion(this.state.results, this.state.criterion, sortOrder)});
         this.setURLParams(this.state.longitude, this.state.latitude, this.state.radius, this.state.postCode,
-                          this.state.criterion, sortOrder);
+                          this.state.criterion, sortOrder, this.state.map);
         localStorage.setItem("lastSortOrder", sortOrder);
+    }
+
+    toggleMap = () => {
+        var notThisStateMap = !this.state.map;
+
+        this.setState({map: notThisStateMap});
+        this.setURLParams(this.state.longitude, this.state.latitude, this.state.radius, this.state.postCode,
+                          this.state.criterion, this.state.sortOrder, notThisStateMap);
+        localStorage.setItem("lastShowMap", notThisStateMap);
     }
 
     clearError = () => {
@@ -234,7 +234,8 @@ export class SearchResultsPage extends React.Component{
                 <div className="results-header">
                     {!isNaN(this.state.latitude) &&
                         <p className="results-description-header">
-                            <b>{this.state.longitude}°</b> Länge, <b>{this.state.latitude}° </b>Breite,
+                            <b>{Number(Math.round(this.state.longitude+'e2')+'e-2')}°</b> Länge,
+                            <b> {Number(Math.round(this.state.latitude+'e2')+'e-2')}°</b> Breite,
                             {" "}<b>{this.state.radius}m</b> Umkreis:
                         </p>
                     }
@@ -250,6 +251,10 @@ export class SearchResultsPage extends React.Component{
                                  onValueChange={this.onSortCriterionChange} defaultValue={this.state.criterion}/>
                                 <SelectBox label="Reihenfolge:" values={this.getSortOrders()}
                                  onValueChange={this.onSortOrderChange} defaultValue={this.state.order}/>
+                                <br className="map-break" />
+                                <p style={{display: "inline-block", margin: "auto 5px auto 5px",
+                                 transform: "translateY(3px)"}}>Karte:</p>
+                                <Switch on={this.state.map} onClick={this.toggleMap}/>
                             </div>
                         }
 
@@ -258,12 +263,19 @@ export class SearchResultsPage extends React.Component{
                          src="images/icons/uicomponents/filter.png" />
                     </div>
                 </div>
-                <div className="results-content">
-                    <OptionalAlert display={this.state.error} error={this.state.error} onClose={this.clearError} />
-                    {this.state.results.map(result => <BarrierPreview key={result._id} title={result.title}
-                     icon={result.picture} description={result.description} distance={result.distance}
-                     upvotes={result.upvotes} downvotes={result.downvotes} vote={result.vote}/>)}
-                 </div>
+
+                <OptionalAlert display={this.state.error} error={this.state.error} onClose={this.clearError} />
+                {!this.state.map &&
+                    <div className="results-content">
+                        {this.state.results.map(result => <BarrierPreview key={result._id} title={result.title}
+                         icon={result.picturePath} description={result.description} distance={result.distance}
+                         upvotes={result.upVotes} downvotes={result.downVotes} vote={result.vote}/>)}
+                     </div>
+                }
+                {this.state.map &&
+                     <MapComponent longitude={this.state.longitude} latitude={this.state.latitude}
+                      results={this.state.results} />
+                }
             </div>
         );
     }

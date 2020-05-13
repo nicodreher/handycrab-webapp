@@ -14,3 +14,5 @@
 "de.dhbw.handycrab.exceptions.pictures.PictureToBigException",400,14
 "de.dhbw.handycrab.exceptions.pictures.InvalidPictureFormatException",400,15
 "de.dhbw.handycrab.exceptions.pictures.PictureNotFoundException",404,16
+"de.dhbw.handycrab.exceptions.InvalidJSONException",400,17
+"de.dhbw.handycrab.exceptions.InvalidObjectIdException",400,18

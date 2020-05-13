@@ -1,5 +1,7 @@
 package de.dhbw.handycrab.server.rest.errors;
 
+import de.dhbw.handycrab.exceptions.InvalidJSONException;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import javax.ws.rs.NotFoundException;
@@ -30,6 +32,9 @@ public class ThrowableExceptionMapper implements ExceptionMapper<Throwable>{
     public Response toResponse(Throwable exception) {
         if(exception instanceof WebApplicationException) {
             return Response.status(((WebApplicationException) exception).getResponse().getStatus()).entity(exception.getMessage()).type(MediaType.TEXT_PLAIN + ";charset=UTF-8").build();
+        }
+        if(exception instanceof JSONException) {
+            return new HandyCrabExceptionMapper().toResponse(new InvalidJSONException());
         }
         exception.printStackTrace();
         return Response.serverError().entity(new JSONObject().put("exception",

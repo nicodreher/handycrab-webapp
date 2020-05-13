@@ -5,8 +5,8 @@ export class Footer extends React.Component{
     render(){
         return(
             <div className="footer">
-                <a className="footer-element" href="/about">Datenschutzerklärung</a>
-                <a className="footer-element" href="/about">Impressum</a>
+                <a className="footer-element" href="/about?el=datenschutz">Datenschutzerklärung</a>
+                <a className="footer-element" href="/about?el=impressum">Impressum</a>
             </div>
         )
     }

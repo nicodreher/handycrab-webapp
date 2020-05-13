@@ -1,0 +1,38 @@
+.switch {
+  display: inline-block;
+	cursor: pointer;
+	text-indent: -9999px;
+	width: 40px;
+	height: 20px;
+	background: grey;
+	vertical-align: middle;
+	margin-top: 4px;
+	margin-bottom: auto;
+	margin-left: 5px;
+	margin-right: 5px;
+	border-radius: 100px;
+	position: relative;
+}
+
+.switch::after {
+	content: '';
+  background-color: #EEE;
+	position: absolute;
+	top: 2px;
+	left: 2px;
+	width: 16px;
+	height: 16px;
+	border-radius: 90px;
+	transition: 0.3s;
+}
+
+.on{
+  transition: 0.5s;
+	background-color: #FFF;
+}
+
+.on::after{
+  left: 22px;
+  transition: 0.5s;
+	background-color: #ffe187;
+}
