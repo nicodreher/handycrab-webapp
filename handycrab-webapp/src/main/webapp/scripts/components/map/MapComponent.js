@@ -8,7 +8,7 @@ export class MapComponent extends React.Component {
             iconUrl: "images/icons/uicomponents/pin.svg",
             iconRetinaUrl: "images/icons/uicomponents/pin.svg",
             iconAnchor: [23, 46],
-            popupAnchor: null,
+            popupAnchor: [0, -46],
             shadowUrl: null,
             shadowSize: null,
             shadowAnchor: null,

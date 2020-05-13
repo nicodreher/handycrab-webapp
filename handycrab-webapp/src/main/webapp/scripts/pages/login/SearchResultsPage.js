@@ -23,7 +23,7 @@ export class SearchResultsPage extends React.Component{
 
     componentDidMount()
     {
-        this.getData(this.state.longitude, this.state.latitude, this.state.radius, this.state.postCode)
+        this.getData(this.state.longitude, this.state.latitude, this.state.radius, this.state.postCode, this.state.map)
             .then(data => {
                 this.setState({results: this.addDistance(this.sortDataByCriterion(data, this.state.criterion,
                                                                                   this.state.order),
@@ -156,10 +156,13 @@ export class SearchResultsPage extends React.Component{
         return order == "desc" ? sortedData.reverse() : sortedData;
     }
 
-    getData = (longitude, latitude, radius, postCode) => {
+    getData = (longitude, latitude, radius, postCode, map) => {
         var requestString;
         let hasErrorCode;
-        let resultData
+        let resultData;
+
+        //earths circumference, 2x needed because search goes in every direction
+        radius = map ? 40007863 : radius
 
         if (!isNaN(longitude))
         {
@@ -217,6 +220,13 @@ export class SearchResultsPage extends React.Component{
     toggleMap = () => {
         var notThisStateMap = !this.state.map;
 
+        this.getData(this.state.longitude, this.state.latitude, this.state.radius, this.state.postCode, notThisStateMap)
+            .then(data => {
+                this.setState({results: this.addDistance(this.sortDataByCriterion(data, this.state.criterion,
+                                                                                  this.state.order),
+                                                         this.state.longitude, this.state.latitude)});
+            });
+
         this.setState({map: notThisStateMap});
         this.setURLParams(this.state.longitude, this.state.latitude, this.state.radius, this.state.postCode,
                           this.state.criterion, this.state.sortOrder, notThisStateMap);
@@ -235,8 +245,10 @@ export class SearchResultsPage extends React.Component{
                     {!isNaN(this.state.latitude) &&
                         <p className="results-description-header">
                             <b>{Number(Math.round(this.state.longitude+'e2')+'e-2')}°</b> Länge,
-                            <b> {Number(Math.round(this.state.latitude+'e2')+'e-2')}°</b> Breite,
-                            {" "}<b>{this.state.radius}m</b> Umkreis:
+                            <b> {Number(Math.round(this.state.latitude+'e2')+'e-2')}°</b> Breite
+                            { !this.state.map &&
+                               <span>{", "} <b> {this.state.radius}m</b> Umkreis:</span>
+                            }
                         </p>
                     }
                     {this.state.postCode != null &&
