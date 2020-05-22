@@ -80,11 +80,7 @@ export class SearchForm extends React.Component {
         if (this.state.searchByPosition) {
             search = "lo=" + this.state.longitude + "&la=" + this.state.latitude + "&ra=" + this.state.radius;
         } else {
-            if (this.state.postal.size === 4) {
-                search = "pc=0" + this.state.postal;
-            } else {
-                search = "pc=" + this.state.postal;
-            }
+            search = "pc=" + this.state.postal;
         }
         window.location.replace(window.location.origin + "/results?" + search);
     }
@@ -114,8 +110,8 @@ export class SearchForm extends React.Component {
                                                        }}/>)}
                         </Col>
                     </Form.Group>
-                    <FormField id='postalcode' type='number' value={this.state.postal}
-                               onChange={this.handleChangedPostal} min='01001' max='99999' label='Postleitzahl'
+                    <FormField id='postalcode' type='text' value={this.state.postal}
+                               onChange={this.handleChangedPostal}
                                disabled={this.state.searchByPosition}/>
                     <Form.Group as={Row}>
                         <Form.Label as="legend" column sm={2}>
