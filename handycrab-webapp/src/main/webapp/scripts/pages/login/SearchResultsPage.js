@@ -281,7 +281,7 @@ export class SearchResultsPage extends React.Component{
                     <div className="results-content">
                         {this.state.results.map(result => <BarrierPreview key={result._id} title={result.title}
                          icon={result.picturePath} description={result.description} distance={result.distance}
-                         upvotes={result.upVotes} downvotes={result.downVotes} vote={result.vote}/>)}
+                         upvotes={result.upVotes} downvotes={result.downVotes} vote={result.vote} _id={result._id}/>)}
                      </div>
                 }
                 {this.state.map &&
