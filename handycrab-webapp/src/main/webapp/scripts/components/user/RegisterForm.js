@@ -104,7 +104,7 @@ export class RegisterForm extends React.Component {
         }).then((data) => {
             if (!hasErrorCode) {
                 console.log(data);
-                logIn();
+                logIn(data);
                 this.props.history.push("/search");
             } else {
                 console.error('Errorcode: ' + data.errorCode);

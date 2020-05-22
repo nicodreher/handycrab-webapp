@@ -1,12 +1,20 @@
 import {currentUserUrl, logoutUrl} from "./RestEndpoints";
 
+const loggedInKey = 'loggedIn';
+const currentUserKey = 'getCurrentUser'
+
 /**
  * Logs the user in locally.
  * This extra step is necessary since the client cannot access or check
  * for the cookie the backend sets. Thus a special key is set in the sessionStorage.
  */
-export function logIn() {
-    sessionStorage.setItem("loggedIn", "true");
+export function logIn(user) {
+    sessionStorage.setItem(loggedInKey, "true");
+    sessionStorage.setItem(currentUserKey, JSON.stringify(user));
+}
+
+export function getCurrentUser() {
+    return JSON.parse(sessionStorage.getItem(currentUserKey));
 }
 
 /**
@@ -15,7 +23,7 @@ export function logIn() {
  * @returns {boolean} Whether the user is logged in
  */
 export function isLoggedIn() {
-    const value = sessionStorage.getItem("loggedIn");
+    const value = sessionStorage.getItem(loggedInKey);
     if (value === null) {
         fetch(currentUserUrl, {
             method: 'GET',
@@ -28,17 +36,21 @@ export function isLoggedIn() {
         }).then((response) => {
             if (response.ok) {
                 logIn();
+                response.json().then(data => logIn(data)).catch(error => console.error(error));
                 location.pathname = sessionStorage.getItem("destination") ? sessionStorage.getItem("destination") : "/search";
             } else {
-                sessionStorage.setItem('loggedIn', 'false');
+                console.error(response.status + ': ' + response.statusText);
+                sessionStorage.setItem(loggedInKey, 'false');
+                sessionStorage.removeItem(currentUserKey);
             }
         }).catch((error) => console.warn(error));
     }
-    return "true" === sessionStorage.getItem("loggedIn");
+    return "true" === sessionStorage.getItem(loggedInKey);
 }
 
 export function logoutLocally() {
-    sessionStorage.setItem('loggedIn', 'false');
+    sessionStorage.removeItem(loggedInKey);
+    sessionStorage.removeItem(currentUserKey);
 }
 
 /**

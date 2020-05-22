@@ -1,5 +1,5 @@
 import React from "react";
-import {Form, Button} from "react-bootstrap";
+import {Button, Form} from "react-bootstrap";
 import {errorCodeToMessage} from "../../util/errorCode";
 import {FormField} from "../general/FormField";
 import {OptionalAlert} from "../app/OptionalAlert";
@@ -23,7 +23,7 @@ export class LoginForm extends React.Component {
         this.setState({error: ''});
     }
 
-    handleChangedStayLoggedIn = (event) => {
+    handleChangedStayLoggedIn = () => {
         this.setState({stayLoggedIn: !this.state.stayLoggedIn});
     }
 
@@ -60,9 +60,8 @@ export class LoginForm extends React.Component {
                 this.setState({error: errorCodeToMessage(data.errorCode), password: ''});
             } else {
                 console.log(data);
-                logIn();
-                const destination = sessionStorage.getItem("destination");
-                this.props.history.push(destination ? destination : "/search");
+                logIn(data);
+                window.location.href = sessionStorage.getItem("destination") ? sessionStorage.getItem("destination") : "/search";
             }
         }).catch(error => {
             console.error(error);
@@ -82,7 +81,7 @@ export class LoginForm extends React.Component {
                                onChange={this.handleChangedPassword} label="Passwort"/>
                     <Form.Group controlId="stay logged in">
                         <Form.Check type={"checkbox"} label={"Angemeldet bleiben"} checked={this.state.stayLoggedIn}
-                                    onChange={this.handleChangedStayLoggedIn}/>
+                                    onChange={this.handleChangedStayLoggedIn} custom/>
                     </Form.Group>
                     <Button type="submit">
                         Anmelden
