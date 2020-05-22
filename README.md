@@ -26,10 +26,10 @@ userId: ObjectId\
 title: string\
 longitude: double\
 latitude: double\
-picture: url\
+picturePath: url\
 description: string\
 postcode: string\
-solution: Solution[]\
+solutions: Solution[]\
 upvotes: int\
 downvotes: int\
 vote: Vote
@@ -100,7 +100,7 @@ Alles Ander Explizit definiert sein\
     Login: true
     QueryPrams:
         longitude: Double, latitude: Double, radius: Integer (m) (optional)
-        id: ObjectId (optional)
+        _id: ObjectId (optional)
         postcode: String (optional)
         
     {longitude, latitude, radius (m)} -> [Barrier]
