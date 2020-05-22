@@ -21,7 +21,7 @@ export class MapComponent extends React.Component {
                 <LeafletMap center={[this.props.latitude, this.props.longitude]} zoom={13} minZoom={1} maxZoom={19}
                  attributionControl={true} zoomControl={true} doubleClickZoom={true} scrollWheelZoom={true} dragging={true}
                  animate={true} easeLinearity={0.35}>
-                    <TileLayer url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'/>
+                    <TileLayer url='http://{s}.tile.osm.org/{z}/{x}/{y}.png' attribution='&amp;copy <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'/>
 
                     {this.props.results.map(result =>
                         <Marker key={result._id} position={[result.latitude, result.longitude]} icon={pinIcon}>
