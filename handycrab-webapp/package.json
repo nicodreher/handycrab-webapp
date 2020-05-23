@@ -21,6 +21,7 @@
     "css-loader": "^3.4.2",
     "file-loader": "^6.0.0",
     "jest": "^25.2.3",
+    "leaflet": "^1.6.0",
     "react": "^16.13.0",
     "react-bootstrap": "^1.0.0",
     "react-dom": "^16.13.0",
