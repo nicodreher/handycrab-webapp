@@ -59,7 +59,6 @@ export class LoginForm extends React.Component {
                 console.error("Errorcode: " + data.errorCode);
                 this.setState({error: errorCodeToMessage(data.errorCode), password: ''});
             } else {
-                console.log(data);
                 logIn(data);
                 window.location.href = sessionStorage.getItem("destination") ? sessionStorage.getItem("destination") : "/search";
             }

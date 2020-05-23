@@ -103,7 +103,6 @@ export class RegisterForm extends React.Component {
             return response.json();
         }).then((data) => {
             if (!hasErrorCode) {
-                console.log(data);
                 logIn(data);
                 this.props.history.push("/search");
             } else {
