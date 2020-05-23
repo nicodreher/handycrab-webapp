@@ -18,15 +18,26 @@ import {
     Route,
     Switch
 } from "react-router-dom"
-import {isLoggedIn, logout} from "./util/Auth";
+import {isLoggedIn, logout, updateCurrentUser} from "./util/Auth";
 import {ProtectedRoute} from "./components/app/ProtectedRoute";
 import {BarrierAddPage} from "./pages/login/BarrierAddPage";
+import {BarrierDetailViewPage} from "./pages/login/BarrierDetailViewPage";
+
+const duration_5_min = 5 * 1000 * 60;
 
 class App extends React.Component {
 
     constructor(props) {
         super(props);
         this.state = {menuOpen: false};
+    }
+
+    componentDidMount() {
+        this.intervalID = setInterval(() => updateCurrentUser(), duration_5_min);
+    }
+
+    componentWillUnmount() {
+        clearInterval(this.intervalID);
     }
 
     toggleMenu = () => {
@@ -38,34 +49,41 @@ class App extends React.Component {
     }
 
     render() {
-        const  loggedIn = isLoggedIn();
+        const loggedIn = isLoggedIn();
         return (
             <div id="app-flex-div">
                 <TitleBar menuAction={this.toggleMenu}/>
                 <div id="content-div">
                     <div id="main-menu" style={{visibility: this.state.menuOpen ? "visible" : "hidden"}}>
-                        <MainMenuItem icon="images/icons/menu/home_icon.png" altText="home" title="Home" url="/" />
+                        <MainMenuItem icon="images/icons/menu/home_icon.png" altText="home" title="Home" url="/"/>
                         {!loggedIn &&
-                        <MainMenuItem icon="images/icons/menu/login_icon.png" altText="login" title="Anmeldung" url="/login" />}
+                        <MainMenuItem icon="images/icons/menu/login_icon.png" altText="login" title="Anmeldung"
+                                      url="/login"/>}
                         {!loggedIn &&
-                        <MainMenuItem icon="images/icons/menu/register_icon.png" altText="register" title="Registrierung" url="/register" />}
+                        <MainMenuItem icon="images/icons/menu/register_icon.png" altText="register"
+                                      title="Registrierung" url="/register"/>}
                         {loggedIn &&
-                        <MainMenuItem icon="images/icons/menu/search_icon.png" altText="search" title="Suche" url="/search" />}
+                        <MainMenuItem icon="images/icons/menu/search_icon.png" altText="search" title="Suche"
+                                      url="/search"/>}
                         {loggedIn &&
-                        <MainMenuItem icon="images/icons/menu/add_icon.svg" altText="add" title="Barriere hinzufügen" url="/add" />}
-                        <MainMenuItem icon="images/icons/menu/info_icon.png" altText="about" title="Über die Anwendung" url="/about" />
+                        <MainMenuItem icon="images/icons/menu/add_icon.svg" altText="add" title="Barriere hinzufügen"
+                                      url="/add"/>}
+                        <MainMenuItem icon="images/icons/menu/info_icon.png" altText="about" title="Über die Anwendung"
+                                      url="/about"/>
                         {loggedIn &&
-                        <MainMenuItem icon="images/icons/menu/logout_icon.svg" altText="logout" title="Abmelden" onClick={logout} />}
+                        <MainMenuItem icon="images/icons/menu/logout_icon.svg" altText="logout" title="Abmelden"
+                                      onClick={logout}/>}
                     </div>
                     <Router>
                         <Switch>
                             <Route exact path="/login" component={LoginPage}/>
                             <Route exact path="/register" component={RegisterPage}/>
-                            <ProtectedRoute exact path="/" component={HomePage}/>
+                            <ProtectedRoute exact path="/" component={SearchPage}/>
                             <Route exact path="/about" component={AboutPage}/>
                             <ProtectedRoute exact path="/search" component={SearchPage}/>
                             <ProtectedRoute exact path="/results" component={SearchResultsPage}/>
                             <ProtectedRoute exact path="/add" component={BarrierAddPage}/>
+                            <ProtectedRoute exact path="/detail" component={BarrierDetailViewPage}/>
                             <Route component={ErrorPage}/>
                         </Switch>
                     </Router>

@@ -53,6 +53,20 @@ export function logoutLocally() {
     sessionStorage.removeItem(currentUserKey);
 }
 
+export function updateCurrentUser() {
+    fetch(currentUserUrl, {
+        method: 'GET',
+        cache: 'no-cache',
+        mode: 'cors',
+        credentials: 'include',
+        headers: new Headers({
+            'Content-Type': 'application/json'
+        })
+    }).then(response => {
+        return response.json();
+    }).then(data => sessionStorage.setItem(currentUserKey, JSON.stringify(data))).catch(error => console.error(error));
+}
+
 /**
  * Destroys the session a user has with the backend and logs the user out locally.
  */
@@ -66,7 +80,7 @@ export function logout() {
     }).then((response) => {
         window.location.pathname = "/login";
     }).catch((error) => {
-            console.log(error);
+            console.error(error);
             window.location.pathname = "/error";
         }
     );

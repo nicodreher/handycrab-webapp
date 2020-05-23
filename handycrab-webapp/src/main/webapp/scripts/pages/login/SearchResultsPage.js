@@ -1,6 +1,5 @@
 import React from "react";
 import {BarrierPreview} from "../../components/search/BarrierPreview";
-import {errorCodeToMessage} from "../../util/errorCode";
 import {OptionalAlert} from "../../components/app/OptionalAlert";
 import {SelectBox} from "../../components/general/SelectBox";
 import {MapComponent} from "../../components/map/MapComponent";
@@ -285,7 +284,7 @@ export class SearchResultsPage extends React.Component{
                      </div>
                 }
                 {this.state.map &&
-                     <MapComponent longitude={this.state.longitude} latitude={this.state.latitude}
+                     <MapComponent longitude={this.state.longitude ? this.state.longitude : 0} latitude={this.state.latitude ? this.state.latitude : 0}
                       results={this.state.results} />
                 }
             </div>

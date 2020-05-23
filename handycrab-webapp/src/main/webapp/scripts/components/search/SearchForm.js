@@ -15,7 +15,7 @@ export class SearchForm extends React.Component {
             latitude: parseFloat('0.0'),
             longitude: parseFloat('0.0'),
             radius: 10,
-            postal: 1001,
+            postal: '',
             searchByPosition: true,
             error: ''
         };
@@ -80,7 +80,12 @@ export class SearchForm extends React.Component {
         if (this.state.searchByPosition) {
             search = "lo=" + this.state.longitude + "&la=" + this.state.latitude + "&ra=" + this.state.radius;
         } else {
-            search = "pc=" + this.state.postal;
+            if (/^\s*$/.test(this.state.postal)) {
+                this.setState({error: 'Bitte geben Sie eine Postleitzahl ein'})
+                return;
+            } else {
+                search = "pc=" + this.state.postal;
+            }
         }
         window.location.replace(window.location.origin + "/results?" + search);
     }
@@ -111,8 +116,9 @@ export class SearchForm extends React.Component {
                         </Col>
                     </Form.Group>
                     <FormField id='postalcode' type='text' value={this.state.postal}
-                               onChange={this.handleChangedPostal}
-                               disabled={this.state.searchByPosition}/>
+                               onChange={this.handleChangedPostal} label={'Postleitzahl'}
+                               disabled={this.state.searchByPosition}
+                               isInvalid={/^\s*$/.test(this.state.postal) && !this.state.searchByPosition}/>
                     <Form.Group as={Row}>
                         <Form.Label as="legend" column sm={2}>
                             Suchen über

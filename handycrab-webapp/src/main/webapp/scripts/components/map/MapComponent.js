@@ -26,7 +26,7 @@ export class MapComponent extends React.Component {
                     {this.props.results.map(result =>
                         <Marker key={result._id} position={[result.latitude, result.longitude]} icon={pinIcon}>
                           <Popup>
-                            <p><b>{result.title}</b></p>
+                              <p><a href={'/detail?id='+ result._id}><b>{result.title}</b></a></p>
                           </Popup>
                         </Marker>
                     )};

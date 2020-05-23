@@ -13,7 +13,7 @@ export class BarrierPreview extends React.Component {
 
         return (
             <div className="barrier-preview">
-                <p className="barrier-title">{this.props.title}</p>
+                <a href={'/detail?id='+this.props._id}> <p className="barrier-title">{this.props.title}</p></a>
 
                 <div className="barrier-content">
                     <img className="barrier-img"

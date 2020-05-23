@@ -1,9 +1,9 @@
 import React from "react";
-import {Col, Form, Row, Spinner} from "react-bootstrap";
+import {Col, Form, Image, Row, Spinner} from "react-bootstrap";
 import {FormField} from "../general/FormField";
 import Button from "react-bootstrap/Button";
 import {OptionalAlert} from "../app/OptionalAlert";
-import {addBarrierUrl} from "../../util/RestEndpoints";
+import {addBarrierUrl, modifyBarrierUrl} from "../../util/RestEndpoints";
 import {errorCodeToMessage} from "../../util/errorCode";
 import Alert from "react-bootstrap/Alert";
 
@@ -11,17 +11,34 @@ export class AddForm extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            inAddMode: this.props.barrier === undefined,
             title: '',
             longitude: 0.0,
             latitude: 0.0,
             description: '',
-            postal: '01001',
+            postcode: '',
             solution: '',
             fileName: 'Keine Datei ausgewählt',
             error: '',
             processing: 0
         };
         this.fileInput = React.createRef();
+    }
+
+    componentDidMount() {
+        if (!(this.state.inAddMode)) {
+            this.setState({...this.props.barrier});
+        } else {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        this.setState({
+                            latitude: position.coords.latitude.toFixed(6),
+                            longitude: position.coords.longitude.toFixed(6),
+                        });
+                    });
+            }
+        }
     }
 
     /**
@@ -43,44 +60,70 @@ export class AddForm extends React.Component {
 
         if (this.validateInputs()) {
             this.setState({processing: 1})
-            console.log(this.fileInput.current.files[0]);
-            this.toBase64(this.fileInput.current.files[0]).then((text) => {
-                let postcode = this.state.postal;
-                postcode = postcode.length === 4 ? '0' + postcode : postcode;
-                return fetch(addBarrierUrl, {
-                    method: 'POST',
-                    cache: 'no-cache',
-                    headers: new Headers({
-                        'Content-Type': 'application/json'
-                    }),
-                    credentials: 'include',
-                    body: JSON.stringify(
-                        {
-                            title: this.state.title,
-                            longitude: parseFloat(this.state.longitude),
-                            latitude: parseFloat(this.state.latitude),
-                            picture: text,
-                            description: this.state.description,
-                            postcode: postcode,
-                            solution: this.state.solution
-                        })
+            if (this.state.inAddMode) {
+                this.toBase64(this.fileInput.current.files[0]).then((text) => {
+                    return fetch(addBarrierUrl, {
+                        method: 'POST',
+                        cache: 'no-cache',
+                        headers: new Headers({
+                            'Content-Type': 'application/json'
+                        }),
+                        credentials: 'include',
+                        body: JSON.stringify(
+                            {
+                                title: this.state.title,
+                                longitude: parseFloat(this.state.longitude),
+                                latitude: parseFloat(this.state.latitude),
+                                picture: text,
+                                description: this.state.description,
+                                postcode: this.state.postcode,
+                                solution: this.state.solution
+                            })
+                    });
+                }).then((response) => {
+                    return response.json();
+                }).then((data) => {
+                    if (data.errorCode) {
+                        this.setState({error: errorCodeToMessage(data.errorCode)});
+                    } else {
+                        this.setState({processing: 2});
+                        window.location.replace(window.location.origin + "/detail?id=" + data._id);
+                    }
+                }).catch((error) => {
+                    console.error(error);
+                    this.setState({processing: 0, error: 'Barriere konnte nicht hinzugefügt werden'});
                 });
-            }).then((response) => {
-                return response.json();
-            }).then((data) => {
-                if (data.errorCode) {
-                    this.setState({error: errorCodeToMessage(data.errorCode)});
-                } else {
-                    this.setState({processing: 2});
-                    console.log(data);
-                    //TODO success case, prolly redirect to detailansicht
-
-                }
-
-            }).catch((error) => {
-                console.error(error);
-                this.setState({processing: 0, error: 'Barriere konnte nicht hinzugefügt werden'});
-            });
+            } else {
+                this.toBase64(this.fileInput.current.files[0]).then((text) => {
+                    const body = {_id: this.props.barrier._id};
+                    if (this.props.barrier.description !== this.state.description) {
+                        body.description = this.state.description;
+                    }
+                    if (this.props.barrier.title !== this.state.title) {
+                        body.title = this.state.title;
+                    }
+                    body.picture = text;
+                    return fetch(modifyBarrierUrl, {
+                        method: 'PUT',
+                        cache: 'no-cache',
+                        headers: new Headers({
+                            'Content-Type': 'application/json'
+                        }),
+                        credentials: 'include',
+                        body: JSON.stringify(body)
+                    });
+                }).then(response => response.json()).then(data => {
+                    if (data.errorCode) {
+                        this.setState({error: errorCodeToMessage(data.errorCode)});
+                    } else {
+                        this.setState({processing: 2});
+                        window.location.replace(window.location.origin + "/detail?id=" + data._id);
+                    }
+                }).catch(error => {
+                    console.error(error);
+                    this.setState({error: 'Die Änderungen an der Barriere konnten nicht gespeichert werden.'})
+                });
+            }
         }
     }
 
@@ -135,27 +178,34 @@ export class AddForm extends React.Component {
             <OptionalAlert error={this.state.error} display={this.state.error}
                            onClose={() => this.setState({error: ''})}/>
             {(this.state.processing === 2) &&
-            <Alert dismissible={true} onClose={() => this.setState({processing: 0})} variant={'success'}>Barriere
-                erfolgreich hinzugefügt</Alert>}
+            <Alert dismissible={true} onClose={() => this.setState({processing: 0})}
+                   variant={'success'}>{this.state.inAddMode ? 'Barriere erfolgreich hinzugefügt' : 'Barriere erfolgreich geändert'} </Alert>}
             <div>&nbsp;</div>
+            {!this.state.inAddMode && <>
+                <div align={'center'}><Image src={this.state.picturePath} fluid/></div>
+                <div align={'center'} text-align={'center'}>Aktuelles Bild</div>
+                <br/>
+            </>}
+
             <FormField id='barrier_title' label='Titel' required={true}
                        onChange={(event) => this.setState({title: event.target.value})} value={this.state.title}
                        type={'text'} isInvalid={invalidTitle}/>
-            <FormField id='barrier_latitude' label='Breitengrad' required={true}
-                       onChange={(event) => this.setState({latitude: event.target.value})} value={this.state.latitude}
-                       type='number' step='0.000001' min='-90' max='90'/>
-            <FormField id='barrier_longitude' label='Längengrad' required={true}
-                       onChange={(event) => this.setState({longitude: event.target.value})} value={this.state.longitude}
-                       type='number' step='0.000001' min='-180' max='180'/>
-            <FormField id='barrier_postcode' type='number' value={this.state.postal}
-                       onChange={(event) => this.setState({postal: event.target.value})} min='01001' max='99999'
-                       label='Postleitzahl' required={true}/>
+            {this.state.inAddMode && <>
+                <FormField id='barrier_latitude' label='Breitengrad' required={true}
+                           onChange={(event) => this.setState({latitude: event.target.value})}
+                           value={this.state.latitude} type='number' step='0.000001' min='-90' max='90'/>
+                <FormField id='barrier_longitude' label='Längengrad' required={true}
+                           onChange={(event) => this.setState({longitude: event.target.value})}
+                           value={this.state.longitude} type='number' step='0.000001' min='-180' max='180'/>
+                <FormField id='barrier_postcode' type='text' value={this.state.postcode}
+                           onChange={(event) => this.setState({postcode: event.target.value})}
+                           label='Postleitzahl' required={true}/></>}
             <FormField id='barrier_description' label='Beschreibung'
                        onChange={(event) => this.setState({description: event.target.value})}
                        value={this.state.description} as='textarea'/>
-            <FormField id='barrier_solution' label='Lösungsvorschlag'
-                       onChange={(event) => this.setState({solution: event.target.value})} value={this.state.solution}
-                       as='textarea'/>
+            {this.state.inAddMode && <FormField id='barrier_solution' label='Lösungsvorschlag'
+                                                onChange={(event) => this.setState({solution: event.target.value})}
+                                                value={this.state.solution} as='textarea'/>}
             <Form.Group as={Row}>
                 <Form.Label id={'barrier_image_label'} htmlFor={'barrier_image'} column sm="2">
                     Bild der Barriere
@@ -168,9 +218,12 @@ export class AddForm extends React.Component {
             </Form.Group>
 
             <Button type={"submit"} disabled={promisesRunning}>
-                Barriere hinzufügen &nbsp;
-                {promisesRunning && <Spinner as="span" animation="grow" size="sm" role="status" aria-hidden="true"/>}
+                {this.state.inAddMode ? 'Barriere hinzufügen ' : 'Speichern '}
+                {promisesRunning &&
+                <Spinner as="span" animation="grow" size="sm" role="status" aria-hidden="true"/>}
             </Button>
+            {!this.state.inAddMode && <>{' '}
+                <Button variant={"danger"} onClick={this.props.switchMode}>Abbrechen</Button></>}
         </Form>
     }
 }
