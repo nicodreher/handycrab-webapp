@@ -1,7 +1,8 @@
 import {currentUserUrl, logoutUrl} from "./RestEndpoints";
+import {errorCodeToMessage} from "./errorCode";
 
 const loggedInKey = 'loggedIn';
-const currentUserKey = 'getCurrentUser'
+const currentUserKey = 'currentUser'
 
 /**
  * Logs the user in locally.
@@ -34,14 +35,14 @@ export function isLoggedIn() {
                 'Content-Type': 'application/json'
             })
         }).then((response) => {
-            if (response.ok) {
-                logIn();
-                response.json().then(data => logIn(data)).catch(error => console.error(error));
+            return response.json();
+        }).then(data => {
+            if (!data.errorCode) {
+                logIn(data);
                 location.href = sessionStorage.getItem("destination") ? sessionStorage.getItem("destination") : "/search";
             } else {
-                console.error(response.status + ': ' + response.statusText);
-                sessionStorage.setItem(loggedInKey, 'false');
-                sessionStorage.removeItem(currentUserKey);
+                console.error(errorCodeToMessage(data.errorCode));
+                logoutLocally();
             }
         }).catch((error) => console.warn(error));
     }

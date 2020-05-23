@@ -63,7 +63,7 @@ export class BarrierDetailView extends Component {
     render() {
         const isBarrierPresent = !!this.props.barrier;
         const user = getCurrentUser();
-        const barrierCreatedByCurrentUser = this.props.barrier?.userId === user._id;
+        const barrierCreatedByCurrentUser = user? this.props.barrier?.userId === user._id : false;
         return <><Jumbotron>
             <Container>
                 <Row>
