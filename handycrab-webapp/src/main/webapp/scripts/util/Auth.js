@@ -37,7 +37,7 @@ export function isLoggedIn() {
             if (response.ok) {
                 logIn();
                 response.json().then(data => logIn(data)).catch(error => console.error(error));
-                location.pathname = sessionStorage.getItem("destination") ? sessionStorage.getItem("destination") : "/search";
+                location.href = sessionStorage.getItem("destination") ? sessionStorage.getItem("destination") : "/search";
             } else {
                 console.error(response.status + ': ' + response.statusText);
                 sessionStorage.setItem(loggedInKey, 'false');
