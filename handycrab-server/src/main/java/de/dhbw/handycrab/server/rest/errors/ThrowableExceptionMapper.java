@@ -1,10 +1,11 @@
 package de.dhbw.handycrab.server.rest.errors;
 
+import com.mongodb.MongoException;
 import de.dhbw.handycrab.exceptions.InvalidJSONException;
+import de.dhbw.handycrab.exceptions.MongoDBException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import javax.ws.rs.NotFoundException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -35,6 +36,10 @@ public class ThrowableExceptionMapper implements ExceptionMapper<Throwable>{
         }
         if(exception instanceof JSONException) {
             return new HandyCrabExceptionMapper().toResponse(new InvalidJSONException());
+        }
+        if(exception instanceof MongoException) {
+            exception.printStackTrace();
+            return new HandyCrabExceptionMapper().toResponse(new MongoDBException());
         }
         exception.printStackTrace();
         return Response.serverError().entity(new JSONObject().put("exception",

@@ -46,15 +46,21 @@ userId: ObjectId
 401 - Unauthorized (Immer möglich)\
 404 - Not Found (Immer möglich)\
 500 - Interner Server Error (Immer möglich)\          
-Alles Ander Explizit definiert sein\
+Alles andere muss explizit definiert sein
 ### Error:
-{errorCode}
+Fehler, die von dem Backend erkannt werden können: 
+    
+    {"errorCode": <Siehe Fehlertypen>}
+Java-Fehler, die vom Backend nicht erwartet und abgefangen werden (z.B.: NullPointerException, IOException): 
+    
+    {"exception": {"name": "KlassenNamen (z.B.: NullPointerException)", "message": "Java Exception Nachricht"}} 
+HTTP-Status Code: 500
 ### Fehlertypen
 
 | errorCode | Return Code | Text |
 --- | --- | ---
-1 | 400 | Unvollständige Anfrage
-2 | 401 | Unauthorizized
+1 | 400 | Unvollständige Anfrage (Immer möglich)
+2 | 401 | Unauthorized
 3 | 400 | E-Mail schon verwendet
 4 | 400 | Username schon verwendet
 5 | 400 | Ungültige E-Mail
@@ -69,8 +75,9 @@ Alles Ander Explizit definiert sein\
 14 | 400 | Picture To Big
 15 | 400 | Invalid Picture Format
 16 | 404 | Picture Not Found
-17 | 400 | Invalid JSON
+17 | 400 | Invalid JSON (Immer möglich)
 18 | 400 | Invalid ObjectId
+19 | 500 | MongoDB Fehler (Immer möglich)
 ## REST-Schnittstellen
 ### Registrierung:
     .../users/register POST
