@@ -27,12 +27,18 @@ title: string\
 longitude: double\
 latitude: double\
 picturePath: url\
+delete: boolean\
+comments: Comment[]\
 description: string\
 postcode: string\
 solutions: Solution[]\
 upvotes: int\
 downvotes: int\
 vote: Vote
+
+### Comment:
+comment: String\
+userId: ObjectId
 
 ## Return-Codes: 
 200 - OK (Immer möglich)\
@@ -98,12 +104,12 @@ Alles Ander Explizit definiert sein\
 ### Barriers-Get:
     .../barriers/get GET
     Login: true
-    QueryPrams (optional):
-        longitude: Double, latitude: Double, radius: Integer (m), toDelete (optional Standard: false) 
+    QueryParams (optional):
+        longitude: Double, latitude: Double, radius: Integer (m), toDelete: boolean(optional Standard: false) 
         _id: ObjectId 
         postcode: String 
         
-    {longitude, latitude, radius (m)} -> [Barrier]
+    {longitude, latitude, radius (m), toDelete: boolean (optional Standard: false)} -> [Barrier]
     {_id} -> {Barrier}
     {postcode} - [Barrier]
     {} - [Barrier] //Barriers des aktuell angemeldeten Benutzers
