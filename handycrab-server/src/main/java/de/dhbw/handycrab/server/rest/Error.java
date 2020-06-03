@@ -12,13 +12,13 @@ public class Error {
     @GET
     @Path("/java")
     public String createJavaException() throws IOException {
-        throw new IOException();
+        throw new IOException("DEMO");
     }
 
     @GET
     @Path("/mongo")
     public String createMongoException() {
-        throw new MongoSocketWriteException("DEMO Exception", null, new IOException());
+        throw new MongoSocketWriteException("DEMO Exception", null, new IOException("DEMO"));
     }
 
     @GET
