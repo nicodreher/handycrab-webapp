@@ -179,7 +179,15 @@ export class SearchResultsPage extends React.Component{
             }).then(response => {
                 hasErrorCode = !response.ok;
                 return response.json();
-            }).then(data => data)
+            }).then(data => {
+                if (hasErrorCode) {
+                    console.error("Errorcode: " + data.errorCode);
+                    this.setState({error: errorCodeToMessage(data.errorCode)});
+                    return [];
+                } else {
+                    return data;
+                }
+            })
             .catch(error => {
                 console.error(error);
                 this.setState({error: 'Ein unerwarteter Fehler ist aufgetreten'})
