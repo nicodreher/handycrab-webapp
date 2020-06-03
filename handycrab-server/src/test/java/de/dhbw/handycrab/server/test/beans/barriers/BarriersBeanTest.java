@@ -3,10 +3,8 @@ package de.dhbw.handycrab.server.test.beans.barriers;
 import com.mongodb.client.model.geojson.Point;
 import com.mongodb.client.model.geojson.Position;
 import de.dhbw.handycrab.api.barriers.Barrier;
-import de.dhbw.handycrab.api.barriers.FrontendBarrier;
 import de.dhbw.handycrab.api.barriers.Solution;
 import de.dhbw.handycrab.api.barriers.Vote;
-import de.dhbw.handycrab.api.pictures.Pictures;
 import de.dhbw.handycrab.exceptions.*;
 import de.dhbw.handycrab.exceptions.barriers.BarrierNotFoundException;
 import de.dhbw.handycrab.exceptions.barriers.InvalidGeoPositionException;
@@ -165,7 +163,7 @@ class BarriersBeanTest {
     }
 
     /**
-     * Test for the {@link BarriersBean#getBarrier(double, double, int)} with valid inputs.
+     * Test for the {@link BarriersBean#getBarrier(double, double, int, boolean)} with valid inputs.
      * Dependent on geological position and radius.
      */
     @Test
@@ -175,7 +173,7 @@ class BarriersBeanTest {
         double latitude = 40;
         int radius = 10;
 
-        var result = bean.getBarrier(longitude, latitude, radius);
+        var result = bean.getBarrier(longitude, latitude, radius, false);
 
         assertNotNull(result);
         assertEquals(3, result.size());
@@ -186,7 +184,7 @@ class BarriersBeanTest {
     }
 
     /**
-     * Test for the {@link BarriersBean#getBarrier(double, double, int)} with invalid longitude
+     * Test for the {@link BarriersBean#getBarrier(double, double, int, boolean)} with invalid longitude
      */
     @Test
     void getBarrier_onPositionWithInvalidGeoPosition_throwsInvalidGeoPositionException() {
@@ -195,11 +193,11 @@ class BarriersBeanTest {
         double latitude = 40;
         int radius = 10;
 
-        assertThrows(InvalidGeoPositionException.class, () -> bean.getBarrier(longitude, latitude, radius));
+        assertThrows(InvalidGeoPositionException.class, () -> bean.getBarrier(longitude, latitude, radius, false));
     }
 
     /**
-     * Test for the {@link BarriersBean#getBarrier(double, double, int)} with invalid latitude
+     * Test for the {@link BarriersBean#getBarrier(double, double, int, boolean)} with invalid latitude
      */
     @Test
     void getBarrier_OnPositionInvalidLatitude_throwsInvalidGeoPositionException() {
@@ -208,7 +206,7 @@ class BarriersBeanTest {
         double latitude = 120;
         int radius = 10;
 
-        assertThrows(InvalidGeoPositionException.class, () -> bean.getBarrier(longitude, latitude, radius));
+        assertThrows(InvalidGeoPositionException.class, () -> bean.getBarrier(longitude, latitude, radius, false));
     }
 
     /**
@@ -866,5 +864,119 @@ class BarriersBeanTest {
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
 
         assertThrows(IncompleteRequestException.class, () -> bean.deleteBarrier(null, REQUESTERID));
+    }
+
+    /**
+     * Test for the {@link BarriersBean#markBarrierForDeletion(ObjectId, ObjectId)} with valid parameters
+     * Returns true and barrier is marked for deletion
+     */
+    @Test
+    void markForDeletion_barrierMarked_returnsTrue()
+    {
+        var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
+        var _id = new ObjectId("000000000000000000000000");
+
+        assertTrue(bean.markBarrierForDeletion(_id, REQUESTERID));
+
+        var bar = bean.getBarrier(_id);
+        assertTrue(bar.isDelete());
+    }
+
+    /**
+     * Test for the {@link BarriersBean#markBarrierForDeletion(ObjectId, ObjectId)} with invalid BarrierId
+     * throws BarrierNotFound
+     */
+    @Test
+    void markForDeletion_invalidBarrierId_throwsBarrierNotFoundException()
+    {
+        var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
+        var _id = new ObjectId();
+
+        assertThrows(BarrierNotFoundException.class, ()-> bean.markBarrierForDeletion(_id, REQUESTERID));
+    }
+
+    /**
+     * Test for the {@link BarriersBean#markBarrierForDeletion(ObjectId, ObjectId)} with incomplete parameters
+     * throws IncompleteRequestException
+     */
+    @Test
+    void markForDeletion_incompleteRequest_throwsIncompleteRequestException()
+    {
+        var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
+        ObjectId _id = null;
+
+        assertThrows(IncompleteRequestException.class, () -> bean.markBarrierForDeletion(_id, REQUESTERID));
+    }
+
+    /**
+     * Test for the {@link BarriersBean#addCommentToBarrier(ObjectId, String, ObjectId)} with valid parameters
+     * comment added. Correct userid and text
+     */
+    @Test
+    void commentOnBarrier_valid_addedCommentToBarrier()
+    {
+        var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
+        var _id = new ObjectId("000000000000000000000000");
+        String comment = "Neuer Kommentar";
+
+        var bar = bean.addCommentToBarrier(_id, comment, REQUESTERID);
+
+        assertEquals(1, bar.getComments().size());
+        assertEquals(comment, bar.getComments().get(0).getComment());
+        assertEquals(REQUESTERID, bar.getComments().get(0).getUserId());
+    }
+
+    /**
+     * Test for the {@link BarriersBean#addCommentToBarrier(ObjectId, String, ObjectId)} with invalid barrier id
+     * Throws BarrierNotFoundException
+     */
+    @Test
+    void commentOnBarrier_barrierNotFound_throwsBarrierNotFoundException()
+    {
+        var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
+        var _id = new ObjectId();
+        String comment = "Das wird nicht funktionieren";
+
+        assertThrows(BarrierNotFoundException.class, () -> bean.addCommentToBarrier(_id, comment, REQUESTERID));
+    }
+
+    /**
+     * Test for the {@link BarriersBean#addCommentToBarrier(ObjectId, String, ObjectId)} with incomplete request parameters
+     * Throws IncompleteRequestException
+     */
+    @Test
+    void commentOnBarrier_incompleteRequest_throwsIncompleteRequestException()
+    {
+        var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
+        ObjectId _id = null;
+        String comment = "Hallo";
+
+        assertThrows(IncompleteRequestException.class, () -> bean.addCommentToBarrier(_id, comment, REQUESTERID));
+    }
+
+    /**
+     * Test for the {@link BarriersBean#addCommentToBarrier(ObjectId, String, ObjectId)} adding multiple comments
+     * Both comments are added correctly
+     */
+    @Test
+    void commentOnBarrier_multipleComments_addedMultipleCommentsToBarrier()
+    {
+        var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
+        ObjectId _id = new ObjectId("000000000000000000000000");
+        String comment1 = "Erster!";
+        String comment2 = "Zweiter!";
+        ObjectId userId2 = new ObjectId("000000000000000000000001");
+
+        bean.addCommentToBarrier(_id, comment1, REQUESTERID);
+        bean.addCommentToBarrier(_id, comment2, userId2);
+
+        var bar = bean.getBarrier(_id);
+        assertEquals(2, bar.getComments().size());
+        var com1 = bar.getComments().get(0);
+        var com2 = bar.getComments().get(1);
+        assertEquals(comment1, com1.getComment());
+        assertEquals(REQUESTERID, com1.getUserId());
+        assertEquals(comment2, com2.getComment());
+        assertEquals(userId2, com2.getUserId());
     }
 }

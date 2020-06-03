@@ -25,6 +25,7 @@ public class FrontendBarrier implements Serializable {
     private String description;
     private String postcode;
     private List<FrontendSolution> solutions;
+    private List<Comment> comments;
     private int upVotes;
     private int downVotes;
     /**
@@ -50,6 +51,7 @@ public class FrontendBarrier implements Serializable {
         this.solutions = barrier.getSolutions().stream().map(e -> new FrontendSolution(e, userId)).collect(Collectors.toList());
         this.upVotes = barrier.getUpVotes().size();
         this.downVotes = barrier.getDownVotes().size();
+        this.comments = barrier.getComments();
         if (barrier.getUpVotes().contains(userId))
             this.vote = Vote.UP;
         else if (barrier.getDownVotes().contains(userId))

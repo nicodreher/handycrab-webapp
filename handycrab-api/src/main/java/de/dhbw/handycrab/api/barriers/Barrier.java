@@ -26,9 +26,12 @@ public class Barrier implements Serializable {
     private ObjectId picture = null;
     private String description;
     private String postcode;
+    private boolean delete;
+    private List<Comment> comments = new ArrayList<>();
     private List<Solution> solutions = new ArrayList<>();
     private List<ObjectId> upVotes = new ArrayList<>();
     private List<ObjectId> downVotes = new ArrayList<>();
+
 
     public ObjectId getUserId() {
         return userId;
@@ -110,6 +113,8 @@ public class Barrier implements Serializable {
         this.point = point;
     }
 
+    public List<Comment> getComments(){ return this.comments;}
+
     /**
      * Helper method to create a BSON Point based on a given longitude and latitude.
      * @param longitude Longitude
@@ -120,6 +125,12 @@ public class Barrier implements Serializable {
         this.latitude = latitude;
         this.point = new Point(new Position(longitude, latitude));
     }
+
+    public void addComment(String comment, ObjectId userId)
+    {
+        this.comments.add(new Comment(userId, comment));
+    }
+
     /**
      * Method for the deserialization of a barrier.
      * Used to enable geospatial queries on longitude and latitude.
@@ -140,6 +151,8 @@ public class Barrier implements Serializable {
         solutions = (List<Solution>) objectInputStream.readObject();
         upVotes = (List<ObjectId>) objectInputStream.readObject();
         downVotes = (List<ObjectId>) objectInputStream.readObject();
+        comments = (List<Comment>) objectInputStream.readObject();
+        delete = objectInputStream.readBoolean();
     }
 
     /**
@@ -161,5 +174,15 @@ public class Barrier implements Serializable {
         stream.writeObject(solutions);
         stream.writeObject(upVotes);
         stream.writeObject(downVotes);
+        stream.writeObject(comments);
+        stream.writeBoolean(delete);
+    }
+
+    public boolean isDelete() {
+        return delete;
+    }
+
+    public void setDelete(boolean delete) {
+        this.delete = delete;
     }
 }

@@ -44,6 +44,12 @@ public class BarrierBuilder {
         return this;
     }
 
+    public BarrierBuilder comment(Comment comment)
+    {
+        barrier.addComment(comment.getComment(), comment.getUserId());
+        return this;
+    }
+
     public Barrier build() {
         return barrier;
     }

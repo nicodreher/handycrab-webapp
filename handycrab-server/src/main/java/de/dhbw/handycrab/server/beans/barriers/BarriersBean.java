@@ -23,6 +23,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
+import javax.enterprise.event.Observes;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -102,13 +103,21 @@ public class BarriersBean implements Barriers {
     }
 
     @Override
-    public List<Barrier> getBarrier(double longitude, double latitude, int radius) {
+    public List<Barrier> getBarrier(double longitude, double latitude, int radius, boolean toDelete) {
         if (longitude <= 180 && longitude >= -180 && latitude <= 90 && latitude >= -90) {
             Point point = new Point(new Position(longitude, latitude));
-            return dataSource.find(new RequestBuilder().filter(Filters.nearSphere("point", point, (double) radius, 0d)))
-                    .collect(Collectors.toList());
-        } else throw new InvalidGeoPositionException();
+            var barriersStream = dataSource.find(new RequestBuilder().filter(Filters.nearSphere("point", point, (double) radius, 0d)));
+            if (!toDelete) {
+                return barriersStream.collect(Collectors.toList());
+            }
+            else {
+                return barriersStream.filter(Barrier::isDelete).collect(Collectors.toList());
+            }
+        }
+        else
+            throw new InvalidGeoPositionException();
     }
+
 
     @Override
     public Barrier addBarrier(String title, double longitude, double latitude, String picture, String postalCode, String description, String solution, ObjectId userId) {
@@ -235,6 +244,41 @@ public class BarriersBean implements Barriers {
             } else
                 throw new BarrierNotFoundException();
         } else
+            throw new IncompleteRequestException();
+    }
+
+    @Override
+    public Barrier addCommentToBarrier(ObjectId barrierId, String comment, ObjectId requesterId) {
+        if(barrierId != null && requesterId != null)
+        {
+            if(dataSource.contains(barrierId))
+            {
+                var barrier = dataSource.get(barrierId);
+                barrier.addComment(comment, requesterId);
+                dataSource.update(barrier);
+                return barrier;
+            }
+            else
+                throw new BarrierNotFoundException();
+        }
+        else
+            throw new IncompleteRequestException();
+    }
+
+    @Override
+    public boolean markBarrierForDeletion(ObjectId barrierId, ObjectId requesterId) {
+        if (barrierId != null && requesterId != null)
+        {
+            if(dataSource.contains(barrierId)) {
+                var barrier = dataSource.get(barrierId);
+                barrier.setDelete(true);
+                dataSource.update(barrier);
+                return true;
+            }
+            else
+                throw new BarrierNotFoundException();
+        }
+        else
             throw new IncompleteRequestException();
     }
 }

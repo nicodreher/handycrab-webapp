@@ -1,6 +1,7 @@
 package de.dhbw.handycrab.server.rest.barriers;
 
 
+import com.mongodb.util.JSON;
 import de.dhbw.handycrab.api.RequestResult;
 import de.dhbw.handycrab.api.barriers.Barriers;
 import de.dhbw.handycrab.api.barriers.FrontendBarrier;
@@ -51,7 +52,7 @@ public class BarriersService {
                 return barriers.getBarrier(obj.getString("postcode"))
                         .stream().map(e -> new FrontendBarrier(e, userId)).collect(Collectors.toList());
             else if (obj.has("longitude") && obj.has("latitude") && obj.has("radius"))
-                return barriers.getBarrier(obj.getDouble("longitude"), obj.getDouble("latitude"), obj.getInt("radius"))
+                return barriers.getBarrier(obj.getDouble("longitude"), obj.getDouble("latitude"), obj.getInt("radius"), obj.optBoolean("toDelete", false))
                         .stream().map(e -> new FrontendBarrier(e, userId)).collect(Collectors.toList());
             else
                 return barriers.getBarrierOnUserId(userId).stream().map(e -> new FrontendBarrier(e, userId)).collect(Collectors.toList());
@@ -61,7 +62,7 @@ public class BarriersService {
     @Authorized
     @Path("/get")
     @Produces(MEDIA_TYPE)
-    public Object get(@QueryParam("_id") String id, @QueryParam("postcode") String postcode, @QueryParam("longitude") Double longitude, @QueryParam("latitude") Double latitude, @QueryParam("radius") Integer radius)
+    public Object get(@QueryParam("_id") String id, @QueryParam("postcode") String postcode, @QueryParam("longitude") Double longitude, @QueryParam("latitude") Double latitude, @QueryParam("radius") Integer radius, @QueryParam("toDelete") boolean toDelete)
     {
         if(id != null && !id.isEmpty())
         {
@@ -73,7 +74,7 @@ public class BarriersService {
         }
         else if(longitude != null && latitude != null && radius != null)
         {
-            return barriers.getBarrier(longitude, latitude, radius).stream().map(e -> new FrontendBarrier(e, user.getID())).collect(Collectors.toList());
+            return barriers.getBarrier(longitude, latitude, radius, toDelete).stream().map(e -> new FrontendBarrier(e, user.getID())).collect(Collectors.toList());
         }
         else if(longitude == null && latitude == null && radius == null)
         {
@@ -141,5 +142,27 @@ public class BarriersService {
     public RequestResult deleteBarrier(String json) {
         JSONObject obj = new JSONObject(json);
         return new RequestResult(barriers.deleteBarrier(new ObjectId(validateObjectId(obj.optString("_id", null))), user.getID()));
+    }
+
+    @DELETE
+    @Authorized
+    @Path("/mark")
+    @Consumes(MEDIA_TYPE)
+    @Produces(MEDIA_TYPE)
+    public RequestResult markBarrier(String json)
+    {
+        JSONObject obj = new JSONObject(json);
+        return new RequestResult(barriers.markBarrierForDeletion(new ObjectId(validateObjectId(obj.optString("_id", null))), user.getID()));
+    }
+
+    @POST
+    @Authorized
+    @Path("/comment")
+    @Consumes(MEDIA_TYPE)
+    @Produces(MEDIA_TYPE)
+    public FrontendBarrier addCommentToBarrier(String json)
+    {
+        JSONObject obj = new JSONObject(json);
+        return new FrontendBarrier(barriers.addCommentToBarrier(new ObjectId(validateObjectId(obj.optString("_id", null))), obj.optString("comment", null), user.getID()), user.getID());
     }
 }

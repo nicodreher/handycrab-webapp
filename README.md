@@ -98,10 +98,10 @@ Alles Ander Explizit definiert sein\
 ### Barriers-Get:
     .../barriers/get GET
     Login: true
-    QueryPrams:
-        longitude: Double, latitude: Double, radius: Integer (m) (optional)
-        _id: ObjectId (optional)
-        postcode: String (optional)
+    QueryPrams (optional):
+        longitude: Double, latitude: Double, radius: Integer (m), toDelete (optional Standard: false) 
+        _id: ObjectId 
+        postcode: String 
         
     {longitude, latitude, radius (m)} -> [Barrier]
     {_id} -> {Barrier}
@@ -127,7 +127,7 @@ Alles Ander Explizit definiert sein\
 ### Barrier-Solution:
     .../barriers/solution POST
     {_id (BarrierId), solution: Solution} -> {Barrier}
-    ErrorCodes: 1, 9, 10, 18
+    ErrorCodes: 1, 9, 18
 
 ### Barrier-Solution-Vote: 
     .../barriers/solutions/vote PUT
@@ -143,3 +143,13 @@ Alles Ander Explizit definiert sein\
     .../pictures/<objectId> GET
     () -> Binary Picture as image/jpeg or image/png
     ErrorCodes: 16, 18
+    
+### Barrier-comment:
+    ../barriers/comment POST
+    {_id (BarrierId), comment: String} -> {Barrier}
+    ErrorCodes: 1, 9, 18 
+    
+### Barrier-markForDelete:
+    ../barriers/mark DELETE
+    {_id (BarrierId)} -> true if marked
+    ErrorCodes: 1, 9, 18

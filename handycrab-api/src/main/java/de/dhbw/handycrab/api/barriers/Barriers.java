@@ -40,7 +40,7 @@ public interface Barriers {
      * @param radius
      * @return List of barriers within the radius of the given position
      */
-    List<Barrier> getBarrier(double longitude, double latitude, int radius);
+    List<Barrier> getBarrier(double longitude, double latitude, int radius, boolean toDelete);
 
     /**
      * Adds a barrier
@@ -101,4 +101,21 @@ public interface Barriers {
      * @return true, if barrier was deleted
      */
     boolean deleteBarrier(ObjectId id, ObjectId requesterId);
+
+    /**
+     * Adds a comment to a existing barrier
+     * @param barrierId ObjectId of the barrier
+     * @param comment comment as string
+     * @param requesterId ObjectId of the requester
+     * @return The barrier with the given barrierId
+     */
+    Barrier addCommentToBarrier(ObjectId barrierId, String comment, ObjectId requesterId);
+
+    /**
+     * Marks a barrier for deletion.
+     * @param barrierId ObjectId of the barrier
+     * @param requesterId ObjectId of the requester
+     * @return true, if marked
+     */
+    boolean markBarrierForDeletion(ObjectId barrierId, ObjectId requesterId);
 }
