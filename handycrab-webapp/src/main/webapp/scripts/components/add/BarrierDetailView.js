@@ -63,7 +63,7 @@ export class BarrierDetailView extends Component {
     render() {
         const isBarrierPresent = !!this.props.barrier;
         const user = getCurrentUser();
-        const barrierCreatedByCurrentUser = user? this.props.barrier?.userId === user._id : false;
+        const barrierCreatedByCurrentUser = user ? this.props.barrier?.userId === user._id : false;
         return <><Jumbotron>
             <Container>
                 <Row>
@@ -85,11 +85,35 @@ export class BarrierDetailView extends Component {
                 {isBarrierPresent && <Row>
                     <Col>
                         {this.props.barrier._id &&
-                        <Button onClick={() => this.setState({showModal: true})}>Lösung hinzufügen</Button>}
+                        <Button onClick={() => this.setState({showModal: true})}>Lösung hinzufügen
+                            <img src="images/icons/uicomponents/add_solution.svg" style={{
+                                height: "30px",
+                                width: "auto",
+                                marginTop: "auto",
+                                marginBottom: "auto",
+                                marginLeft: "5px",
+                            }}/>
+                        </Button>}
                         {barrierCreatedByCurrentUser && <>&nbsp;
-                            <Button variant={"secondary"} onClick={this.props.switchMode} style={{margin:'1px'}}>
-                                Bearbeiten</Button>&nbsp;
-                            <Button variant={"danger"} onClick={this.deleteBarrier} style={{margin:'1px'}}>Löschen</Button> </>}
+                            <Button variant={"secondary"} onClick={this.props.switchMode} style={{margin: '1px'}}>
+                                Bearbeiten
+                                <img src="images/icons/uicomponents/hammer_and_wrench.svg" style={{
+                                    height: "30px",
+                                    width: "auto",
+                                    marginTop: "auto",
+                                    marginBottom: "auto",
+                                    marginLeft: "5px",
+                                }}/></Button>&nbsp;
+                            <Button variant={"danger"} onClick={this.deleteBarrier} style={{margin: '1px'}}>
+                                Löschen
+                                <img src="images/icons/uicomponents/trashcan.png" style={{
+                                    height: "30px",
+                                    width: "auto",
+                                    marginTop: "auto",
+                                    marginBottom: "auto",
+                                    marginLeft: "5px",
+                                }}/>
+                            </Button> </>}
                     </Col>
                 </Row>}
             </Container>
