@@ -31,9 +31,10 @@ class App extends React.Component {
     constructor(props) {
         super(props);
 
-        var showCookieNotice = sessionStorage.getItem("cookieNotice") == null ? true :
+        const showCookieNotice = sessionStorage.getItem("cookieNotice") == null ? true :
             sessionStorage.getItem("cookieNotice") == "true";
 
+        updateCurrentUser();
         this.state = {menuOpen: false, showCookieNotice: showCookieNotice};
     }
 
