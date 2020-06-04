@@ -28,11 +28,12 @@ const duration_5_min = 5 * 1000 * 60;
 
 class App extends React.Component {
 
+    cookieNoticeKey = "cookieNotice";
     constructor(props) {
         super(props);
 
-        const showCookieNotice = sessionStorage.getItem("cookieNotice") == null ? true :
-            sessionStorage.getItem("cookieNotice") == "true";
+        const showCookieNotice = localStorage.getItem(this.cookieNoticeKey) == null ? true :
+            localStorage.getItem(this.cookieNoticeKey) !== "false";
 
         updateCurrentUser();
         this.state = {menuOpen: false, showCookieNotice: showCookieNotice};
@@ -55,7 +56,7 @@ class App extends React.Component {
     }
 
     acceptCookies = () => {
-        sessionStorage.setItem("cookieNotice", false);
+        localStorage.setItem(this.cookieNoticeKey, "false");
         this.setState({showCookieNotice: false});
     }
 
