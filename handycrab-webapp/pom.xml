@@ -54,7 +54,7 @@
                         <phase>generate-resources</phase>
 
                         <configuration>
-                            <arguments>--config webpack.config.js --mode development --display-modules --verbose</arguments>
+                            <arguments>--config webpack.config.js --mode production --display-modules --verbose</arguments>
                         </configuration>
                     </execution>
                 </executions>
