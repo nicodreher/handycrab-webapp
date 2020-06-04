@@ -48,10 +48,10 @@ export class BarrierPreview extends React.Component {
                     <VoteParagraph downvotes={this.props.downvotes} upvotes={this.props.upvotes} _id={this.props._id}
                                    barrier={true} vote={this.props.vote}/>
 
-                    {!this.props.distance === null || !this.props.distance === undefined &&
+                    {!(this.props.distance == null)  &&
                     <span className="metric-distance">
                         <img src="images/icons/uicomponents/pin.png"/>
-                        <p>{this.props.distance}m Abstand</p>
+                        <p>ca. {this.props.distance}m Abstand</p>
                     </span>
                     }
                 </div>
