@@ -16,7 +16,14 @@ Die Webapp und das Backend wurden für den Java-EE Application Server Wildfly er
 Die aktuelle Version aus dem Repository wird im Bewertungszeitraum unter https://handycrab.nico-dreher.de/ bereitgesellt.\
 REST-Anfragen können mit einem REST-Client an die Basis-URL https://handycrab.nico-dreher.de/rest gestellt werden. Die verfügbaren Services sind in der README.md (https://git.nico-dreher.de/University/mobile-applications/webapp/blob/master/README.md) aufgelistet
 
-**Installation MongoDB:** https://docs.mongodb.com/manual/installation/
+### Projekt compilieren
+Gebaut wird das Handycrab Projekt mit maven.\
+Im Root-Verzeichnis des Projektes muss dazu folgender Befehl aufgerufen werden:
+
+    mvn -Dmaven.test.skip=true compile package
+
+Die gebaute App befindet sich anschließend unter */handycrab-ear/target/handycrab-ear-1.0-SNAPSHOT.ear*
+
 
 ## Projektstruktur
 Das Projekt gliedert sich in vier Module:
