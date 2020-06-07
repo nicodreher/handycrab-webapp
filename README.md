@@ -83,7 +83,6 @@ title: string\
 longitude: double\
 latitude: double\
 picturePath: url\
-delete: boolean\
 comments: Comment[]\
 description: string\
 postcode: string\
