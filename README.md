@@ -1,5 +1,61 @@
-# HandyCrap
+![HandyCrab- Logo](https://git.nico-dreher.de/University/mobile-applications/webapp/raw/master/handycrab-webapp/src/main/webapp/images/logo/logo.jpeg?inline=false)
+# HandyCrab
+HandyCrab ist eine mobile Applikation zum Erfassen von Barrieren in der Öffentlichkeit. Mithilfe der App können Menschen mit eingeschränkter Mobilität Barrieren fotografieren und beschreiben. Andere Nutzer können die Barrieren dadurch vorzeitig erkennen und Lösungen beitragen. Durch die vorhandenen Lösungen soll es Menschen mit eingeschränkter Mobilität ermöglicht werden, Barrieren durch die Lösungsvorschlägen effizient zu überwinden. 
+
 Bilder in handycrab-server/test/resources/pictures/images sind von Pixabay.com
+
+## Links zum Projekt
+* **Web-Applikation:** https://handycrab.nico-dreher.de/
+* **REST-API Basis URL:** https://handycrab.nico-dreher.de/rest/
+* **JavaDocs (Backend):** https://handycrab.nico-dreher.de/javadoc/
+* **Repository:** https://git.nico-dreher.de/University/mobile-applications/webapp
+
+## Bereitstellung
+Die Webapp und das Backend wurden für den Java-EE Application Server Wildfly erstellt. Zur Datenhaltung wird die MongoDB verwendet.
+
+Die aktuelle Version aus dem Repository wird im Bewertungszeitraum unter https://handycrab.nico-dreher.de/ bereitgesellt.\
+REST-Anfragen können mit einem REST-Client an die Basis-URL https://handycrab.nico-dreher.de/rest gestellt werden. Die verfügbaren Services sind in der README.md (https://git.nico-dreher.de/University/mobile-applications/webapp/blob/master/README.md) aufgelistet
+
+**Installation MongoDB:** https://docs.mongodb.com/manual/installation/
+
+## Projektstruktur
+Das Projekt gliedert sich in vier Module:
+* **handycrab-api:** Schnittstellen und Datentypen, die vom Server-Modul verwendet werden
+* **handycrab-server:** Enterprise Java-Beans, REST-Services
+* **handycrab-webapp:** React App für Browser
+* **handycrab-ear:** Finales Enterprise Archive Paket
+
+## Projektstatus (Backend)
+### Must have Anforderungen
+| Arbeitspaket | Status |
+| --- | --- |
+| CI/CD aufsetzen | Abgeschlossen |
+| MongoDB | Abgeschlossen |
+| MongoDB API | Abgeschlossen |
+| Aufsetzung der REST-API | Abgeschlossen |
+| Benutzerverwaltung | Abgeschlossen |
+| Bilderverwaltung | Abgeschlossen |
+| Barrierenverwaltung | Abgeschlossen |
+### Should have Anforderungen
+| Arbeitspaket | Status |
+| --- | --- |
+| Registrierung über Google Konto | Offen |
+| Erweiterung der Barrier-API | Abgeschlossen |
+| Löschungen beantragen | Umgesetzt in separaten Branch - Automatische Tests erfolreich - Manuelle Tests stehen aus |
+### Nice to have Anforderungen
+| Arbeitspaket | Status |
+| --- | --- |
+| GeoFencing von Barrieren (Löschungen) | Abgeschlossen |
+| Kommentarfunktion | Abgeschlossen |
+
+## Sonstiges
+### Löschungen beantragen 
+Es ist in dem folgenden Branch umgesetzt:\
+https://git.nico-dreher.de/University/mobile-applications/webapp/tree/DeleteBarrier
+
+Wenn ein Nutzer eine fremde Barrier löschen möchte, kann er einen Antrag auf Lösung stellen. Dazu wird einfach ein Upvote an den */barriers/votedelete* Service gesendet. Falls das der erste Vote in den letzten 48 Stunden ist, wird ein neues Voting gestartet. Das Voting geht 48 Stunden und Nutzer können in diesem Zeitraum für eine Löschung Up oder Downvoten. Wenn mindestens 66% der Benutzer für eine Löschung gestimmt haben, wird die Barriere gelöscht. Anderenfalls das Voting beendet und die Stimmen zurückgesetzt.
+
+# REST-API Dokumentation
 ## Datentypen:
 
 ### enum Vote:
@@ -39,7 +95,6 @@ vote: Vote
 ### Comment:
 comment: String\
 userId: ObjectId
-
 ## Return-Codes: 
 200 - OK (Immer möglich)\
 400 - Bad Request (Immer möglich)\
