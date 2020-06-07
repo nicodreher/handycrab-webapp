@@ -7,6 +7,7 @@ import org.bson.types.ObjectId;
 
 /**
  * The EJB-Interface for everything related the the users
+ *
  * @author Nico Dreher
  */
 public interface Users {
@@ -15,7 +16,8 @@ public interface Users {
     /**
      * The regex pattern for the E-Mail addresses
      */
-    String EMAIL_REGEX = "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
+    String EMAIL_REGEX =
+            "^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$";
     /**
      * The regex pattern for the username
      */
@@ -27,6 +29,7 @@ public interface Users {
 
     /**
      * Get the user by the UserId
+     *
      * @param id
      * @return The user if it exists. Otherwise returns null
      */
@@ -34,6 +37,7 @@ public interface Users {
 
     /**
      * Register a new User
+     *
      * @param email
      * @param username
      * @param password
@@ -46,21 +50,26 @@ public interface Users {
      * @throws NameAlreadyUsedException If the Username is already used by a user
      */
     User register(String email, String username, String password) throws IncompleteRequestException,
-            InvalidMailException, InvalidUsernameException, InvalidPasswordException, AddressAlreadyUsedException,
-            NameAlreadyUsedException;
+                                                                         InvalidMailException, InvalidUsernameException,
+                                                                         InvalidPasswordException,
+                                                                         AddressAlreadyUsedException,
+                                                                         NameAlreadyUsedException;
 
     /**
      * Log the user in with the credentials
+     *
      * @param login The E-Mail address or the username
      * @param password
      * @return The logged in user
      * @throws IncompleteRequestException If a argument is null or empty
      * @throws InvalidLoginException If the login credentials are wrong
      */
-    LoggedInUser login(String login, String password, boolean createToken) throws IncompleteRequestException, InvalidLoginException;
+    LoggedInUser login(String login, String password, boolean createToken)
+            throws IncompleteRequestException, InvalidLoginException;
 
     /**
      * Get the username by the UserId
+     *
      * @param id
      * @return The username
      * @throws IncompleteRequestException If a argument is null
@@ -70,6 +79,7 @@ public interface Users {
 
     /**
      * Check if a user with the UserId exists
+     *
      * @param id
      * @return True if the user exists
      */
@@ -77,6 +87,7 @@ public interface Users {
 
     /**
      * Check if a authentication token with the UserId exists
+     *
      * @param id
      * @param token
      * @return True if the token exists.
@@ -85,6 +96,7 @@ public interface Users {
 
     /**
      * Removes a token from the database
+     *
      * @param id
      * @param token
      */
@@ -92,6 +104,7 @@ public interface Users {
 
     /**
      * Check if a user with the UserId exists
+     *
      * @param id
      * @throws UnauthorizedException if the user does not exist
      */

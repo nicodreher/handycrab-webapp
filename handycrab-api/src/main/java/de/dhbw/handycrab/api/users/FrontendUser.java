@@ -6,6 +6,7 @@ import java.io.Serializable;
 
 /**
  * A representation of a registered user without the password field for the REST-Clients
+ *
  * @author Nico Dreher
  */
 public class FrontendUser implements Serializable {
@@ -27,20 +28,20 @@ public class FrontendUser implements Serializable {
         this.email = user.getEmail();
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
     public String getUsername() {
         return username;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getEmail() {
         return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public ObjectId getID() {

@@ -1,17 +1,15 @@
 package de.dhbw.handycrab.server.rest.users;
+
 import de.dhbw.handycrab.api.RequestResult;
 import de.dhbw.handycrab.api.users.FrontendUser;
 import de.dhbw.handycrab.api.users.LoggedInUser;
 import de.dhbw.handycrab.api.users.User;
 import de.dhbw.handycrab.api.users.Users;
-import de.dhbw.handycrab.exceptions.IncompleteRequestException;
 import de.dhbw.handycrab.exceptions.users.InvalidLoginException;
 import de.dhbw.handycrab.server.rest.authorization.Authorized;
 import de.dhbw.handycrab.server.rest.authorization.CurrentUser;
 import org.bson.types.ObjectId;
 import org.json.JSONObject;
-
-import static de.dhbw.handycrab.server.rest.RestApplication.*;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;
@@ -22,8 +20,11 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 
+import static de.dhbw.handycrab.server.rest.RestApplication.*;
+
 /**
  * REST-Services for the {@link de.dhbw.handycrab.server.beans.users.UsersBean}
+ *
  * @author Nico Dreher
  */
 @Path("/users")
@@ -51,7 +52,9 @@ public class UsersService {
         request.getSession().setAttribute("userId", loggedInUser.getUser().getID());
         Response.ResponseBuilder builder = Response.ok().entity(new FrontendUser(loggedInUser.getUser()));
         if(loggedInUser.getToken() != null) {
-            NewCookie cookie = new NewCookie("TOKEN", loggedInUser.getUser().getID().toHexString() + ":" + loggedInUser.getToken(), "/", null, NewCookie.DEFAULT_VERSION, null, 60 * 60 * 24 * 30, null, false, false);
+            NewCookie cookie =
+                    new NewCookie("TOKEN", loggedInUser.getUser().getID().toHexString() + ":" + loggedInUser.getToken(),
+                            "/", null, NewCookie.DEFAULT_VERSION, null, 60 * 60 * 24 * 30, null, false, false);
             builder.cookie(cookie);
         }
         return builder.build();
@@ -63,9 +66,11 @@ public class UsersService {
     @Produces(MEDIA_TYPE)
     public Response register(@Context HttpServletRequest request, String json) {
         JSONObject entity = new JSONObject(json);
-        User user = users.register(entity.optString("email", null), entity.optString("username", null), entity.optString("password", null));
+        User user = users.register(entity.optString("email", null), entity.optString("username", null),
+                entity.optString("password", null));
         try {
-            return login(request, user.getEmail(), entity.optString("password"), entity.optBoolean("createToken", false));
+            return login(request, user.getEmail(), entity.optString("password"),
+                    entity.optBoolean("createToken", false));
         }
         catch(InvalidLoginException e) {
             e.printStackTrace();
@@ -79,7 +84,8 @@ public class UsersService {
     @Produces(MEDIA_TYPE)
     public Response login(@Context HttpServletRequest request, String json) {
         JSONObject entity = new JSONObject(json);
-        return login(request, entity.optString("login", null), entity.optString("password", null), entity.optBoolean("createToken", false));
+        return login(request, entity.optString("login", null), entity.optString("password", null),
+                entity.optBoolean("createToken", false));
     }
 
     @POST
@@ -112,8 +118,7 @@ public class UsersService {
     @GET
     @Path("/name")
     @Produces(MEDIA_TYPE)
-    public RequestResult getNameWithQueryParam(@QueryParam("id") String id)
-    {
+    public RequestResult getNameWithQueryParam(@QueryParam("id") String id) {
         return new RequestResult(users.getUsername(new ObjectId(validateObjectId(id))));
     }
 }

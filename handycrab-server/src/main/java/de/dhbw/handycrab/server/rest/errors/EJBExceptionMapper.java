@@ -19,9 +19,7 @@ public class EJBExceptionMapper implements ExceptionMapper<EJBException> {
      * Creates the response of the ExceptionMapper
      *
      * @param exception the thrown exception
-     *
      * @return the response to the client
-     *
      * @see ExceptionMapper#toResponse(Throwable)
      */
     @Override

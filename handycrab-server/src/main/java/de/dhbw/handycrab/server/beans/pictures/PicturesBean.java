@@ -24,6 +24,7 @@ import java.util.Iterator;
 
 /**
  * Implementation of the {@link Pictures} Interface
+ *
  * @author Lukas Lautenschlager
  * @see Pictures
  */
@@ -54,42 +55,53 @@ public class PicturesBean implements Pictures {
 
     @Override
     public Picture get(ObjectId uuid) {
-        if (uuid != null) {
-            if (dataSource.contains(uuid))
+        if(uuid != null) {
+            if(dataSource.contains(uuid)) {
                 return dataSource.get(uuid);
-            else
+            }
+            else {
                 throw new PictureNotFoundException();
-        } else
+            }
+        }
+        else {
             throw new IncompleteRequestException();
+        }
     }
 
     @Override
     public Picture put(String base64) {
-        if (base64 != null) {
+        if(base64 != null) {
             var decodedBase64 = Base64.getDecoder().decode(base64.getBytes());
-            if (decodedBase64.length > 8388608)
+            if(decodedBase64.length > 8388608) {
                 throw new PictureToBigException();
+            }
             try {
                 var iis = ImageIO.createImageInputStream(new ByteArrayInputStream(decodedBase64));
                 Iterator<ImageReader> readers = ImageIO.getImageReaders(iis);
                 String format = "";
-                if (readers.hasNext()) {
+                if(readers.hasNext()) {
                     var reader = readers.next();
                     format = reader.getFormatName();
                 }
-                if (format.equals("JPEG"))
+                if(format.equals("JPEG")) {
                     format = "image/jpeg";
-                else if (format.equals("png"))
+                }
+                else if(format.equals("png")) {
                     format = "image/png";
-                else
+                }
+                else {
                     throw new InvalidPictureFormatException();
+                }
                 var pic = new Picture(base64, format);
                 dataSource.insert(pic);
                 return pic;
-            } catch (IOException e) {
+            }
+            catch(IOException e) {
                 throw new InvalidPictureFormatException();
             }
-        } else
+        }
+        else {
             throw new IncompleteRequestException();
+        }
     }
 }

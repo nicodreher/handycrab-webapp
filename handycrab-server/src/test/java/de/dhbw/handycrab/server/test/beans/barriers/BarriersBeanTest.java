@@ -5,7 +5,7 @@ import com.mongodb.client.model.geojson.Position;
 import de.dhbw.handycrab.api.barriers.Barrier;
 import de.dhbw.handycrab.api.barriers.Solution;
 import de.dhbw.handycrab.api.barriers.Vote;
-import de.dhbw.handycrab.exceptions.*;
+import de.dhbw.handycrab.exceptions.IncompleteRequestException;
 import de.dhbw.handycrab.exceptions.barriers.BarrierNotFoundException;
 import de.dhbw.handycrab.exceptions.barriers.InvalidGeoPositionException;
 import de.dhbw.handycrab.exceptions.barriers.InvalidUserIdException;
@@ -58,7 +58,8 @@ class BarriersBeanTest {
      * @param votes
      * @return
      */
-    private Document generateBarrier(ObjectId id, ObjectId userId, String title, double longitude, double latitude, String description, String postcode, List<Solution> solutions, List<Vote> votes) {
+    private Document generateBarrier(ObjectId id, ObjectId userId, String title, double longitude, double latitude,
+            String description, String postcode, List<Solution> solutions, List<Vote> votes) {
         var point = new Point(new Position(longitude, latitude));
         Document doc = new Document();
         doc.put("_id", id);
@@ -79,12 +80,22 @@ class BarriersBeanTest {
      */
     private Document[] generateBarriers() {
         return new Document[]{
-                generateBarrier(new ObjectId("000000000000000000000000"), new ObjectId("000000000000000000000000"), "Bordstein behindert mich", 60, 40, "Der Bordstein behindert mich", "XYZ123", new ArrayList<>(), new ArrayList<>()),
-                generateBarrier(new ObjectId("000000000000000000000001"), new ObjectId("000000000000000000000001"), "Treppe nicht barrierefrei", 60, 40, "Treppe nicht barrierefrei", "ABC123", new ArrayList<>(), new ArrayList<>()),
-                generateBarrier(new ObjectId("000000000000000000000002"), new ObjectId("000000000000000000000002"), "Keine Behindertenparkplätze", 30, 50, "Keine Behindertenparkplätze", "XYZ123", new ArrayList<>(), new ArrayList<>()),
-                generateBarrier(new ObjectId("000000000000000000000003"), new ObjectId("000000000000000000000003"), "Vorsicht Pflasterstein", 61, 41, "Vorsicht Pflasterstein", "ABC123", new ArrayList<>(), new ArrayList<>()),
-                generateBarrier(new ObjectId("000000000000000000000004"), new ObjectId("000000000000000000000004"), "ABC", 60.00001, 40.00001, "ABC", "ABC123", new ArrayList<>(), new ArrayList<>()),
-                generateBarrier(new ObjectId("000000000000000000000005"), new ObjectId("000000000000000000000000"), "Ich bin #2", 30, 40, "Beschreibung", "ABC1234", new ArrayList<>(), new ArrayList<>())
+                generateBarrier(new ObjectId("000000000000000000000000"), new ObjectId("000000000000000000000000"),
+                        "Bordstein behindert mich", 60, 40, "Der Bordstein behindert mich", "XYZ123", new ArrayList<>(),
+                        new ArrayList<>()),
+                generateBarrier(new ObjectId("000000000000000000000001"), new ObjectId("000000000000000000000001"),
+                        "Treppe nicht barrierefrei", 60, 40, "Treppe nicht barrierefrei", "ABC123", new ArrayList<>(),
+                        new ArrayList<>()),
+                generateBarrier(new ObjectId("000000000000000000000002"), new ObjectId("000000000000000000000002"),
+                        "Keine Behindertenparkplätze", 30, 50, "Keine Behindertenparkplätze", "XYZ123",
+                        new ArrayList<>(), new ArrayList<>()),
+                generateBarrier(new ObjectId("000000000000000000000003"), new ObjectId("000000000000000000000003"),
+                        "Vorsicht Pflasterstein", 61, 41, "Vorsicht Pflasterstein", "ABC123", new ArrayList<>(),
+                        new ArrayList<>()),
+                generateBarrier(new ObjectId("000000000000000000000004"), new ObjectId("000000000000000000000004"),
+                        "ABC", 60.00001, 40.00001, "ABC", "ABC123", new ArrayList<>(), new ArrayList<>()),
+                generateBarrier(new ObjectId("000000000000000000000005"), new ObjectId("000000000000000000000000"),
+                        "Ich bin #2", 30, 40, "Beschreibung", "ABC1234", new ArrayList<>(), new ArrayList<>())
         };
     }
 
@@ -286,8 +297,7 @@ class BarriersBeanTest {
      * with valid Parameters (edge case longitude = 180 and latitude = 90)
      */
     @Test
-    void addBarrier_validEdgeCase_savedInMongoDB()
-    {
+    void addBarrier_validEdgeCase_savedInMongoDB() {
         var picturesBean = new PicturesBean(container.getMongoClient(), new SerializerBean());
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean(), picturesBean);
         var title = "Neue Barriere";
@@ -297,7 +307,7 @@ class BarriersBeanTest {
         var description = "Beschreibung";
         var solution = "Lösung für Barriere";
 
-        var bar = bean.addBarrier(title,longitude,latitude,null, postalCode, description, solution, REQUESTERID);
+        var bar = bean.addBarrier(title, longitude, latitude, null, postalCode, description, solution, REQUESTERID);
 
         var result = bean.getBarrier(bar.get_id());
         assertNotNull(result);
@@ -314,8 +324,7 @@ class BarriersBeanTest {
      * with valid Parameters (edge case longitude = -180 and latitude = -90)
      */
     @Test
-    void addBarrier_validEdgeCaseNeg_savedInMongoDB()
-    {
+    void addBarrier_validEdgeCaseNeg_savedInMongoDB() {
         var picturesBean = new PicturesBean(container.getMongoClient(), new SerializerBean());
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean(), picturesBean);
         var title = "Neue Barriere";
@@ -325,7 +334,7 @@ class BarriersBeanTest {
         var description = "Beschreibung";
         var solution = "Lösung für Barriere";
 
-        var bar = bean.addBarrier(title,longitude,latitude,null, postalCode, description, solution, REQUESTERID);
+        var bar = bean.addBarrier(title, longitude, latitude, null, postalCode, description, solution, REQUESTERID);
 
         var result = bean.getBarrier(bar.get_id());
         assertNotNull(result);
@@ -342,8 +351,7 @@ class BarriersBeanTest {
      * with valid Parameters (edge case longitude = 180.1 and latitude = 90.1)
      */
     @Test
-    void addBarrier_invalidEdgeCase_savedInMongoDB()
-    {
+    void addBarrier_invalidEdgeCase_savedInMongoDB() {
         var picturesBean = new PicturesBean(container.getMongoClient(), new SerializerBean());
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean(), picturesBean);
         var title = "Neue Barriere";
@@ -353,7 +361,8 @@ class BarriersBeanTest {
         var description = "Beschreibung";
         var solution = "Lösung für Barriere";
 
-        assertThrows(InvalidGeoPositionException.class, () -> bean.addBarrier(title,longitude,latitude,null, postalCode, description, solution, REQUESTERID));
+        assertThrows(InvalidGeoPositionException.class, () -> bean
+                .addBarrier(title, longitude, latitude, null, postalCode, description, solution, REQUESTERID));
     }
 
     /**
@@ -361,8 +370,7 @@ class BarriersBeanTest {
      * with valid Parameters (edge case longitude = -180.1 and latitude = -90.1)
      */
     @Test
-    void addBarrier_invalidEdgeCaseNeg_savedInMongoDB()
-    {
+    void addBarrier_invalidEdgeCaseNeg_savedInMongoDB() {
         var picturesBean = new PicturesBean(container.getMongoClient(), new SerializerBean());
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean(), picturesBean);
         var title = "Neue Barriere";
@@ -372,7 +380,8 @@ class BarriersBeanTest {
         var description = "Beschreibung";
         var solution = "Lösung für Barriere";
 
-        assertThrows(InvalidGeoPositionException.class, () -> bean.addBarrier(title,longitude,latitude,null, postalCode, description, solution, REQUESTERID));
+        assertThrows(InvalidGeoPositionException.class, () -> bean
+                .addBarrier(title, longitude, latitude, null, postalCode, description, solution, REQUESTERID));
     }
 
     /**
@@ -382,8 +391,10 @@ class BarriersBeanTest {
      */
     private JSONObject generateValidBarrierAsJSON() throws IOException {
         var bar = new JSONObject();
-        var pic = Base64.getEncoder().encodeToString(IOUtils.toByteArray(getClass().getResourceAsStream("/pictures/images/success/jpeg1.jpg")));
-        bar.put("title", "TestBarrier").put("latitude", 30d).put("longitude", 40d).put("postcode", "70000").put("description", "Beschreibung")
+        var pic = Base64.getEncoder().encodeToString(
+                IOUtils.toByteArray(getClass().getResourceAsStream("/pictures/images/success/jpeg1.jpg")));
+        bar.put("title", "TestBarrier").put("latitude", 30d).put("longitude", 40d).put("postcode", "70000")
+                .put("description", "Beschreibung")
                 .put("solution", "Eine von Vielen").put("picture", pic);
         return bar;
     }
@@ -419,7 +430,8 @@ class BarriersBeanTest {
      */
     private JSONObject generateBarrierWithInvalidGeoPositionAsJSON() {
         var bar = new JSONObject();
-        bar.put("title", "TestBarrier").put("latitude", 300d).put("longitude", 40d).put("postcode", "70000").put("description", "Beschreibung");
+        bar.put("title", "TestBarrier").put("latitude", 300d).put("longitude", 40d).put("postcode", "70000")
+                .put("description", "Beschreibung");
         return bar;
     }
 
@@ -433,7 +445,11 @@ class BarriersBeanTest {
         var userId = new ObjectId("000000000000000000000000");
         var barrier = generateBarrierWithIncompleteInfo();
 
-        assertThrows(IncompleteRequestException.class, () -> bean.addBarrier(barrier.optString("title", null), barrier.optDouble("longitude", 200d), barrier.optDouble("latitude", 200d), barrier.optString("picture", null), barrier.optString("postcode", null), barrier.optString("description", null), barrier.optString("solution", null), userId));
+        assertThrows(IncompleteRequestException.class, () -> bean
+                .addBarrier(barrier.optString("title", null), barrier.optDouble("longitude", 200d),
+                        barrier.optDouble("latitude", 200d), barrier.optString("picture", null),
+                        barrier.optString("postcode", null), barrier.optString("description", null),
+                        barrier.optString("solution", null), userId));
     }
 
     /**
@@ -458,7 +474,8 @@ class BarriersBeanTest {
         var _id = new ObjectId("000000000000000000000000");
         var title = "Changed title";
         var description = "Changed description and title";
-        var pic = Base64.getEncoder().encodeToString(IOUtils.toByteArray(getClass().getResourceAsStream("/pictures/images/success/jpeg1.jpg")));
+        var pic = Base64.getEncoder().encodeToString(
+                IOUtils.toByteArray(getClass().getResourceAsStream("/pictures/images/success/jpeg1.jpg")));
 
         bean.modifyBarrier(_id, title, pic, description, REQUESTERID);
 
@@ -494,7 +511,8 @@ class BarriersBeanTest {
         var userId = new ObjectId("000000000000000000000012");
         var title = "Neuer Titel";
         var description = "Neue Beschreibung";
-        var pic = Base64.getEncoder().encodeToString(IOUtils.toByteArray(getClass().getResourceAsStream("/pictures/images/success/jpeg1.jpg")));
+        var pic = Base64.getEncoder().encodeToString(
+                IOUtils.toByteArray(getClass().getResourceAsStream("/pictures/images/success/jpeg1.jpg")));
 
         assertThrows(InvalidUserIdException.class, () -> bean.modifyBarrier(_id, title, pic, description, userId));
     }
@@ -871,8 +889,7 @@ class BarriersBeanTest {
      * Returns true and barrier is marked for deletion
      */
     @Test
-    void markForDeletion_barrierMarked_returnsTrue()
-    {
+    void markForDeletion_barrierMarked_returnsTrue() {
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
         var _id = new ObjectId("000000000000000000000000");
 
@@ -887,12 +904,11 @@ class BarriersBeanTest {
      * throws BarrierNotFound
      */
     @Test
-    void markForDeletion_invalidBarrierId_throwsBarrierNotFoundException()
-    {
+    void markForDeletion_invalidBarrierId_throwsBarrierNotFoundException() {
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
         var _id = new ObjectId();
 
-        assertThrows(BarrierNotFoundException.class, ()-> bean.markBarrierForDeletion(_id, REQUESTERID));
+        assertThrows(BarrierNotFoundException.class, () -> bean.markBarrierForDeletion(_id, REQUESTERID));
     }
 
     /**
@@ -900,8 +916,7 @@ class BarriersBeanTest {
      * throws IncompleteRequestException
      */
     @Test
-    void markForDeletion_incompleteRequest_throwsIncompleteRequestException()
-    {
+    void markForDeletion_incompleteRequest_throwsIncompleteRequestException() {
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
         ObjectId _id = null;
 
@@ -913,8 +928,7 @@ class BarriersBeanTest {
      * comment added. Correct userid and text
      */
     @Test
-    void commentOnBarrier_valid_addedCommentToBarrier()
-    {
+    void commentOnBarrier_valid_addedCommentToBarrier() {
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
         var _id = new ObjectId("000000000000000000000000");
         String comment = "Neuer Kommentar";
@@ -931,8 +945,7 @@ class BarriersBeanTest {
      * Throws BarrierNotFoundException
      */
     @Test
-    void commentOnBarrier_barrierNotFound_throwsBarrierNotFoundException()
-    {
+    void commentOnBarrier_barrierNotFound_throwsBarrierNotFoundException() {
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
         var _id = new ObjectId();
         String comment = "Das wird nicht funktionieren";
@@ -945,8 +958,7 @@ class BarriersBeanTest {
      * Throws IncompleteRequestException
      */
     @Test
-    void commentOnBarrier_incompleteRequest_throwsIncompleteRequestException()
-    {
+    void commentOnBarrier_incompleteRequest_throwsIncompleteRequestException() {
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
         ObjectId _id = null;
         String comment = "Hallo";
@@ -959,8 +971,7 @@ class BarriersBeanTest {
      * Both comments are added correctly
      */
     @Test
-    void commentOnBarrier_multipleComments_addedMultipleCommentsToBarrier()
-    {
+    void commentOnBarrier_multipleComments_addedMultipleCommentsToBarrier() {
         var bean = new BarriersBean(container.getMongoClient(), new SerializerBean());
         ObjectId _id = new ObjectId("000000000000000000000000");
         String comment1 = "Erster!";

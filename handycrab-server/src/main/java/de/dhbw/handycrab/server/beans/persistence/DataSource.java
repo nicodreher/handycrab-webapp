@@ -82,22 +82,23 @@ public class DataSource<T> {
      */
     private FindIterable<Document> getIterable(RequestBuilder builder) {
         FindIterable<Document> iterable;
-        if (builder.getFilter() != null) {
+        if(builder.getFilter() != null) {
             iterable = getCollection()
                     .find(builder.getFilter());
-        } else {
+        }
+        else {
             iterable = getCollection().find();
         }
 
-        if (builder.getSort() != null) {
+        if(builder.getSort() != null) {
             iterable.sort(builder.getSort());
         }
 
-        if (builder.isLimitSet()) {
+        if(builder.isLimitSet()) {
             iterable.limit(builder.getLimit());
         }
 
-        if (builder.isOffsetSet()) {
+        if(builder.isOffsetSet()) {
             iterable.skip(builder.getOffset());
         }
         return iterable;
@@ -153,16 +154,18 @@ public class DataSource<T> {
         Document doc = toBson(t);
         getCollection().insertOne(doc);
 
-        if (doc.containsKey("_id")) {
+        if(doc.containsKey("_id")) {
             try {
                 Field field = t.getClass().getDeclaredField("_id");
                 field.setAccessible(true);
                 try {
                     field.set(t, doc.getObjectId("_id"));
-                } catch (JsonSyntaxException e) {
+                }
+                catch(JsonSyntaxException e) {
                     field.set(t, doc.get("_id"));
                 }
-            } catch (NoSuchFieldException | IllegalAccessException ignored) {
+            }
+            catch(NoSuchFieldException | IllegalAccessException ignored) {
             }
         }
     }
@@ -174,7 +177,7 @@ public class DataSource<T> {
      */
     public void update(T t) {
         Document document = toBson(t);
-        if (document.containsKey("_id")) {
+        if(document.containsKey("_id")) {
             Object _id = document.get("_id");
             document.remove("_id");
             getCollection()
@@ -201,6 +204,7 @@ public class DataSource<T> {
 
     /**
      * Delete one document with a given id
+     *
      * @param _id
      */
     public void deleteOne(Object _id) {
@@ -214,6 +218,7 @@ public class DataSource<T> {
 
     /**
      * Delete one document matching the filter
+     *
      * @param filter
      */
     public void deleteOne(Bson filter) {
@@ -222,6 +227,7 @@ public class DataSource<T> {
 
     /**
      * Get the {@link MongoCollection} of the DataSource
+     *
      * @return
      */
     public MongoCollection<Document> getCollection() {

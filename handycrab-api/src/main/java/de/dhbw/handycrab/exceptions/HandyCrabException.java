@@ -2,6 +2,7 @@ package de.dhbw.handycrab.exceptions;
 
 /**
  * HandyCrabExceptions can be thrown to respond to a request with an error code
+ *
  * @author Nico Dreher
  */
 public class HandyCrabException extends RuntimeException {

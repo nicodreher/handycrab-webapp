@@ -16,6 +16,7 @@ public class RestApplication extends Application {
 
     /**
      * Validates a {@link org.bson.types.ObjectId} from hexadecimal string
+     *
      * @param objectId
      * @return The valid ObjectId
      * @throws IncompleteRequestException If the ObjectId is invalid

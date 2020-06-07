@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 /**
  * Class for representing a Barrier, which is used by the REST-Clients.
  * Up- and Downvotes only represented by integers (amount of up- and downvotes).
+ *
  * @author Lukas Lautenschlager
  */
 public class FrontendBarrier implements Serializable {
@@ -40,24 +41,30 @@ public class FrontendBarrier implements Serializable {
         this._id = barrier.get_id();
         this.userId = barrier.getUserId();
         this.title = barrier.getTitle();
-        if(barrier.getPicture() != null)
+        if(barrier.getPicture() != null) {
             this.picturePath = Pictures.BASE_URL + "/" + barrier.getPicture().toString();
-        else
+        }
+        else {
             this.picturePath = null;
+        }
         this.longitude = barrier.getLongitude();
         this.latitude = barrier.getLatitude();
         this.description = barrier.getDescription();
         this.postcode = barrier.getPostcode();
-        this.solutions = barrier.getSolutions().stream().map(e -> new FrontendSolution(e, userId)).collect(Collectors.toList());
+        this.solutions =
+                barrier.getSolutions().stream().map(e -> new FrontendSolution(e, userId)).collect(Collectors.toList());
         this.upVotes = barrier.getUpVotes().size();
         this.downVotes = barrier.getDownVotes().size();
         this.comments = barrier.getComments();
-        if (barrier.getUpVotes().contains(userId))
+        if(barrier.getUpVotes().contains(userId)) {
             this.vote = Vote.UP;
-        else if (barrier.getDownVotes().contains(userId))
+        }
+        else if(barrier.getDownVotes().contains(userId)) {
             this.vote = Vote.DOWN;
-        else
+        }
+        else {
             this.vote = Vote.NONE;
+        }
     }
 
     public ObjectId get_id() {

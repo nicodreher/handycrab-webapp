@@ -6,6 +6,7 @@ import java.io.Serializable;
 
 /**
  * The representation of the pictures
+ *
  * @author Nico Dreher
  */
 public class Picture implements Serializable {

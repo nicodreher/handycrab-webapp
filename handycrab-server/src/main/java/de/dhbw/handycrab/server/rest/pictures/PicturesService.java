@@ -6,7 +6,9 @@ import de.dhbw.handycrab.exceptions.IncompleteRequestException;
 import org.bson.types.ObjectId;
 
 import javax.annotation.Resource;
-import javax.ws.rs.*;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 import java.util.Base64;
 
@@ -23,9 +25,13 @@ public class PicturesService {
     @GET
     @Path("{id}")
     public Response getImage(@PathParam("id") String id) {
-        if (id.matches("^[0-9a-fA-F]+$") && id.length() == 24) {
+        if(id.matches("^[0-9a-fA-F]+$") && id.length() == 24) {
             Picture picture = pictures.get(new ObjectId(id));
-            return Response.ok().type(picture.getContentType()).entity(Base64.getDecoder().decode(picture.getBase64())).build();
-        } else throw new IncompleteRequestException();
+            return Response.ok().type(picture.getContentType()).entity(Base64.getDecoder().decode(picture.getBase64()))
+                    .build();
+        }
+        else {
+            throw new IncompleteRequestException();
+        }
     }
 }

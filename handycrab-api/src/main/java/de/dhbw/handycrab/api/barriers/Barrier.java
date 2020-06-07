@@ -13,6 +13,7 @@ import java.util.List;
 
 /**
  * Data structure of a barrier
+ *
  * @author Lukas Lautenschlager
  */
 public class Barrier implements Serializable {
@@ -113,10 +114,13 @@ public class Barrier implements Serializable {
         this.point = point;
     }
 
-    public List<Comment> getComments(){ return this.comments;}
+    public List<Comment> getComments() {
+        return this.comments;
+    }
 
     /**
      * Helper method to create a BSON Point based on a given longitude and latitude.
+     *
      * @param longitude Longitude
      * @param latitude Latitude
      */
@@ -126,18 +130,18 @@ public class Barrier implements Serializable {
         this.point = new Point(new Position(longitude, latitude));
     }
 
-    public void addComment(String comment, ObjectId userId)
-    {
+    public void addComment(String comment, ObjectId userId) {
         this.comments.add(new Comment(userId, comment));
     }
 
     /**
      * Method for the deserialization of a barrier.
      * Used to enable geospatial queries on longitude and latitude.
+     *
      * @param objectInputStream - InputStream
      * @throws ClassNotFoundException
      * @throws IOException
-    */
+     */
     private void readObject(ObjectInputStream objectInputStream) throws ClassNotFoundException, IOException {
         _id = (ObjectId) objectInputStream.readObject();
         userId = (ObjectId) objectInputStream.readObject();
@@ -159,9 +163,10 @@ public class Barrier implements Serializable {
      * Method for the serialization of a barrier.
      * Used to enable geospatial queries on longitude and latitude on the Mongo DB
      * and excluding point to implement the {@link Serializable} interface, which is needed for the EJB bean.
+     *
      * @param stream - OutputStream
      * @throws IOException
-    */
+     */
     private void writeObject(ObjectOutputStream stream) throws IOException {
         stream.writeObject(_id);
         stream.writeObject(userId);

@@ -8,6 +8,7 @@ import java.util.List;
 
 /**
  * Data structure of a solution.
+ *
  * @author Lukas Lautenschlager
  */
 public class Solution implements Serializable {

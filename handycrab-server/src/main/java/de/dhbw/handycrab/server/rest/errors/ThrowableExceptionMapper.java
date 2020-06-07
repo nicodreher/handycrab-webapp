@@ -19,20 +19,19 @@ import javax.ws.rs.ext.Provider;
  * @see javax.ws.rs.ext.ExceptionMapper
  */
 @Provider
-public class ThrowableExceptionMapper implements ExceptionMapper<Throwable>{
+public class ThrowableExceptionMapper implements ExceptionMapper<Throwable> {
     /**
      * Creates the response of the ExceptionMapper
      *
      * @param exception the thrown exception
-     *
      * @return the response to the client
-     *
      * @see javax.ws.rs.ext.ExceptionMapper#toResponse(Throwable)
      */
     @Override
     public Response toResponse(Throwable exception) {
         if(exception instanceof WebApplicationException) {
-            return Response.status(((WebApplicationException) exception).getResponse().getStatus()).entity(exception.getMessage()).type(MediaType.TEXT_PLAIN + ";charset=UTF-8").build();
+            return Response.status(((WebApplicationException) exception).getResponse().getStatus())
+                    .entity(exception.getMessage()).type(MediaType.TEXT_PLAIN + ";charset=UTF-8").build();
         }
         if(exception instanceof JSONException) {
             return new HandyCrabExceptionMapper().toResponse(new InvalidJSONException());

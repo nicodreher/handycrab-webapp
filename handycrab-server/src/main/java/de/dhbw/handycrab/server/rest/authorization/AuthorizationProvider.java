@@ -1,6 +1,5 @@
 package de.dhbw.handycrab.server.rest.authorization;
 
-import de.dhbw.handycrab.api.users.Token;
 import de.dhbw.handycrab.api.users.User;
 import de.dhbw.handycrab.api.users.Users;
 import de.dhbw.handycrab.exceptions.UnauthorizedException;
@@ -17,11 +16,10 @@ import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ResourceInfo;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.ext.Provider;
-import java.io.IOException;
-import java.util.Arrays;
 
 /**
  * Provides the {@link CurrentUser} Fields an the {@link Authorized} annotated functions
+ *
  * @author Nico Dreher
  */
 @Provider
@@ -58,6 +56,7 @@ public class AuthorizationProvider implements ContainerRequestFilter {
 
     /**
      * Provides the {@link CurrentUser} annotated fields
+     *
      * @return the currently authorized user
      */
     @Produces
@@ -73,13 +72,15 @@ public class AuthorizationProvider implements ContainerRequestFilter {
 
     /**
      * Filters the requests to {@link Authorized} annotated functions and classes
+     *
      * @param requestContext
      * @throws UnauthorizedException If a user tries to access a annotated function or class without being authorized
      */
     @Override
     public void filter(ContainerRequestContext requestContext) throws UnauthorizedException {
         checkTokenCookie();
-        if(info.getResourceClass().isAnnotationPresent(Authorized.class) || info.getResourceMethod().isAnnotationPresent(Authorized.class)) {
+        if(info.getResourceClass().isAnnotationPresent(Authorized.class) ||
+                info.getResourceMethod().isAnnotationPresent(Authorized.class)) {
             users.checkAuthorized((ObjectId) request.getSession().getAttribute("userId"));
         }
     }

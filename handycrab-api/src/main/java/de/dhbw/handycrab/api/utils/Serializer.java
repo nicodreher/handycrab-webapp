@@ -2,6 +2,7 @@ package de.dhbw.handycrab.api.utils;
 
 /**
  * A EJB-Interface to serialize an deserialize objects with Gson
+ *
  * @author Nico Dreher
  */
 public interface Serializer {
@@ -9,6 +10,7 @@ public interface Serializer {
 
     /**
      * Deserialize a object coming from the database
+     *
      * @param json The JSON Object
      * @param tClass The Class of the object
      * @param <T> The Type of the object
@@ -18,6 +20,7 @@ public interface Serializer {
 
     /**
      * Serialize a object for the database
+     *
      * @param obj The object to serialize
      * @return The serialized JSON Object as string
      */
@@ -25,6 +28,7 @@ public interface Serializer {
 
     /**
      * Deserialize a object coming from a REST-Client
+     *
      * @param json The JSON Object
      * @param tClass The Class of the object
      * @param <T> The Type of the object
@@ -34,6 +38,7 @@ public interface Serializer {
 
     /**
      * Serialize a object for the REST-Client
+     *
      * @param obj The object to serialize
      * @return The serialized JSON Object as string
      */

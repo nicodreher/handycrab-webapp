@@ -20,13 +20,13 @@ public class HandyCrabExceptionMapper implements ExceptionMapper<HandyCrabExcept
      * Creates the response of the ExceptionMapper
      *
      * @param exception the thrown exception
-     *
      * @return the response to the client
-     *
      * @see javax.ws.rs.ext.ExceptionMapper#toResponse(Throwable)
      */
     @Override
     public Response toResponse(HandyCrabException exception) {
-        return Response.status(exception.getStatusCode()).entity(new JSONObject().put("errorCode", exception.getErrorCode()).toString()).type(MediaType.APPLICATION_JSON).build();
+        return Response.status(exception.getStatusCode())
+                .entity(new JSONObject().put("errorCode", exception.getErrorCode()).toString())
+                .type(MediaType.APPLICATION_JSON).build();
     }
 }

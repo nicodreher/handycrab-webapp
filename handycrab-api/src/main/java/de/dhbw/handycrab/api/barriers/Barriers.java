@@ -1,12 +1,12 @@
 package de.dhbw.handycrab.api.barriers;
 
-import de.dhbw.handycrab.api.RequestResult;
 import org.bson.types.ObjectId;
 
 import java.util.List;
 
 /**
  * EJB interface for the administration of barriers.
+ *
  * @author Lukas Lautenschlager
  */
 public interface Barriers {
@@ -14,6 +14,7 @@ public interface Barriers {
 
     /**
      * Get a barrier based on the ObjectId
+     *
      * @param id ObjectId of the barrier
      * @return The Barrier
      */
@@ -21,6 +22,7 @@ public interface Barriers {
 
     /**
      * Get a list of barriers based on the userId of the requester
+     *
      * @param requesterId ObjectId of the requester
      * @return List of barriers, where the requesterId equals the userId of the creator of a barrier.
      */
@@ -28,6 +30,7 @@ public interface Barriers {
 
     /**
      * Get a list of barriers based on a postal code
+     *
      * @param postcode
      * @return List of barriers with the given postal code.
      */
@@ -35,6 +38,7 @@ public interface Barriers {
 
     /**
      * Get a list of barriers based on a position (longitude, latitude) and radius
+     *
      * @param longitude
      * @param latitude
      * @param radius
@@ -44,6 +48,7 @@ public interface Barriers {
 
     /**
      * Adds a barrier
+     *
      * @param title
      * @param longitude
      * @param latitude
@@ -54,10 +59,12 @@ public interface Barriers {
      * @param requesterId
      * @return The added barrier
      */
-    Barrier addBarrier(String title, double longitude, double latitude, String picture, String postalCode, String description, String solution, ObjectId requesterId);
+    Barrier addBarrier(String title, double longitude, double latitude, String picture, String postalCode,
+            String description, String solution, ObjectId requesterId);
 
     /**
      * Modify a barrier
+     *
      * @param id ObjectId of the barrier
      * @param title
      * @param picture
@@ -69,6 +76,7 @@ public interface Barriers {
 
     /**
      * Adds a vote to a barrier
+     *
      * @param id ObjectId of the barrier
      * @param vote Value of {@link Vote} enum
      * @param requesterId ObjectId of the requester
@@ -78,6 +86,7 @@ public interface Barriers {
 
     /**
      * Adds a solution to a barrier
+     *
      * @param id ObjectId of the barrier
      * @param solution Text of the solution
      * @param requesterId ObjectId of the requester
@@ -87,6 +96,7 @@ public interface Barriers {
 
     /**
      * Adds a vote to a solution
+     *
      * @param solutionId ObjectId of the solution
      * @param vote Value of {@link Vote} enum
      * @param requesterId ObjectId of the requester
@@ -96,6 +106,7 @@ public interface Barriers {
 
     /**
      * Deletes a barrier
+     *
      * @param id ObjectId of the barrier
      * @param requesterId ObjectId of the requester
      * @return true, if barrier was deleted
@@ -104,6 +115,7 @@ public interface Barriers {
 
     /**
      * Adds a comment to a existing barrier
+     *
      * @param barrierId ObjectId of the barrier
      * @param comment comment as string
      * @param requesterId ObjectId of the requester
@@ -113,6 +125,7 @@ public interface Barriers {
 
     /**
      * Marks a barrier for deletion.
+     *
      * @param barrierId ObjectId of the barrier
      * @param requesterId ObjectId of the requester
      * @return true, if marked

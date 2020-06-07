@@ -7,6 +7,7 @@ import java.io.Serializable;
 /**
  * Data structure of a solution for the REST-Clients.
  * Up- and Downvotes representing the amount.
+ *
  * @author Lukas Lautenschlager
  */
 public class FrontendSolution implements Serializable {
@@ -29,12 +30,15 @@ public class FrontendSolution implements Serializable {
         this.text = solution.getText();
         this.upVotes = solution.getUpVotes().size();
         this.downVotes = solution.getDownVotes().size();
-        if (solution.getUpVotes().contains(userIdForVote))
+        if(solution.getUpVotes().contains(userIdForVote)) {
             this.vote = Vote.UP;
-        else if (solution.getDownVotes().contains(userIdForVote))
+        }
+        else if(solution.getDownVotes().contains(userIdForVote)) {
             this.vote = Vote.DOWN;
-        else
+        }
+        else {
             this.vote = Vote.NONE;
+        }
     }
 
     public String getText() {

@@ -7,6 +7,7 @@ import java.util.Date;
 
 /**
  * A token gets created for a user to bypass the authentication for 30 days after a successful authentication
+ *
  * @author Nico Dreher
  */
 public class Token implements Serializable {

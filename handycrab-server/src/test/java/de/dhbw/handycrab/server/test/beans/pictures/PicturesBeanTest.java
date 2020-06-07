@@ -18,7 +18,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import java.io.IOException;
 import java.util.Base64;
 
-import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Filters.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -34,6 +34,7 @@ class PicturesBeanTest {
 
     /**
      * Place a picture in the mongodb
+     *
      * @param objectId
      * @param base64 The base64 encoded picture
      * @param contentType The http media type of the picture
@@ -48,6 +49,7 @@ class PicturesBeanTest {
 
     /**
      * Inserts the array of pictures into the mongodb
+     *
      * @param data The array of the picture data
      */
     private void placePictures(Object[][] data) {
@@ -58,20 +60,29 @@ class PicturesBeanTest {
 
     /**
      * Generates six valid pictures
+     *
      * @return The data of the pictures in a array
      * @throws IOException
      */
     private Object[][] getDemoPictures() throws IOException {
-        return new Object[][]{{new ObjectId("000000000000000000000000"), getFileAsBase64("/pictures/images/success/jpeg1.jpg"), "image/jpeg"},
-                {new ObjectId("000000000000000000000001"), getFileAsBase64("/pictures/images/success/jpeg2.jpeg"), "image/jpeg"},
-                {new ObjectId("000000000000000000000002"), getFileAsBase64("/pictures/images/success/jpeg3.jpg"), "image/jpeg"},
-                {new ObjectId("000000000000000000000003"), getFileAsBase64("/pictures/images/success/png1.png"), "image/png"},
-                {new ObjectId("000000000000000000000004"), getFileAsBase64("/pictures/images/success/png2.png"), "image/png"},
-                {new ObjectId("000000000000000000000005"), getFileAsBase64("/pictures/images/success/png3.png"), "image/png"}};
+        return new Object[][]{
+                {new ObjectId("000000000000000000000000"), getFileAsBase64("/pictures/images/success/jpeg1.jpg"),
+                        "image/jpeg"},
+                {new ObjectId("000000000000000000000001"), getFileAsBase64("/pictures/images/success/jpeg2.jpeg"),
+                        "image/jpeg"},
+                {new ObjectId("000000000000000000000002"), getFileAsBase64("/pictures/images/success/jpeg3.jpg"),
+                        "image/jpeg"},
+                {new ObjectId("000000000000000000000003"), getFileAsBase64("/pictures/images/success/png1.png"),
+                        "image/png"},
+                {new ObjectId("000000000000000000000004"), getFileAsBase64("/pictures/images/success/png2.png"),
+                        "image/png"},
+                {new ObjectId("000000000000000000000005"), getFileAsBase64("/pictures/images/success/png3.png"),
+                        "image/png"}};
     }
 
     /**
      * Generates a base64 String of a file in the package
+     *
      * @param path The path to the file in the package
      * @return The file content as base64 String
      * @throws IOException
@@ -82,6 +93,7 @@ class PicturesBeanTest {
 
     /**
      * Tests the {@link PicturesBean#put(String)} function with valid images
+     *
      * @param picturePath
      * @param format The http media type of the picture
      * @throws IOException
@@ -104,6 +116,7 @@ class PicturesBeanTest {
 
     /**
      * Tests the {@link PicturesBean#put(String)} function with invalid images
+     *
      * @param picturePath
      * @param expectedException The exception which should be thrown
      * @throws IOException
@@ -125,6 +138,7 @@ class PicturesBeanTest {
 
     /**
      * Tests the {@link PicturesBean#get(ObjectId)} function with existing PictureIds
+     *
      * @throws IOException
      */
     @Test
@@ -146,6 +160,7 @@ class PicturesBeanTest {
 
     /**
      * Tests the {@link PicturesBean#get(ObjectId)} with non existing pictures
+     *
      * @throws IOException
      */
     @Test
@@ -156,7 +171,8 @@ class PicturesBeanTest {
         placePictures(pictures);
 
         Picture[] picture = new Picture[1];
-        assertThrows(PictureNotFoundException.class, () -> picture[0] = bean.get(new ObjectId("000000000000000000000006")));
+        assertThrows(PictureNotFoundException.class,
+                () -> picture[0] = bean.get(new ObjectId("000000000000000000000006")));
         assertNull(picture[0]);
 
         assertThrows(IncompleteRequestException.class, () -> picture[0] = bean.get(null));

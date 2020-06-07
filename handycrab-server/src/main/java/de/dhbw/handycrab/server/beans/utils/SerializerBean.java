@@ -14,6 +14,7 @@ import java.util.Date;
 
 /**
  * Implementation of the {@link Serializer} interface
+ *
  * @author Nico Dreher
  */
 @Stateless
@@ -44,7 +45,8 @@ public class SerializerBean implements Serializer {
             .registerTypeAdapter(Point.class,
                     (JsonDeserializer<Point>) (json, typeofT, context) -> {
                         var coordinateArray = json.getAsJsonObject().getAsJsonArray("coordinates");
-                        return new Point(new Position(coordinateArray.get(0).getAsDouble(), coordinateArray.get(1).getAsDouble()));
+                        return new Point(new Position(coordinateArray.get(0).getAsDouble(),
+                                coordinateArray.get(1).getAsDouble()));
                     })
             .registerTypeAdapter(Point.class,
                     (JsonSerializer<Point>) (src, typeOfSrc, context) -> {
@@ -61,7 +63,8 @@ public class SerializerBean implements Serializer {
                 obj.add("$date", new JsonPrimitive(src.getTime()));
                 return obj;
             })
-            .registerTypeAdapter(Date.class, (JsonDeserializer<Date>) (json, typeofT, context) -> new Date(json.getAsJsonObject().get("$date").getAsLong()));
+            .registerTypeAdapter(Date.class, (JsonDeserializer<Date>) (json, typeofT, context) -> new Date(
+                    json.getAsJsonObject().get("$date").getAsLong()));
 
 
     /**
@@ -70,12 +73,14 @@ public class SerializerBean implements Serializer {
      */
     private static final GsonBuilder restGsonBuilder = new GsonBuilder()
             .setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
-            .registerTypeAdapter(ObjectId.class, (JsonSerializer<ObjectId>) (src, typeOfSrc, context) -> new JsonPrimitive(src.toHexString()))
+            .registerTypeAdapter(ObjectId.class,
+                    (JsonSerializer<ObjectId>) (src, typeOfSrc, context) -> new JsonPrimitive(src.toHexString()))
             .registerTypeAdapter(JSONObject.class,
                     (JsonSerializer<JSONObject>) (src, typeOfSrc, context) -> new JsonParser().parse(src.toString()))
             .registerTypeAdapter(JSONArray.class,
                     (JsonSerializer<JSONArray>) (src, typeOfSrc, context) -> new JsonParser().parse(src.toString()))
-            .registerTypeAdapter(ObjectId.class, (JsonDeserializer<ObjectId>) (json, typeOfT, context) -> new ObjectId(json.getAsString()))
+            .registerTypeAdapter(ObjectId.class,
+                    (JsonDeserializer<ObjectId>) (json, typeOfT, context) -> new ObjectId(json.getAsString()))
             .registerTypeAdapter(JSONObject.class,
                     (JsonDeserializer<JSONObject>) (json, typeofT, context) -> new JSONObject(json.toString()))
             .registerTypeAdapter(JSONArray.class,
@@ -83,7 +88,8 @@ public class SerializerBean implements Serializer {
             .registerTypeAdapter(Point.class,
                     (JsonDeserializer<Point>) (json, typeofT, context) -> {
                         var coordinateArray = json.getAsJsonObject().getAsJsonArray("coordinates");
-                        return new Point(new Position(coordinateArray.get(0).getAsDouble(), coordinateArray.get(1).getAsDouble()));
+                        return new Point(new Position(coordinateArray.get(0).getAsDouble(),
+                                coordinateArray.get(1).getAsDouble()));
                     })
             .registerTypeAdapter(Point.class,
                     (JsonSerializer<Point>) (src, typeOfSrc, context) -> {

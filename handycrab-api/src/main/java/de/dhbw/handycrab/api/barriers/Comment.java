@@ -8,8 +8,7 @@ public class Comment implements Serializable {
     private ObjectId userId;
     private String comment;
 
-    public Comment(ObjectId userId, String comment)
-    {
+    public Comment(ObjectId userId, String comment) {
         this.comment = comment;
         this.userId = userId;
     }

@@ -4,6 +4,7 @@ import org.bson.types.ObjectId;
 
 /**
  * Builder pattern for the {@link Barrier} class.
+ *
  * @author Lukas Lautenschlager
  */
 public class BarrierBuilder {
@@ -44,8 +45,7 @@ public class BarrierBuilder {
         return this;
     }
 
-    public BarrierBuilder comment(Comment comment)
-    {
+    public BarrierBuilder comment(Comment comment) {
         barrier.addComment(comment.getComment(), comment.getUserId());
         return this;
     }

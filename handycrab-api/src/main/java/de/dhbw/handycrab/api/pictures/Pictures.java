@@ -17,6 +17,7 @@ public interface Pictures {
 
     /**
      * Retrieve a picture from the database
+     *
      * @param id The {@link ObjectId} of the picture
      * @return The Picture
      * @throws PictureNotFoundException If not Picture with the PictureId exists
@@ -25,6 +26,7 @@ public interface Pictures {
 
     /**
      * Uploads a picture to the database.
+     *
      * @param base64 The base64 encoded picture
      * @return The uploaded picture
      * @throws InvalidPictureFormatException If the picture ist not a valid png or jpeg image

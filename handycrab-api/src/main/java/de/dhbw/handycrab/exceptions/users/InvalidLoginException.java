@@ -4,6 +4,7 @@ import de.dhbw.handycrab.exceptions.HandyCrabException;
 
 /**
  * Thrown if a REST-Client tries to login with invalid credentials
+ *
  * @author Nico Dreher
  */
 public class InvalidLoginException extends HandyCrabException {

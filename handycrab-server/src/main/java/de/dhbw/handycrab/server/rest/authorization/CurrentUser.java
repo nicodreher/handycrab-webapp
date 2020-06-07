@@ -9,6 +9,7 @@ import java.lang.annotation.Target;
 
 /**
  * A annotation to inject the currently logged in user
+ *
  * @author Nico Dreher
  */
 @Qualifier

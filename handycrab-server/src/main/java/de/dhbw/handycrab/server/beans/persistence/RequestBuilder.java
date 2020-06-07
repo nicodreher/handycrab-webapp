@@ -89,10 +89,10 @@ public class RequestBuilder implements Cloneable, Serializable {
     @Override
     public RequestBuilder clone() {
         RequestBuilder builder = new RequestBuilder().filter(getFilter()).sort(getSort());
-        if (isLimitSet()) {
+        if(isLimitSet()) {
             builder.limit(getLimit());
         }
-        if (isOffsetSet()) {
+        if(isOffsetSet()) {
             builder.offset(getOffset());
         }
         return builder;
