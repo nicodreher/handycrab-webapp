@@ -215,9 +215,4 @@ HTTP-Status Code: 500
 ### Barrier-comment:
     ../barriers/comment POST
     {_id (BarrierId), comment: String} -> {Barrier}
-    ErrorCodes: 1, 9, 18 
-    
-### Barrier-markForDelete:
-    ../barriers/mark DELETE
-    {_id (BarrierId)} -> true if marked
     ErrorCodes: 1, 9, 18
